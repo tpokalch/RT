@@ -1,25 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   memory.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/06 14:21:37 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/06 14:22:47 by tpokalch         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "rtv1.h"
 
-int			free_hits(t_global *g)
+int		free_hits(t_global *g)
 {
 	int i;
 	int j;
 
 	i = -1;
 	while (++i < HEIGHT && (j = -1))
-		while (++j < WIDTH)
+		while(++j < WIDTH)
 			free(*(*(g->hits + i) + j));
 	i = -1;
 	while (++i < HEIGHT)
@@ -27,7 +16,7 @@ int			free_hits(t_global *g)
 	free(g->hits);
 	i = -1;
 	while (++i < HEIGHT && (j = -1))
-		while (++j < WIDTH)
+		while(++j < WIDTH)
 			free(*(*(g->rays + i) + j));
 	i = -1;
 	while (++i < HEIGHT)
@@ -38,7 +27,12 @@ int			free_hits(t_global *g)
 		free(g->tcps[i]);
 	return (1);
 }
-
+void		copy_obj(t_object *t, t_object *g)
+{
+	t = g;
+//	t->tile = g->tile;
+}
+	
 void		copy(t_global *tcps, t_global *g)
 {
 	tcps->win_ptr = g->win_ptr;
@@ -55,7 +49,11 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->normal = g->normal;
 	tcps->li = g->li;
 	tcps->cam_pos = g->cam_pos;
+
+//	copy_obj(tcps->obj, g->obj);
+
 	tcps->obj = g->obj;
+
 	tcps->objn = g->objn;
 	tcps->argc = g->argc;
 	tcps->core = g->core;
@@ -64,7 +62,15 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->prim = g->prim;
 	tcps->cone[0] = g->cone[0];
 	tcps->cone[1] = g->cone[1];
+	tcps->ambient = g->ambient;
+//	tcps->e1 = g->e1;
+//	tcps->sz_l1 = g->sz_l1;
+//	tcps->bpp1 = g->bpp1;
+//	tcps->tile_data_ptr = g->tile_data_ptr;
+
 }
+
+
 
 void		copy_tcps(t_global *g)
 {
@@ -90,8 +96,8 @@ void		init_hits(t_objecthit ***hits)
 	while (++i < HEIGHT)
 	{
 		j = -1;
-		while (++j < WIDTH)
-			*(*(hits + i) + j) = (t_objecthit *)malloc(sizeof(t_objecthit));
+		while(++j < WIDTH)
+			*(*(hits + i) + j)= (t_objecthit *)malloc(sizeof(t_objecthit));
 	}
 }
 
@@ -108,7 +114,7 @@ void		init_rays(t_vector ****ray)
 	while (++i < HEIGHT)
 	{
 		j = -1;
-		while (++j < WIDTH)
-			*(*(*ray + i) + j) = (t_vector *)malloc(sizeof(t_vector));
+		while(++j < WIDTH)
+			*(*(*ray + i) + j)= (t_vector *)malloc(sizeof(t_vector));
 	}
 }

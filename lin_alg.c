@@ -36,7 +36,7 @@ t_vector	norm(t_vector a)
 	return (a);
 }
 
-t_vector	sum(t_vector b, t_vector a)
+t_vector	sum(t_vector a, t_vector b)
 {
 	a.x = b.x + a.x;
 	a.y = b.y + a.y;
