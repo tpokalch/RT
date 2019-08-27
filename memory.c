@@ -63,6 +63,11 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->cone[0] = g->cone[0];
 	tcps->cone[1] = g->cone[1];
 	tcps->ambient = g->ambient;
+	tcps->base[0] = g->base[0];
+	tcps->base[1] = g->base[1];
+	tcps->base[2] = g->base[2];
+
+
 //	tcps->e1 = g->e1;
 //	tcps->sz_l1 = g->sz_l1;
 //	tcps->bpp1 = g->bpp1;

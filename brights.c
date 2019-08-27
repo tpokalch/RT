@@ -283,7 +283,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	int		retobs;
 
 	hit0 = diff(hit, *obj.ctr);
-	vrt = obj.nr;
+	vrt = obj.base[1];
 	vrt = scale(dot(hit0, vrt), vrt);
 	nrm = norm(diff(hit0, vrt));
 	if (obj.cam_pos)
@@ -305,9 +305,9 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	{
 		int x;
 		int y;
-		t_vector _100;
+//		t_vector _100;
 
-		init_vector(&_100, 1, 0, 0);
+//		init_vector(&_100, 1, 0, 0);
 		t_vector proj;
 
 
@@ -315,34 +315,37 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 		ctrhit = diff(hit, *obj.ctr);
 
-		proj = diff(ctrhit, scale(dot(obj.nr, ctrhit),obj.nr));
+		proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit),obj.base[1]));
 		proj = norm(proj);
 		if (con(g))
 		{
 			printf("proj is %f,%f,%f\n", proj.x, proj.y, proj.z);
 			printf("width is %d\n", obj.tile[0].w);
-			printf("acos is %f\n", acos(dot(_100, proj)));
+			printf("acos is %f\n", acos(dot(obj.base[0], proj)));
 		}
 //	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, _100) < 0)) * acos(dot(_100, proj))));
-	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, _100) < 0)) * M_1_PI * acos(dot(proj, _100))));
+	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) * M_1_PI * acos(dot(proj, obj.base[0]))));
 
 
 	double xdst;
 
-	xdst = dot(obj.nr, diff(hit, *obj.ctr));
-	if (xdst > 0)
-		y = lround(obj.tile[0].h - fmod(xdst, obj.tile[0].h) - 1);
-	else
-		y = lround(-fmod(xdst, obj.tile[0].h + 1));
-	
+	xdst = dot(obj.base[1], diff(hit, *obj.ctr));
+//	if (xdst > 0)
+//		y = lround(obj.tile[0].h - fmod(xdst, obj.tile[0].h));
+//	else
+//		y = lround(-fmod(xdst, obj.tile[0].h + 1));
+	if (con(g))
+	{
+		printf("xdst is %f\n", xdst);
+		printf("tile h is %d\n", obj.tile[0].h);
+	}
+	y = mymod(xdst, obj.tile[0].h);	
 	if (con(g))
 	{
 		printf("x is %d\n", x);
 		printf("y is %d\n", y);
 	}
 	ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
-
-
 //	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
 	}
 	else
@@ -407,18 +410,19 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		proj.y = 0;
 		proj = norm(proj);
 
-	t_vector _001;
-	t_vector _100;
-	init_vector(&_001, 0, 0, 1);
-	init_vector(&_100, 1, 0, 0);
+//	t_vector _001;
+//	t_vector _100;
+//	init_vector(&_001, 0, 0, 1);
+//	init_vector(&_100, 1, 0, 0);
  	if (con(g))
 	{
-		printf("sign det %f\n", det(proj, _100));
+		printf("obj base if %f,%f,%f\n", obj.base[0].x, obj.base[1].y, obj.base[2].z);
+		printf("sign det %f\n", det(proj, obj.base[2]));
 		printf("proj is %f,%f,%f\n", proj.x, proj.y, proj.z);
 	}
-	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, _001) < 0)) * M_1_PI * acos(dot(proj, _001))));
+	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, obj.base[2]) < 0)) * M_1_PI * acos(dot(proj, obj.base[2]))));
 
-	y = lround(obj.tile[0].h * ( (1 - 2 * (det(nrm, obj.nr) < 0)) * M_1_PI * acos(dot(nrm, obj.nr))));
+	y = lround(obj.tile[0].h * ( (1 - 2 * (det(nrm, obj.base[1]) < 0)) * M_1_PI * acos(dot(nrm, obj.base[1]))));
 
 	if (con(g))
 		printf("acos is %f\n", acos(dot(nrm, obj.nr)));

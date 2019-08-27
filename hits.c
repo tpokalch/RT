@@ -143,7 +143,7 @@ t_dstpst	hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_glob
 	t_global p;
 
 	p = *g;
-	t.dst = -dot(diff(st, *obj.ctr), obj.nr) / dot(ray, obj.nr);
+	t.dst = -dot(diff(st, *obj.ctr), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.0000001)
 		return(*NANI(&t));
 	t.obj = obj;
@@ -200,8 +200,8 @@ t_dstpst		hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 	t.pst = 0;
 	po[0] = ray;
 	po[3] = diff(st, *obj.ctr);
-	d.y = dot(po[0], obj.nr);
-	d.x = dot(po[3], obj.nr);
+	d.y = dot(po[0], obj.base[1]);
+	d.x = dot(po[3], obj.base[1]);
 	po[2].x = dot(po[0], po[0]) - d.y * d.y;
 	po[2].y = 2 * (dot(po[0], po[3]) - d.y * d.x);
 	po[2].z = dot(po[3], po[3]) - d.x * d.x - obj.rd2;
@@ -227,7 +227,7 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	if (con(g))
 		printf("we are hitting tri\n");
 
-	t.dst = -dot(diff(st, obj.bd1), obj.nr) / dot(ray, obj.nr);
+	t.dst = -dot(diff(st, obj.bd1), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.000001)
 	{
 		if (con(g))
@@ -237,10 +237,10 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	t_vector hit = sum(scale(t.dst, ray), st);
 	if (con(g))
 	{
-//		printf("dot nr bound %f\n", dot(obj.nr, diff(obj.bd1, obj.bd3)));
-//		printf("dot nr bound->hit %f\n", dot(obj.nr, diff(obj.bd1, hit)));
+//		printf("dot nr bound %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
+//		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
 	}
-	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.nr, g))
+	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.base[1], g))
 	{
 		if (con(g))
 			printf("returning nani from tri\n");
@@ -267,8 +267,8 @@ t_dstpst		hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_glob
 	p = *g;
 	dx[0] = diff(st, *obj.ctr);
 	dx[1] = ray;
-	dvxvdet.x = dot(dx[1], obj.nr);
-	dvxvdet.y = dot(dx[0], obj.nr);
+	dvxvdet.x = dot(dx[1], obj.base[1]);
+	dvxvdet.y = dot(dx[0], obj.base[1]);
 	abc.x   = dot(dx[1], dx[1]) - (1 + obj.rd2) *dvxvdet.x * dvxvdet.x;
 	abc.y = 2 * (dot(dx[1], dx[0]) - (1 + obj.rd2) * dvxvdet.x * dvxvdet.y);
 	abc.z = dot(dx[0], dx[0]) - (1 + obj.rd2) * dvxvdet.y * dvxvdet.y;

@@ -20,7 +20,7 @@
 
 #define WIDTH HEIGHT
 #define HEIGHT 200
-#define CORES 16
+#define CORES 1
 
 
 typedef	struct	s_vector t_vector;
@@ -133,8 +133,7 @@ void				white(int *a, int w, int h, int c);
 t_vector			**initialize_points(int height);
 t_vector			**create_points(char *filename, t_vector *ptdim, t_global *g);
 void				free_points(t_vector **pts);
-int				mymod(int x, int m);
-
+int				mymod(float x, int m);
 
 typedef	struct		s_tile
 {
@@ -160,7 +159,7 @@ typedef struct		s_object
 	t_vector		bd1;
 	t_vector		bd2;
 	t_vector		bd3;
-
+	t_vector		base[3];
 	t_tile			tile[15];
 	t_vector		nr;
 	t_vector		*ctr;
@@ -202,6 +201,7 @@ typedef struct		s_global
 	t_vector		_001;
 	t_vector		_010;
 	t_vector		_100;
+	t_vector		base[3];
 	t_vector		*ray;
 	t_vector		*li;
 	t_vector		*cam_pos;

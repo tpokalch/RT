@@ -25,6 +25,11 @@ void		ginit(t_global *g)
 	init_vector(&g->_001, 0, 0, 15);
 	init_vector(&g->_010, 0, 1, 0);
 	init_vector(&g->_100, 1, 0, 0);
+
+	init_vector(&g->base[0], 1, 0, 0);
+	init_vector(&g->base[1], 0, 1, 0);
+	init_vector(&g->base[2], 0, 0, 1);
+
 	init_vector(g->angle, 0, 0, 0);
 	init_vector(g->normal, 0, 0, 20);
 	init_vector(g->cam_pos, 0, 0, 0);
@@ -148,9 +153,13 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].nr.x = 0;
 	g->obj[i].nr.y = 1;
 	g->obj[i].nr.z = 0;
+
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	printf("end init\n");
 	init_tile(i,"./tiles/chess.xpm", g->obj, g);
 	free(g->obj[i].tile[0].data_ptr);
@@ -294,6 +303,9 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = /*-(-M_2_PI + 2) - 1 */-M_PI_2;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);	
 	g->obj[i].frame = init_frame(g->obj[i], g);
 	printf("frame name is %s\n", g->obj[i].frame->name);
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
@@ -334,6 +346,10 @@ void		init_tri(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);
+	
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 //	free(g->obj[i].tile[0].data_ptr);
 //	g->obj[i].tile[0].data_ptr = NULL;
@@ -359,6 +375,9 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);	
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
 		"./tiles/blank.xpm",
@@ -417,6 +436,10 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);
+	
 	t_vector dir[8];
 
 	init_vector(&dir[0], 100, 100, 100);
@@ -488,6 +511,10 @@ void		init_spheror(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);
+	
 }
 
 void		init_cone(t_vector *ctr, int i, t_global *g)
@@ -508,7 +535,9 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-
+	init_vector(&g->obj[i].base[0], 1, 0, 0);
+	init_vector(&g->obj[i].base[1], 0, 1, 0);
+	init_vector(&g->obj[i].base[2], 0, 0, 1);	
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
 		"./tiles/blank.xpm",

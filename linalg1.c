@@ -126,7 +126,16 @@ t_vector		rotate(t_vector ray, t_vector angle)
 	init_vector(&ret, dot(row[0], ray), dot(row[1], ray), dot(row[2], ray));
 	return (ret);
 }
+/*
+t_vector			rotate3(t_vector base[3], t_vector ang)
+{
+	t_vector ret[3];
 
+	ret[0] = rotate(base[0], ang);
+	ret[0] = rotate(base[0], ang);
+	ret[0] = rotate(base[0], ang);
+	return (ret)
+*/
 
 t_dstpst			*NANI(t_dstpst *t)
 {

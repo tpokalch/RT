@@ -70,7 +70,13 @@ int		move_phys(int keycode, t_global *g)
 		g->obj[g->objn].ang.z += 0.05;
 	if (keycode == 34 || keycode == 40 || keycode == 38 || keycode == 37
 	|| keycode == 43 || keycode == 47 || keycode == 123 || keycode == 124)
-		g->obj[g->objn].nr = rotate(g->_010, g->obj[g->objn].ang);
+	{
+		g->obj[g->objn].base[0] = rotate(g->base[0], g->obj[g->objn].ang);
+		g->obj[g->objn].base[1] = rotate(g->base[1], g->obj[g->objn].ang);
+		g->obj[g->objn].base[2] = rotate(g->base[2], g->obj[g->objn].ang);
+//		printf("base is %f,%f,%f\n", g->obj[g->objn].base[0].x, g->obj[g->objn].base[1].y, g->obj[g->objn].base[2].z);
+	}
+
 	return (start_threads(move, g));
 }
 
