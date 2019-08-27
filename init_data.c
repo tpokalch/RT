@@ -42,13 +42,13 @@ void		ginit(t_global *g)
 	printf("end ginit\n");
 }
 
-void		stretch(int *a, int d)
+void		stretch(int *a, int d, int h)
 {
 	int i;
 	int j;
 
 	i = d / 2 - 1;
-	j = d / 2 - 1;
+	j = h / 2 - 1;
 //	printf("d is %d\n", d);
 //	printf("at last place is %d\n", *(a + d * 16 + 12));
 	while (j >= 0)
@@ -59,15 +59,8 @@ void		stretch(int *a, int d)
 			*(a + d * 2 * j + 2 * i) = *(a + d * j + i);
 //			if (i > 0)
 				*(a + d * 2 * j + 2 * i + 1) = *(a + d * j + i);
-//			if (j > 0)
 				*(a + d * (2 * j + 1) + 2 * i) = *(a + d * j + i);
-//			if (i > 0 && j > 0)
 				*(a + d * (2 * j + 1) + 2 * i + 1) = *(a + d * j + i);
-/*			if (i == 0 || j == 0)
-			{
-				*(a + d * (2 * j - 1) + 2 * i - 1) = *(a + d * j + i);	
-		*(a + d * (2 * j - 1) + 2 * i - 1) = *(a + d * j + i);
-*/
 			if (i == d && j == d)
 				printf("copy to %d, %d\n", 2 * i - 1, 2 * (j - 1));
 			i--;
@@ -111,21 +104,20 @@ void		init_tile(int i, char *tile, t_object *obj, t_global *g)
 
 		obj[i].tile[k].w2 = obj[i].tile[k].w / 2;
 		obj[i].tile[k].h2 = obj[i].tile[k].h / 2;
-		white(obj[i].tile[k].data_ptr, obj[i].tile[k].w ,obj[i].tile[k].h, k * 100000);
+//		white(obj[i].tile[k].data_ptr, obj[i].tile[k].w ,obj[i].tile[k].h, k * 100000);
 		k++;
 	}
 	k = 1;
 	int s = 0;
 	while (k < 10)
 	{
+		printf("smothing k is %d\n", k);
 		s = 0;
-//		smooth(obj[i].tile[k].data_ptr, obj[i].tile[k].w,
-
-//		obj[i].tile[k].h,obj[i].tile[k].w / exp2(k),
-//		obj[i].tile[k].h / exp2(k), g);
+		smooth(obj[i].tile[k].data_ptr, obj[i].tile[k].w,
+		obj[i].tile[k].h,obj[i].tile[k].w / exp2(k),
+		obj[i].tile[k].h / exp2(k), g);
 		while (s++ < k)
-			stretch(obj[i].tile[k].data_ptr, obj[i].tile[k].w );
-
+			stretch(obj[i].tile[k].data_ptr, obj[i].tile[k].w , obj[i].tile[k].h);
 		k++;
 	}
 	k = 0;
@@ -162,7 +154,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	printf("end init\n");
 	init_tile(i,"./tiles/chess.xpm", g->obj, g);
 	free(g->obj[i].tile[0].data_ptr);
-	g->obj[i].tile[0].data_ptr = NULL;
+//	g->obj[i].tile[0].data_ptr = NULL;
 
 }
 
@@ -280,7 +272,7 @@ t_object	*init_frame(t_object obj, t_global *g)
 
 	rc = scale(-0.5, sum(sum(bas[0], bas[1]), bas[2]));
 
-	ret->rd2 = ceil(dot(rc, rc)) - 30000;
+	ret->rd2 = ceil(dot(rc, rc)) /*- 30000*/;
 	printf("frame rd2 is %d\n", ret->rd2);
 	ret->rd = sqrt(ret->rd2);
 	return (ret);
@@ -296,8 +288,6 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].bright = &bright_plane;
 	g->obj[i].ctr = &ctr[i];
 	g->obj[i].ctr->x =/*270*/ 0;
-	g->obj[i].ctr->y = /*0*/0;
-	g->obj[i].ctr->z = /*-400*/1000/*-1500*/;
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
 	g->obj[i].color = rgb(0x010001);
@@ -476,7 +466,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
 */
-	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+	init_tile(i,"./tiles/earth.xpm", g->obj, g);
 //	norm_tile(g->obj[i].tile[0].data_ptr, g->obj[i].tile[0].w, g->obj[i].tile[0].h);
 }
 

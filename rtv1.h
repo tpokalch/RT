@@ -19,8 +19,9 @@
 #include <fcntl.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 400
-#define CORES 1
+#define HEIGHT 200
+#define CORES 16
+
 
 typedef	struct	s_vector t_vector;
 
@@ -124,7 +125,7 @@ void				screen(int *a, int w, int h, t_global *g);
 
 t_vector			cross(t_vector a, t_vector b);
 double				det(t_vector a, t_vector b);
-void				stretch(int *a, int d);
+void				stretch(int *a, int d, int h);
 void				smooth(int *a, int w, int h, int xmax, int ymax, t_global *g);
 void				save_im(int *a, int *b, int w, int h);
 t_vector			base255(t_vector);
@@ -132,6 +133,8 @@ void				white(int *a, int w, int h, int c);
 t_vector			**initialize_points(int height);
 t_vector			**create_points(char *filename, t_vector *ptdim, t_global *g);
 void				free_points(t_vector **pts);
+int				mymod(int x, int m);
+
 
 typedef	struct		s_tile
 {
@@ -158,7 +161,7 @@ typedef struct		s_object
 	t_vector		bd2;
 	t_vector		bd3;
 
-	t_tile			tile[10];
+	t_tile			tile[15];
 	t_vector		nr;
 	t_vector		*ctr;
 	t_vector		ang;
@@ -206,6 +209,7 @@ typedef struct		s_global
 	t_vector		*angle;
 	t_vector		*normal;
 	t_object		*obj;
+	t_object		*all_obj;
 	t_objecthit		***hits;
 	t_vector		***rays;
 	int				objn;

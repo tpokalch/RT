@@ -12,6 +12,159 @@
 
 #include "rtv1.h"
 
+
+t_vector		mip_col(int x, int y, double dst2, t_object obj, t_global *g)
+{
+	int		tilelow;
+	int		tilehi;
+	t_tile		*ti;
+	double		newres;
+	double		tilen;
+	t_vector		ret;
+
+	newres = g->ray->z / (double)sqrt(dst2) * obj.tile[0].w;
+	ti = obj.tile;
+
+	tilen = log2(obj.tile[0].w / newres) + 2;
+	if (con(g))
+	{
+		printf("square distange to plane is %f\n", dst2);
+		printf("distance to plane is %f\n", sqrt(dst2));
+
+		printf("tile is %f\n", tilen);
+		printf("newrsi is %f\n", newres);
+		printf("potenital tile n %f\n",log2( obj.tile[0].w / newres));
+	}	
+
+	tilelow = floor(tilen);
+	tilehi = ceil(tilen);
+	float weight[2];
+
+	weight[0] = 1 - (tilen - tilelow);
+	weight[1] = 1 - (tilehi - tilen);
+
+	if (tilehi > ti[0].mipq || tilelow > ti[0].mipq)
+	{
+		tilen = ti[0].mipq;
+		tilehi = ti[0].mipq;
+		tilelow = ti[0].mipq;
+	}
+
+	if (tilehi < 0 || tilelow < 0)
+	{
+		tilen = 0;
+		tilehi = 0;
+		tilelow = 0;
+	}
+
+
+	if (tilehi > 6 || tilelow > 6)
+	{
+		tilehi = 6;
+		tilen = 6;
+		weight[0] = 1;
+		weight[1] = 0;
+	}
+	if (tilehi < 0 || tilelow < 0)
+	{
+		tilehi = 0;
+		tilen = 0;
+		weight[1] = 1;
+		weight[0] = 0;
+	}
+
+	tilen = floor(tilen);
+
+
+	if (tilen < 0)
+		tilen = 0;
+	else if (tilen > ti[0].mipq)
+		tilen = ti[0].mipq;
+
+
+//	printf("x y is %d,%d\n", x, y);
+
+//	printf("weight low %f\n", (1 - (tilen - tilelow)));
+
+
+	if (con(g))
+	{
+//		printf("low weight is %f\n", weight[0]);
+//		printf("high weight is %f\n", weight[1]);
+	}
+
+/*
+	ret.col = sum(scale(weight[0], base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * x + y)))),
+		scale(weight[1], base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * x + y)))));
+*/
+
+	t_vector col[4];
+	t_vector colhi[4];
+	double	colweight[4];
+	double colhiweight[4];
+//the next two colours are colours of the pixel hit int the behind tile and the forward tile	
+/*	col[0] = base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)floor(x) + (int)floor(y))));
+	col[1] = base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)floor(x) + (int)floor(y))));
+*/
+//the next four colours are colours of the four closest pixels to a given hit into a lower tile
+
+	col[0] = base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)floor(x) + (int)floor(y))));
+	col[1] = base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)ceil(x) + (int)ceil(y))));
+	col[2] = base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)ceil(x) + (int)floor(y))));
+	col[3] = base(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)floor(x) + (int)ceil(y))));
+
+//the next 4 are the coresponding weights depending on the distance of hit to each pixel
+
+	colweight[0] = sqrt((1 - (x - floor(x))) * (1 -(x - floor(x))) + (1 - (y - floor(y))) * (1 - (y - floor(y)))) / (double)8;
+	colweight[1] = sqrt(1 - ((ceil(x) - x)) * (1 - (ceil(x) - x)) + (1 - (ceil(y) - y)) * (1 - (ceil(y) - y))) / (double)8;
+	colweight[2] = sqrt(1 - ((ceil(x) - x)) * (1 - (ceil(x) - x)) + (1 - (y - floor(y))) * (1 - (y - floor(y)))) / (double)8;
+	colweight[3] = sqrt(1 - ((floor(x) - x)) * (1 - (x - floor(x))) + (1 - (ceil(y) - y)) * (1 - (ceil(y) - y))) / (double)8;
+
+//the same thing for a higher tile
+
+	colhi[0] = base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)floor(x) + (int)floor(y))));
+	colhi[1] = base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)ceil(x) + (int)ceil(y))));
+	colhi[2] = base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)ceil(x) + (int)floor(y))));
+	colhi[3] = base(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)floor(x) + (int)ceil(y))));
+
+	colhiweight[0] = sqrt((1 - (x - floor(x))) * (1 -(x - floor(x))) + (1 - (y - floor(y))) * (1 - (y - floor(y)))) / (double)8;
+	colhiweight[1] = sqrt(1 - ((ceil(x) - x)) * (1 - (ceil(x) - x)) + (1 - (ceil(y) - y)) * (1 - (ceil(y) - y))) / (double)8;
+	colhiweight[3] = sqrt(1 - (x - (floor(x))) * (1 - (x - floor(x))) + (1 - (ceil(y) - y)) * (1 - (ceil(y) - y))) / (double)8;
+	colhiweight[2] = sqrt(1 - ((ceil(x) - x)) * (1 - (ceil(x) - x)) + (1 - (y - floor(y))) * (1 - (y - floor(y)))) / (double)8;
+
+
+//here are 2 retcols for each tile - back tile and forward tile
+	t_vector retcol[2];
+	retcol[0] = sum(scale(colweight[0],col[0]), sum(scale(colweight[1],col[1]), sum(scale(colweight[2],col[2]), scale(colweight[3], col[3]))));
+
+
+	retcol[1] = sum(scale(colhiweight[0],colhi[0]), sum(scale(colhiweight[1],colhi[1]), sum(scale(colhiweight[2],colhi[2]), scale(colhiweight[3], colhi[3]))));
+
+	ret = sum(scale(weight[0], retcol[0]), scale(weight[1], retcol[1]));
+	return (ret);
+
+	if (con(g))
+		printf("colweight 0 %f\ncolweight 1 %f\n", colweight[0], colweight[1]);
+
+
+//	ret.col = base(rgb(*(ti[0].data_ptr + ti[0].w * x + y)));
+//	ret.col = base(rgb(*(ti[(int)tilen].data_ptr + ti[(int)tilen].w * x + y)));
+
+
+//	ret.col = sum(scale(colweight[0], col[0]), scale(colweight[1], col[1]));
+
+	ret = sum(scale(weight[0], col[0]), scale(weight[1], col[1]));
+
+
+
+	if (con(g))
+		printf("color is %f,%f,%f\n", ret.x, ret.y, ret.z);
+
+	return (ret);	
+}
+
+
+
 int		inside_cone(t_vector p, t_object obj, t_global *g)
 {
 	double axdst;
@@ -177,13 +330,20 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	double xdst;
 
 	xdst = dot(obj.nr, diff(hit, *obj.ctr));
-	y = lround(/*1 - */fabs(fmod(xdst, obj.tile[0].h)));
+	if (xdst > 0)
+		y = lround(obj.tile[0].h - fmod(xdst, obj.tile[0].h) - 1);
+	else
+		y = lround(-fmod(xdst, obj.tile[0].h + 1));
+	
 	if (con(g))
 	{
 		printf("x is %d\n", x);
 		printf("y is %d\n", y);
-	}	
-	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
+	}
+	ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
+
+
+//	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
 	}
 	else
 		ret.col = obj.color;
@@ -203,100 +363,6 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 	return (ret);
 }
-
-t_vector		mip_col(int x, int y, double dst2, t_object obj, t_global *g)
-{
-	int		tilelow;
-	int		tilehi;
-	t_tile		*ti;
-	double		newres;
-	double		tilen;
-	t_vector		ret;
-
-	newres = g->ray->z / (double)sqrt(dst2) * obj.tile[0].w;
-
-	ti = obj.tile;
-
-	tilen = log2(obj.tile[0].w / newres);
-
-
-
-	tilelow = floor(tilen);
-	tilehi = ceil(tilen);
-	float weight[2];
-
-	weight[0] = 1 - (tilen - tilelow);
-	weight[1] = 1 - (tilehi - tilen);
-
-	if (tilehi > ti[0].mipq || tilelow > ti[0].mipq)
-	{
-		tilen = ti[0].mipq;
-		tilehi = ti[0].mipq;
-		tilelow = ti[0].mipq;
-	}
-
-	if (tilehi < 0 || tilelow < 0)
-	{
-		tilen = 0;
-		tilehi = 0;
-		tilelow = 0;
-	}
-
-
-	if (tilehi > 6 || tilelow > 6)
-	{
-		tilehi = 6;
-		tilen = 6;
-		weight[0] = 1;
-		weight[1] = 0;
-	}
-	if (tilehi < 0 || tilelow < 0)
-	{
-		tilehi = 0;
-		tilen = 0;
-		weight[1] = 1;
-		weight[0] = 0;
-	}
-
-	tilen = floor(tilen);
-
-
-	if (tilen < 0)
-		tilen = 0;
-	else if (tilen > ti[0].mipq)
-		tilen = ti[0].mipq;
-
-
-//	printf("x y is %d,%d\n", x, y);
-
-//	printf("weight low %f\n", (1 - (tilen - tilelow)));
-
-
-	if (con(g))
-	{
-//		printf("low weight is %f\n", weight[0]);
-//		printf("high weight is %f\n", weight[1]);
-	}
-
-	t_vector col[4];
-	double	colweight[4];	
-	col[0] = base255(rgb(*(ti[tilelow].data_ptr + ti[tilelow].w * (int)floor(x) + (int)floor(y))));
-	col[1] = base255(rgb(*(ti[tilehi].data_ptr + ti[tilehi].w * (int)floor(x) + (int)floor(y))));
-
-	if (con(g))
-		printf("colweight 0 %f\ncolweight 1 %f\n", colweight[0], colweight[1]);
-
-
-//	ret.col = base255(rgb(*(ti[0].data_ptr + ti[0].w * x + y)));
-//	ret.col = base255(rgb(*(ti[(int)tilen].data_ptr + ti[(int)tilen].w * x + y)));
-
-
-//	ret.col = sum(scale(colweight[0], col[0]), scale(colweight[1], col[1]));
-
-	ret = sum(scale(weight[0], col[0]), scale(weight[1], col[1]));
-	return (ret);
-}
-
 
 t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
@@ -360,8 +426,9 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 	if (con(g))
 		printf("x, y is %d, %d\n", x, y);
-//	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
+//	ret.col = base(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
 	ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
+
 	}
 	else
 		ret.col = obj.color;
@@ -508,7 +575,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 	if (obj.tile[0].data_ptr)
 	{
-		printf("there is tile\n");
+//		printf("there is tile\n");
 		dst2 = dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos));
 		newres = g->ray->z / (double)sqrt(dst2) * obj.tile[0].w;
 
@@ -524,8 +591,8 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}	
 	tilen = log2(obj.tile[0].w / newres);
 
-	x = lround(fabs(v.x)) % (ti[0].w);
-	y = lround(fabs(v.z)) % (ti[0].h);
+	x = lround(mymod(lround(v.x), ti[0].w));
+	y = lround(mymod(lround(v.z), ti[0].h));
 
 
 
@@ -739,7 +806,7 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 	if (obj.tile[0].data_ptr)
 	{
-		printf("there is tile\n");
+//		printf("there is tile\n");
 		dst2 = dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos));
 		newres = g->ray->z / (double)sqrt(dst2) * obj.tile[0].w;
 

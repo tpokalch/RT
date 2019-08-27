@@ -69,6 +69,17 @@ void		screen(int *a, int x, int y, t_global *g)
 	}
 }
 
+void		draw_func(t_global *g)
+{
+	int i = -WIDTH / 2;
+
+	while (i < WIDTH / 2)
+	{
+		mlx_pixel_put(g->mlx_ptr, g->win_ptr, i + WIDTH / 2, HEIGHT / 2- i % 10, 0xFFFFFF);
+		i++;
+	}
+}
+
 int		main(int argc, char **argv)
 {
 	t_global g;
@@ -104,14 +115,15 @@ int		main(int argc, char **argv)
 	t_tile a;
 
 	int i = 0;
-	while (i < 0)
+//	while (i < 0)
 	{
-		a = g.obj[1].tile[i];
+		a = g.obj[1].tile[2];
 		printf("h w is %d, %d\n", a.h, a.w);
 //		stretch(a.data_ptr, a.h);
 		screen(a.data_ptr, a.w, a.h, &g);
 		i++;
 	}
+//	draw_func(&g);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd1.x, g.obj[1].tris[0].bd1.y, g.obj[1].tris[0].bd1.z);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd2.x, g.obj[1].tris[0].bd2.y, g.obj[1].tris[0].bd2.z);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd3.x, g.obj[1].tris[0].bd3.y, g.obj[1].tris[0].bd3.z);
@@ -125,7 +137,7 @@ int		main(int argc, char **argv)
 //	printf("second complex obj is %d %s\n", g.obj[1].tris[1].id, g.obj[1].tris[1].name);
 
 	printf("starting threads\n");
-	start_threads(recalc, &g);
+//	start_threads(recalc, &g);
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
 	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
 	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);
