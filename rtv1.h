@@ -133,7 +133,9 @@ void				white(int *a, int w, int h, int c);
 t_vector			**initialize_points(int height);
 t_vector			**create_points(char *filename, t_vector *ptdim, t_global *g);
 void				free_points(t_vector **pts);
-int				mymod(float x, int m);
+double				mymod(double x, int m);
+int				myintmod(int x, int m);
+
 
 typedef	struct		s_tile
 {

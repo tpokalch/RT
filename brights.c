@@ -178,9 +178,9 @@ int		inside_cone(t_vector p, t_object obj, t_global *g)
 	op = diff(p, *obj.ctr);
 	if (dot(op, op) < 0.001)
 		return (0);
-	axdst = dot(op, obj.nr);
+	axdst = dot(op, obj.base[1]);
 	cirad = axdst * obj.rd2;
-	ptoaxproj = scale(axdst, obj.nr);
+	ptoaxproj = scale(axdst, obj.base[1]);
 	ptoaxperp = diff(op, ptoaxproj);
 	return (dot(ptoaxperp, ptoaxperp) - cirad * cirad <= 0);
 }
@@ -196,7 +196,7 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 //	printf("inside cone\n");
 	hit0 = diff(hit, *obj.ctr);
-	ax = scale(dot(hit0, obj.nr) * (1 + obj.rd2), obj.nr);
+	ax = scale(dot(hit0, obj.base[1]) * (1 + obj.rd2), obj.base[1]);
 	nrm = norm(diff(hit0, ax));
 	camforw = diff(sum(*g->cam_pos, *g->normal), *g->cam_pos);
 	if (inside_cone(*g->cam_pos, obj, g))
@@ -215,14 +215,11 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 		return (ret);
 	}
 	ret.bri = 255 * dot(norm(diff(diff(*g->li, *obj.ctr), hit0)), nrm);
-
 	if (obj.tile[0].data_ptr)
 	{
 		int x;
 		int y;
-		t_vector _100;
 
-		init_vector(&_100, 1, 0, 0);
 		t_vector proj;
 
 
@@ -231,28 +228,29 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 //	printf("hi\n");
 	ctrhit = diff(hit, *obj.ctr);
 
-	proj = diff(ctrhit, scale(dot(obj.nr, ctrhit),obj.nr));
+	proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit),obj.base[1]));
 	proj = norm(proj);
 
 	if (con(g))
 	{
 		printf("proj is %f,%f,%f\n", proj.x, proj.y, proj.z);
 		printf("width is %d\n", obj.tile[0].w);
-		printf("acos is %f\n", acos(dot(_100, proj)));
+		printf("acos is %f\n", acos(dot(obj.base[0], proj)));
 	}
-//	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, _100) < 0)) * acos(dot(_100, proj))));
-	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, _100) < 0)) * M_1_PI * acos(dot(proj, _100))));
+//	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, obj.base[0]) < 0)) * acos(dot(obj.base[0], proj))));
+	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) * M_1_PI * acos(dot(proj, obj.base[0]))));
 
 
 
-	y = lround(fabs(1 - dot(obj.nr, diff(hit, *obj.ctr)))) % obj.tile[0].h;
+	y = lround(fabs(1 - dot(obj.base[1], diff(hit, *obj.ctr)))) % obj.tile[0].h;
 	if (con(g))
 	{
 		printf("x is %d\n", x);
 		printf("y is %d\n", y);
 	}	
-	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
-	
+//	ret.col = base255(rgb(*(obj.tile[0].data_ptr + y * obj.tile[0].w + x)));
+	ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
+
 
 	if (obstructed(hit, obj, g))
 	{
@@ -305,9 +303,9 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	{
 		int x;
 		int y;
-//		t_vector _100;
+//		t_vector obj.base[0];
 
-//		init_vector(&_100, 1, 0, 0);
+//		init_vector(&obj.base[0], 1, 0, 0);
 		t_vector proj;
 
 
@@ -316,6 +314,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 		ctrhit = diff(hit, *obj.ctr);
 
 		proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit),obj.base[1]));
+
 		proj = norm(proj);
 		if (con(g))
 		{
@@ -323,7 +322,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 			printf("width is %d\n", obj.tile[0].w);
 			printf("acos is %f\n", acos(dot(obj.base[0], proj)));
 		}
-//	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, _100) < 0)) * acos(dot(_100, proj))));
+//	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, obj.base[0]) < 0)) * acos(dot(obj.base[0], proj))));
 	x = lround(obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) * M_1_PI * acos(dot(proj, obj.base[0]))));
 
 
@@ -377,11 +376,13 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	int		x;
 	int		y;
 	t_vector	proj;
+	t_vector ctrhit;
 
 	if (con(g))
 		printf("______start BRI SPHERE func______\n");
 	nrm = norm(diff(hit, *obj.ctr));
 	ctrli = diff(*g->li, *obj.ctr);
+	ctrhit = diff(hit, *obj.ctr);
 	if (obj.cam_pos)
 	{
 		if (dot(ctrli, ctrli) > obj.rd2)
@@ -406,14 +407,17 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		ret.bri = g->ambient;
 	if (obj.tile[0].data_ptr)
 	{
-		proj = nrm;
-		proj.y = 0;
+//		proj = nrm;
+//		proj.y = 0;
+		proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit),obj.base[1]));
+
+
 		proj = norm(proj);
 
 //	t_vector _001;
-//	t_vector _100;
+//	t_vector obj.base[0];
 //	init_vector(&_001, 0, 0, 1);
-//	init_vector(&_100, 1, 0, 0);
+//	init_vector(&obj.base[0], 1, 0, 0);
  	if (con(g))
 	{
 		printf("obj base if %f,%f,%f\n", obj.base[0].x, obj.base[1].y, obj.base[2].z);
@@ -425,8 +429,8 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	y = lround(obj.tile[0].h * ( (1 - 2 * (det(nrm, obj.base[1]) < 0)) * M_1_PI * acos(dot(nrm, obj.base[1]))));
 
 	if (con(g))
-		printf("acos is %f\n", acos(dot(nrm, obj.nr)));
-//	y = lround(obj.tile[0].h2 * (1 - (dot(obj.nr, nrm))));
+		printf("acos is %f\n", acos(dot(nrm, obj.base[1])));
+//	y = lround(obj.tile[0].h2 * (1 - (dot(obj.base[1], nrm))));
 
 	if (con(g))
 		printf("x, y is %d, %d\n", x, y);
@@ -556,21 +560,21 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 
 
-	if (dot(diff(hit, *g->cam_pos), obj.nr) > 0)
+	if (dot(diff(hit, *g->cam_pos), obj.base[1]) > 0)
 	{
 		if (con(g))
 			printf("changing normal\n");
-		obj.nr.x = -obj.nr.x;
-		obj.nr.y = -obj.nr.y;
-		obj.nr.z = -obj.nr.z;
+		obj.base[1].x = -obj.base[1].x;
+		obj.base[1].y = -obj.base[1].y;
+		obj.base[1].z = -obj.base[1].z;
 	}
 	if (con(g))
-		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.nr));
+		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.base[1]));
 //	printf("orient calculated\n");
-//	v = dot(obj.nr, hit);
+//	v = dot(obj.base[1], hit);
 	v = diff(hit, *obj.ctr);
 
-	ret.bri = round(255 * dot(norm(diff(*g->li, hit)), obj.nr));
+	ret.bri = round(255 * dot(norm(diff(*g->li, hit)), obj.base[1]));
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
 //	printf("x y is %d, %d\n", x, y);
@@ -787,21 +791,21 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 
 
-	if (dot(diff(hit, *g->cam_pos), obj.nr) > 0)
+	if (dot(diff(hit, *g->cam_pos), obj.base[1]) > 0)
 	{
 		if (con(g))
 			printf("changing normal\n");
-		obj.nr.x = -obj.nr.x;
-		obj.nr.y = -obj.nr.y;
-		obj.nr.z = -obj.nr.z;
+		obj.base[1].x = -obj.base[1].x;
+		obj.base[1].y = -obj.base[1].y;
+		obj.base[1].z = -obj.base[1].z;
 	}
 	if (con(g))
-		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.nr));
+		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.base[1]));
 //	printf("orient calculated\n");
-//	v = dot(obj.nr, hit);
+//	v = dot(obj.base[1], hit);
 //	v = diff(hit, *obj.ctr);
 
-	ret.bri = round(255 * dot(norm(diff(*g->li, hit)), obj.nr));
+	ret.bri = round(255 * dot(norm(diff(*g->li, hit)), obj.base[1]));
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
 //	printf("x y is %d, %d\n", x, y);

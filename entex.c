@@ -51,9 +51,20 @@ int	co(int x, int y, t_global *g)
 	return (g->ray->x == x && g->ray->y == y);
 }
 
-int	mymod(int x, int m)
+int	myintmod(int x, int m)
 {
 	int ret;
+
+	ret = fmod(x, m);
+	if (x >= 0)
+		return (ret);
+	return (ret + m);
+}
+
+
+double	mymod(double x, int m)
+{
+	double ret;
 
 	ret = fmod(x, m);
 	if (x >= 0)
@@ -77,12 +88,12 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 		return ;
 //	if (x > 0)
 	{
-		mid_col = sum(rgb(*(o + y * w + mymod(x - 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + y * w + myintmod(x - 1, xmax))), mid_col);
 		ran++;
 	}
 //	if (x < w - 1)
 	{
-		mid_col = sum(rgb(*(o + y * w + mymod(x + 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + y * w + myintmod(x + 1, xmax))), mid_col);
 		ran++;
 //		if (con(g))
 //			printf("sum is %f,%f,%f\n", mid_col.x, mid_col.y, mid_col.z);
@@ -91,7 +102,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	}
 //	if (y > 0)
 	{
-		mid_col = sum(rgb(*(o + mymod(y - 1, ymax) * w + x)), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y - 1, ymax) * w + x)), mid_col);
 		ran++;
 //		if (con(g))
 //			printf("sum is %f,%f,%f\n", mid_col.x, mid_col.y, mid_col.z);
@@ -100,7 +111,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	}
 //	if (y < h - 1)
 	{
-		mid_col = sum(rgb(*(o + mymod(y + 1, ymax) * w + x)), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y + 1, ymax) * w + x)), mid_col);
 		ran++;
 //		if (con(g))
 //			printf("sum is %f,%f,%f\n", mid_col.x, mid_col.y, mid_col.z);
@@ -109,7 +120,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	}
 //	if (y < h - 1 && (x < w - 1))
 	{
-		mid_col = sum(rgb(*(o + mymod(y + 1, ymax) * w + mymod(x + 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y + 1, ymax) * w + myintmod(x + 1, xmax))), mid_col);
 		ran++;
 //		if (con(g))
 //			printf("sum is %f,%f,%f\n", mid_col.x, mid_col.y, mid_col.z);
@@ -118,7 +129,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	}
 //	if (y < h - 1 && (x > 0))
 	{
-		mid_col = sum(rgb(*(o + mymod(y + 1, ymax) * w + mymod(x - 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y + 1, ymax) * w + myintmod(x - 1, xmax))), mid_col);
 
 		ran++;
 //		if (con(g))
@@ -128,7 +139,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	}
 //	if (y > 0 && (x < w + 1))
 	{
-		mid_col = sum(rgb(*(o + mymod(y - 1, ymax) * w + mymod(x + 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y - 1, ymax) * w + myintmod(x + 1, xmax))), mid_col);
 
 		ran++;
 //		if (con(g))
@@ -139,7 +150,7 @@ void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax,
 	if (y > 0 && x > 0)
 	{
 //		mid_col = sum(rgb(*(o + ywx - w - 1)), mid_col);
-		mid_col = sum(rgb(*(o + mymod(y - 1, ymax) * w + mymod(x - 1, xmax))), mid_col);
+		mid_col = sum(rgb(*(o + myintmod(y - 1, ymax) * w + myintmod(x - 1, xmax))), mid_col);
 
 		ran++;
 //		if (con(g))
