@@ -115,7 +115,7 @@ int		main(int argc, char **argv)
 	t_tile a;
 
 	int i = 0;
-//	while (i < 0)
+	while (i < 0)
 	{
 		a = g.obj[1].tile[2];
 		printf("h w is %d, %d\n", a.h, a.w);
@@ -137,7 +137,7 @@ int		main(int argc, char **argv)
 //	printf("second complex obj is %d %s\n", g.obj[1].tris[1].id, g.obj[1].tris[1].name);
 
 	printf("starting threads\n");
-//	start_threads(recalc, &g);
+	start_threads(recalc, &g);
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
 	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
 	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);

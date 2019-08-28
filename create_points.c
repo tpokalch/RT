@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/20 21:19:59 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/11 17:58:13 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/08/28 21:31:58 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,23 +108,23 @@ void			shift_center(t_vector **pts, t_vector *ptdim, t_global *g)
         t_vector _001;
         t_vector _010;
         t_vector _100;
-	int i;
+
+
+		int i;
 	int j;
 	int imax;
 
 
-        init_vector(&_001, 0, 0, 1);
-	 init_vector(&_010, 0, 1, 0);
-	 init_vector(&_100, 1, 0, 0);
+
 	
 	t_vector	bas[3];  
 	t_vector rc;
 	i = 0;
 	j = 0;
 
-        bas[0] = scale(ptdim->x, _100);
-        bas[1] = scale(ptdim->y, _010);
-        bas[2] = scale(ptdim->z, _001);
+        bas[0] = scale(ptdim->x, g->base[0]);
+		bas[1] = scale(ptdim->y, g->base[1]);
+        bas[2] = scale(ptdim->z, g->base[2]);
 	imax = ptdim->x / 20;
 	rc = scale(-0.5, sum(sum(bas[0], bas[1]), bas[2]));
 	printf("shift is %f,%f,%f\n%f,%f,%f\n%f,%f,%f\n", bas[0].x, bas[0].y, bas[0].z, bas[1].x, bas[1].y, bas[1].z, bas[2].x, bas[2].y, bas[2].z);

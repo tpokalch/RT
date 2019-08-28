@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 15:51:47 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/03 20:10:55 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/08/28 21:38:21 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	printf("end init\n");
 	init_tile(i,"./tiles/chess.xpm", g->obj, g);
 	free(g->obj[i].tile[0].data_ptr);
-//	g->obj[i].tile[0].data_ptr = NULL;
+	g->obj[i].tile[0].data_ptr = NULL;
 
 }
 
@@ -297,6 +297,10 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].bright = &bright_plane;
 	g->obj[i].ctr = &ctr[i];
 	g->obj[i].ctr->x =/*270*/ 0;
+	g->obj[i].ctr->y =/*270*/ 0;
+	g->obj[i].ctr->z =/*270*/ 0;
+
+
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
 	g->obj[i].color = rgb(0x010001);
@@ -343,13 +347,16 @@ void		init_tri(t_vector *ctr, int i, t_global *g)
 	g->obj[i].rd = 10;
 	g->obj[i].color = rgb(0x000101);
 	g->obj[i].nr = norm(cross(diff(g->obj[i].bd1, g->obj[i].bd3), diff(g->obj[i].bd2, g->obj[i].bd3)));
+
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	
+	g->obj[i].base[1] = norm(cross(diff(g->obj[i].bd1, g->obj[i].bd3), diff(g->obj[i].bd2, g->obj[i].bd3)));
+
+
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 //	free(g->obj[i].tile[0].data_ptr);
 //	g->obj[i].tile[0].data_ptr = NULL;
