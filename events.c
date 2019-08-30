@@ -99,7 +99,7 @@ int	move_obj(int kk, t_global *g)
 			g->angle->y -= 0.05;
 		else if (kk == 2 || kk == 124)
 			g->angle->y += 0.05;
-		*g->normal = rotate(g->_001, *g->angle);
+		*g->normal = rotate(g->_0015, *g->angle);
 		return (start_threads(recalc, g));
 	}
 	else if (kk == 1)

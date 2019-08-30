@@ -105,17 +105,9 @@ int				parse_line(t_vector **a, char *s, int j, t_vector *ptdim)
 
 void			shift_center(t_vector **pts, t_vector *ptdim, t_global *g)
 {
-        t_vector _001;
-        t_vector _010;
-        t_vector _100;
-
-
-		int i;
+	int i;
 	int j;
 	int imax;
-
-
-
 	
 	t_vector	bas[3];  
 	t_vector rc;

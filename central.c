@@ -142,7 +142,7 @@ void		*toimg(void *tcp)
 			if (g->hits[j][i]->obj.name != NULL)
 			{
 				bright = (g->hits[j][i])->obj.
-				bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
+				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
 	}
@@ -172,6 +172,8 @@ void		*move(void *p)
 			if (g->hits[j][i]->obj.name != NULL)
 			{
 				bright = (g->hits[j][i])->obj.bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
+				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
+				g->hits[j][i]->obj.color = bright.col;
 				g->data_ptr[j * HEIGHT + i] = color(bright.bri, bright.col);
 			}
 		}
@@ -215,6 +217,8 @@ void		*recalc(void *p)
 				bright = g->hits[j][i]->obj.
 				bright(*g->cam_pos, g->hits[j][i]->hit, (g->hits)[j][i]->obj, g);
 //				printf("bright is %d\n", bright.bri);
+				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
+				g->hits[j][i]->obj.color = bright.col;
 				g->data_ptr[j * HEIGHT + i] = color(bright.bri, bright.col);
 			}
 		}

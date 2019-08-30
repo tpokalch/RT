@@ -19,9 +19,8 @@
 #include <fcntl.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 200
-#define CORES 1
-
+#define HEIGHT 800
+#define CORES 16
 
 typedef	struct	s_vector t_vector;
 
@@ -97,15 +96,26 @@ void				*move(void *p);
 void				*toimg(void *tcp);
 void				objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc, t_global *g);
 
-t_colbri				bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					bright_spheror(t_vector st, t_vector hit, t_object obj, t_global *g);
 t_dstpst			hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
+t_colbri					bright_spheror(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					simple_bright_spheror(t_vector st, t_vector hit, t_object obj, t_global *g);
+
+
+t_colbri				simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri				bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g);
+
 t_colbri					bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g);
+
 t_dstpst			hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
 t_dstpst			hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
 t_colbri					bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g);
 t_colbri					bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g);
 t_colbri					bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					simple_bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g);
+
 
 t_dstpst			hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
 t_dstpst			hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
@@ -158,6 +168,8 @@ typedef struct		s_object
 	int				cam_pos;
 	t_dstpst		(*hit)(t_vector, t_vector, t_vector, t_object, t_global *g);
 	t_colbri				(*bright)(t_vector, t_vector, t_object, struct s_global *);
+	t_colbri				(*simple_bright)(t_vector, t_vector, t_object, struct s_global *);
+
 	t_vector		bd1;
 	t_vector		bd2;
 	t_vector		bd3;
@@ -200,9 +212,7 @@ typedef struct		s_global
 	int				e;
 	int				light_switch;
 	t_dstpst		cone[2];
-	t_vector		_001;
-	t_vector		_010;
-	t_vector		_100;
+	t_vector		_0015;
 	t_vector		base[3];
 	t_vector		*ray;
 	t_vector		*li;

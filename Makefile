@@ -1,4 +1,4 @@
-NAME = RTv1
+NAME = rtv1
 
 OBJ = lin_alg.o color.o init_data.o events.o central.o comline_obj.o main.o check_arg.o hits.o brights.o memory.o linalg1.o entex.o create_points.o initialize_points.o free_points.o
 
