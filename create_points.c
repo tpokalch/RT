@@ -114,7 +114,13 @@ void			shift_center(t_vector **pts, t_vector *ptdim, t_global *g)
 	i = 0;
 	j = 0;
 
-        bas[0] = scale(ptdim->x, g->base[0]);
+	init_vector(&g->base[0], 1, 0, 0);
+        init_vector(&g->base[1], 0, 1, 0);
+        init_vector(&g->base[2], 0, 0, 1);
+ 
+       
+	printf("g base[0] is %f,%f,%f\n", g->base[0].x, g->base[0].y, g->base[0].z);
+		bas[0] = scale(ptdim->x, g->base[0]);
 		bas[1] = scale(ptdim->y, g->base[1]);
         bas[2] = scale(ptdim->z, g->base[2]);
 	imax = ptdim->x / 20;

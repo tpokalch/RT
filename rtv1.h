@@ -19,7 +19,7 @@
 #include <fcntl.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 800
+#define HEIGHT 400
 #define CORES 16
 
 typedef	struct	s_vector t_vector;

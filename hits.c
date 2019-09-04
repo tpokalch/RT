@@ -97,8 +97,6 @@ int		hit_box(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 		hit_quad(st, end, ray, quad[5], g));
 }
 
-
-
 t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 {
 	t_dstpst t;
@@ -114,7 +112,7 @@ t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (con(g))
 		printf("frame hit at %f\n", framecheck.dst);
 
-	if (0 && framecheck.obj.name == NULL)
+	if (framecheck.obj.name == NULL)
 	{
 		if (con(g))
 			printf("miss frame\n");
@@ -131,10 +129,9 @@ t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (t.obj.name == NULL)
 		return (*(NANI(&t)));
 //	t.obj = obj;
+//	printf("returning %d %s\n", t.obj.id, t.obj.name);
 	return (t);
-}		
-	
-			
+}
 
 t_dstpst	hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 
@@ -224,14 +221,15 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	t_dstpst framecheck;
 
 	p = *g;
-	if (con(g))
-		printf("we are hitting tri\n");
+//	if (con(g))
+//		printf("we are hitting tri\n");
 
+//	printf("nr is %f,%f,%f\n", obj.nr.x, obj.nr.y, obj.nr.z);
 	t.dst = -dot(diff(st, obj.bd1), obj.nr) / dot(ray, obj.nr);
 	if (t.dst < 0.000001)
 	{
-		if (con(g))
-			printf("hit behind screen\n");
+//		if (con(g))
+//			printf("hit behind screen\n");
 		return(*NANI(&t));
 	}
 	t_vector hit = sum(scale(t.dst, ray), st);
@@ -242,8 +240,8 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	}
 	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.nr, g))
 	{
-		if (con(g))
-			printf("returning nani from tri\n");
+//		if (con(g))
+//			printf("returning nani from tri\n");
 		return(*NANI(&t));
 	}
 //	printf("assigning %d %s to obj\n", obj.id, obj.name);

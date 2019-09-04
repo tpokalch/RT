@@ -851,6 +851,7 @@ t_colbri		simple_bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g
 		obj.nr.z = -obj.nr.z;
 	}
 	ret.bri = round(255 * dot(norm(diff(*g->li, hit)), obj.nr));
+	ret.col = obj.color;
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
 
@@ -873,7 +874,6 @@ t_colbri		simple_bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g
 t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
 	t_colbri			ret;
-	t_object	a;
 	int			i;
 	int			retobs;
 	int			chess;
@@ -889,7 +889,6 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 	int tilehi;
 
 	i = 0;
-	a = obj;
 	if (dot(diff(hit, *g->cam_pos), obj.nr) > 0)
 	{
 		if (con(g))
@@ -898,6 +897,7 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 		obj.nr.y = -obj.nr.y;
 		obj.nr.z = -obj.nr.z;
 	}
+
 	if (con(g))
 		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.base[1]));
 //	printf("orient calculated\n");
@@ -913,32 +913,33 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 		y = lround(fabs(v.z)) % (ti[0].h);
 		ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
 
-
-	if (0 == 1 && obstructed(hit, obj, g))
-	{
-	//	printf("now obstructed\n");
-		retobs = g->ambient;
-		if (chess)
+		if (0 == 1 && obstructed(hit, obj, g))
 		{
-			if (con(g))
-				printf("hit darker\n");
-//			init_vector(&ret.col, 0, 0, 0);
-		}
-		else
-//			ret.col = obj.color;
-		tempbri = ret.bri /*/ (double)2*/;
-		ret.bri = fmin(tempbri, retobs);
-		if (con(g))
-		{
-			if (retobs == ret.bri)
-				printf("returning constant bri\n");
-			else if (tempbri == ret.bri)
-				printf("returning darker bri\n");
+		//	printf("now obstructed\n");
+			retobs = g->ambient;
+			if (chess)
+			{
+				if (con(g))
+					printf("hit darker\n");
+//				init_vector(&ret.col, 0, 0, 0);
+			}
 			else
-				printf("error\n");
+				ret.col = obj.color;
+			tempbri = ret.bri /*/ (double)2*/;
+			ret.bri = fmin(tempbri, retobs);
+			if (con(g))
+			{
+				if (retobs == ret.bri)
+					printf("returning constant bri\n");
+				else if (tempbri == ret.bri)
+					printf("returning darker bri\n");
+				else
+					printf("error\n");
+			}
 		}
 	}
-	}
+	else
+		ret.col = obj.color;
 	if (ret.bri < g->ambient)
 	{
 		ret.bri = g->ambient;
@@ -946,5 +947,7 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
 			printf("returning ambient bri\n");
 		return (ret);
 	}
+	if (con(g))
+		printf("returning color %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
 	return (ret);
 }

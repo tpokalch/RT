@@ -80,7 +80,7 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 		if (con(g))
 		{
 //			printf("i is %d\n", i);
-			printf("calling on %d %s hit\n", obj[i].id, obj[i].name);
+//			printf("calling on %d %s hit\n", obj[i].id, obj[i].name);
 		}
 //		printf("searching obj %d\n", i);
 		t_crt = obj[i].hit(st, end, ray, obj[i], g);
@@ -96,7 +96,7 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 			legal_hit = 1;
 			closest_tmp = t_crt.dst;
 			ret->obj = t_crt.obj;
-//			ret->obj = obj[i];
+			ret->dst = t_crt.dst;
 			if (con(g))
 				printf("we hit %d %s\n", ret->obj.id, ret->obj.name); 
 			ret->obj.cam_pos = t_crt.pst;
@@ -104,13 +104,20 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 	}
 	if (!legal_hit)
 	{
-//		printf("returning no lega hit\n");
+		if (con(g))
+			printf("returning no lega hit\n");
 //		ret->dst = NAN;
 		ret->obj.name = NULL;
 	}
 	else
-		ret->dst = closest_tmp;
+	{
+//		ret->dst = closest_tmp;
+//		ret->obj = t_crt.obj;
+		if (con(g))
+			printf("there was legal hit\n");
+//		ret->obj = t_crt.obj;
 //		ret->hit = sum(scale(closest_tmp, ray), st);
+	}
 	if (con(g))
 	{
 //		printf("hit %d %s dst is %f\n", ret->obj.id, ret->obj.name, closest_tmp);

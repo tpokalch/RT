@@ -65,7 +65,7 @@ int			left(t_vector a, t_vector b, t_vector nr, t_global *g)
 //		printf("y z %f\n", a.y * b.z - a.z * b.y);
 //		printf("z x %f\n",  a.x * b.z - a.z * b.x);
 	}
-	return (dot(cross(b, a), nr) >= 0);
+	return (dot(cross(b, a), nr) >= -0.000004);
 }
 
 int			pinside(t_vector p, t_vector bd1, t_vector bd2, t_vector bd3, t_vector nr, t_global *g)
@@ -89,9 +89,7 @@ int			pinside(t_vector p, t_vector bd1, t_vector bd2, t_vector bd3, t_vector nr,
 /*		printf("left1 %d\n", left(diff(p, bd3), diff(bd1, bd3), g));
 		printf("left2 %d\n", left(diff(p, bd2), diff(bd3, bd2), g));
 		printf("left3 %d\n", left(diff(p, bd1), diff(bd2, bd1), g));
-*/		t_vector a[2];
-		init_vector(&a[0], 5, 7, 0);
-		init_vector(&a[1], 7, 3, 0);
+*/
 //		printf("left custom %d\n", left(a[0], a[1], g));
 	}
 	return (left(pt[0], bd[0], nr, g)

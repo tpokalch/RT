@@ -239,8 +239,8 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 		ret[retc].tile[0].data_ptr = NULL;
 
 //		printf("end friing tile\n");
-		ret[retc].color = rgb(0x000101);
-		ret[retc + 1].color = rgb(0x010000);
+		ret[retc].color = rgb(0x010000);
+		ret[retc + 1].color = rgb(0x000101);
 
 		i++;
 		retc = retc + 2;
@@ -274,7 +274,7 @@ t_object	*init_frame(t_object obj, t_global *g)
 
 	rc = scale(-0.5, sum(sum(bas[0], bas[1]), bas[2]));
 
-	ret->rd2 = ceil(dot(rc, rc)) /*- 30000*/;
+	ret->rd2 = ceil(dot(rc, rc)) - 5000;
 	printf("frame rd2 is %d\n", ret->rd2);
 	ret->rd = sqrt(ret->rd2);
 	return (ret);
@@ -292,17 +292,20 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ctr = &ctr[i];
 	g->obj[i].ctr->x =/*270*/ 0;
 	g->obj[i].ctr->y =/*270*/ 0;
-	g->obj[i].ctr->z =/*270*/ -600;
+	g->obj[i].ctr->z =/*270*/600;
 
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
-	g->obj[i].color = rgb(0x010001);
+	g->obj[i].color = rgb(0x000101);
 	g->obj[i].ang.x = /*-(-M_2_PI + 2) - 1 */-M_PI_2;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
+
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
+	init_vector(&g->obj[i].nr, 1, 0, 0);
+
 	g->obj[i].frame = init_frame(g->obj[i], g);
 	printf("frame name is %s\n", g->obj[i].frame->name);
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);

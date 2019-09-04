@@ -40,7 +40,7 @@ int		key_press(int kk, void *param)
 		g->liz = g->liz + 15 * (2 * (kk == 15) - 1);
 	else if (kk == 49)
 	{
-		g->light_switch = (g->light_switch + 1) % 2;
+		g->light_switch = (g->light_switch + 1) % 3;
 		return (1);
 	}
 	return (start_threads(toimg, g));
@@ -143,6 +143,23 @@ int		mouse_move(int x, int y, void *param)
 			p.z = g->liz;
 			*g->li = sum(*g->cam_pos, rotate(p, *g->angle));
 			start_threads(toimg, g);
+	}
+	else if (g->light_switch == 2)
+	{
+		ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
+		p.y = /*sin*/((-WIDTH / 2 + x )* 0.001);
+		p.x = /*sin*/(0.001 * (y - HEIGHT / 2));
+		p.z = 0;
+
+//		*g->normal = rotate(g->_0015, p);
+
+//		*g->angle = sum(p, *g->angle);
+		*g->angle = p;
+
+		*g->normal = rotate(g->_0015, p);
+
+	
+		start_threads(recalc, g);
 	}
 	return (1);
 }
