@@ -94,12 +94,10 @@ int				parse_line(t_vector **a, char *s, int j, t_vector *ptdim)
 		s = s + next_num(s);
 		i++;
 	}
-	(**(a + j)).len = i;
 	printf("initing len %d\n", i);
-	ptdim->x = i * 20;
-//	ptdim->z *= 20;
-	if (j > 0 && ((**(a + j)).len != (**(a + j - 1)).len))
+	if (j > 0 && (i * 20 != ptdim->x))
 		return (o_putstr("File must contain rectangular map\n", save, a));
+	ptdim->x = i * 20;
 	return (1);
 }
 
@@ -166,7 +164,7 @@ t_vector		**create_points(char *filename, t_vector *ptdim, t_global *g)
 		free(line);
 		j++;
 	}
-	printf("line len int create is %d\n", (**ret).len);
+//	printf("line len int create is %d\n", (**ret).len);
 	ptdim->y = height * 20;
 	printf("frame dimensions are %f,%f,%f\n", ptdim->x, ptdim->y, ptdim->z);
 	shift_center(ret, ptdim, g);

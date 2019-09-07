@@ -97,6 +97,12 @@ int		main(int argc, char **argv)
 	g.normal = &kenobi[4];
 //	g.obj = (t_object *)malloc(sizeof(t_object) * (argc + 1));
 	g.mlx_ptr = mlx_init();
+
+    //    init_vector(&g.base[0], 1, 0, 0);
+  //      init_vector(&g.base[1], 0, 1, 0);
+//       init_vector(&g.base[2], 0, 0, 1);
+
+	ginit(&g);
 	if (!check_arg(argv, argc, &g, ctr))
 		return (0);
 	g.img_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
@@ -110,7 +116,8 @@ int		main(int argc, char **argv)
 //	printf("%d\n", *(g.tile_data_ptr + 2));
 //	screen(700, 700, &g);
 	printf("initing g\n");
-	ginit(&g);
+//	ginit(&g);
+	copy_tcps(&g);
 	printf("hi\n");
 	t_tile a;
 

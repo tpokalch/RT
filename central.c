@@ -74,6 +74,8 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 	{
 		printf("_____start OBJECTHIT function______\n");
 		printf("objc is %d\n", objc);
+		printf("cam pos is %f,%f,%f\n", g->cam_pos->x, g->cam_pos->y, g->cam_pos->z);
+		printf("cam angle is %f,%f,%f\n", g->angle->x, g->angle->y, g->angle->z);
 	}
 	while (++i < objc)
 	{
@@ -203,8 +205,8 @@ void		*recalc(void *p)
 //	printf("recalcing\n");
 	while (++j < end && (i = -1))
 	{
-//		if (g->core == 0)
-//			printf("%fp\n", j / (double)(HEIGHT / (double)CORES));
+		if (g->core == 0)
+			printf("%fp\n", j / (double)(HEIGHT / (double)CORES));
 		while (++i < WIDTH)
 		{
 

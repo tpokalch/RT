@@ -19,8 +19,8 @@
 #include <fcntl.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 400
-#define CORES 16
+#define HEIGHT 3000
+#define CORES 8
 
 typedef	struct	s_vector t_vector;
 
@@ -30,7 +30,7 @@ struct s_vector
 	double x;
 	double y;
 	double z;
-	int	len;
+//	int	len;
 };
 
 
@@ -175,7 +175,6 @@ typedef struct		s_object
 	t_vector		bd3;
 	t_vector		base[3];
 	t_tile			tile[15];
-	t_vector		nr;
 	t_vector		*ctr;
 	t_vector		ang;
 	t_vector		color;
@@ -183,6 +182,7 @@ typedef struct		s_object
 	int				rd2;
 	t_vector		**pts;
 	t_object		*tris;
+	double			re;
 	t_vector		ptdim;
 	t_object		*frame;
 	t_vector		box[8];

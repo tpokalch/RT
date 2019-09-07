@@ -45,7 +45,12 @@ int		init_objects(t_vector *ctr, char **argv, t_global *g)
 		else if (ft_strequ(*(argv + i), "cone"))
 			init_cone(ctr, i + 1, g);
 		if (obj_traver((argv + i), "or"))
-			g->obj[i + 1].nr = rotate(_010, g->obj[i + 1].ang);
+		{
+			g->obj[i + 1].base[1] = rotate(g->base[1], g->obj[i + 1].ang);
+			g->obj[i + 1].base[0] = rotate(g->base[0], g->obj[i + 1].ang);
+			g->obj[i + 1].base[2] = rotate(g->base[2], g->obj[i + 1].ang);
+
+		}
 		if (ft_strequ(*(argv + i), "tri"))
 			init_tri(ctr, i + 1, g);
 		else

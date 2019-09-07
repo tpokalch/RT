@@ -26,8 +26,8 @@ int 		hit_quad(t_vector st, t_vector end, t_vector ray, t_vector quad[4], t_glob
 	tri[1][1] = quad[2];
 	tri[1][2] = quad[3];
 
-	obj[0].nr = norm(cross(diff(tri[0][0], tri[0][2]), diff(tri[0][1], tri[0][2])));
-	obj[1].nr = norm(cross(diff(tri[1][0], tri[1][2]), diff(tri[1][1], tri[1][2])));
+//	obj[0].nr = norm(cross(diff(tri[0][0], tri[0][2]), diff(tri[0][1], tri[0][2])));
+//	obj[1].nr = norm(cross(diff(tri[1][0], tri[1][2]), diff(tri[1][1], tri[1][2])));
 
 	obj[0].bd1 = tri[0][0];
 	obj[0].bd2 = tri[0][1];
@@ -124,6 +124,7 @@ t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (con(g))
 		printf("now objecthiting tris\n");
 
+//	printf("base 1 of first tri %f\n", obj.tris->base[1].yz;
 
 	objecthit(&t, st, end, obj.tris, obj.rd, g);
 	if (t.obj.name == NULL)
@@ -224,8 +225,8 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 //	if (con(g))
 //		printf("we are hitting tri\n");
 
-//	printf("nr is %f,%f,%f\n", obj.nr.x, obj.nr.y, obj.nr.z);
-	t.dst = -dot(diff(st, obj.bd1), obj.nr) / dot(ray, obj.nr);
+//	printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
+	t.dst = -dot(diff(st, obj.bd1), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.000001)
 	{
 //		if (con(g))
@@ -238,7 +239,7 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 //		printf("dot nr bound %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
 //		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
 	}
-	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.nr, g))
+	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.base[1], g))
 	{
 //		if (con(g))
 //			printf("returning nani from tri\n");
@@ -250,9 +251,6 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	t.obj = obj;
 	return (t);
 }
-
-
-
 
 t_dstpst		hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 {

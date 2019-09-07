@@ -286,7 +286,11 @@ int		start_threads(void *f, t_global *g)
 		pthread_create(&g->tid[i], NULL, f, g->tcps[i]);
 	i = -1;
 	while (++i < CORES)
+	{
+		if (WIDTH > 751)
+			printf("joining cores\n");
 		pthread_join(g->tid[i], NULL);
+	}
 	i = -1;
 //	debug(g);
 //	white(g->data_ptr);
@@ -295,9 +299,16 @@ int		start_threads(void *f, t_global *g)
 //	smooth(g->data_ptr, g);
 
 //	alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
-//	alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
-	//alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
+//	printf("doing alias1\n");
+	if (WIDTH > 2500)
+	{
+		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
+		printf("doing alias2\n");
+	}
+	if (WIDTH > 750)
+		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
 
+//	printf("putting image to window\n");
 
 
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
