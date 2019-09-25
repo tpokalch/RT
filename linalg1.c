@@ -1,6 +1,24 @@
 
 #include "rtv1.h"
 
+double           myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g)
+{
+        float ret;
+
+        ret = acos(dot(ax, v));
+//      if (left(v, ax, nrm, g))
+//              return (acos(dot(ax, v)));
+//      return (acos(dot(ax, v)));
+        if (con(g))
+                printf("left %d\n", left(v, ax, nrm, g));
+        if (left(v, ax, nrm, g))
+                return (M_T - ret);
+        if (ret > M_PI)
+                return (M_T - ret);
+        return (ret);
+        return(M_T - acos(dot(ax, v)));
+}
+
 void		init_vector(t_vector *i, double x, double y, double z)
 {
 	i->x = x;

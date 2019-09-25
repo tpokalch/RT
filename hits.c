@@ -145,6 +145,7 @@ t_dstpst	hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_glob
 	if (t.dst < 0.0000001)
 		return(*NANI(&t));
 	t.obj = obj;
+	t.pst = obj.cam_pos;
 	return (t);
 }
 
@@ -174,7 +175,7 @@ t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (det < 0)
 		return (*(NANI(&t)));
 	t.dst = (-abc.y- sqrt(det)) /(2 * abc.x);
-	if (t.dst <= 0.000001 && (t.pst = 1))
+	if (t.dst <= 0.000001 && (t.pst = 1) /*&& printf("vhsnging to inside\n")*/)
 		t.dst = (-abc.y+ sqrt(det)) / (2 * abc.x);
 	if (con(g))
 		printf("t is 0?%d t is %f\n", t.dst == 0, t.dst);

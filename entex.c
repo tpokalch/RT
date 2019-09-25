@@ -280,10 +280,18 @@ void		alias(int *dst, int *a, int w, int xmax, int ymax, int h)
 int		start_threads(void *f, t_global *g)
 {
 	int 	i;
+	clock_t t[2];
 
+	t[0] = clock();
 	i = -1;
+//	ft_bzero(g->line_taken, 4 * STRIPS);
 	while (++i < CORES)
+	{
+		g->tcps[i]->line_taken[i] = 1;
+		g->tcps[i]->my_line = i * TASK;
 		pthread_create(&g->tid[i], NULL, f, g->tcps[i]);
+	}
+
 	i = -1;
 	while (++i < CORES)
 	{
@@ -291,12 +299,13 @@ int		start_threads(void *f, t_global *g)
 			printf("joining cores\n");
 		pthread_join(g->tid[i], NULL);
 	}
+
 	i = -1;
 //	debug(g);
 //	white(g->data_ptr);
 //	while (++i < mousex / 10)
 //		smooth(g->data_ptr, g);
-//	smooth(g->data_ptr, g);
+//smooth(g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT, g);
 
 //	alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
 //	printf("doing alias1\n");
@@ -311,6 +320,10 @@ int		start_threads(void *f, t_global *g)
 //	printf("putting image to window\n");
 
 
+
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
+//	printf("%f frames second\n",CLOCKS_PER_SEC / (float)(clock() - t));
+	t[1] = clock();
+	printf("fps %f\n",1 / ((float)(t[1] - t[0]) / (float)CLOCKS_PER_SEC));
 	return (1);
 }

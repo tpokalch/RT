@@ -67,12 +67,16 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->base[1] = g->base[1];
 	tcps->base[2] = g->base[2];
 
-
+	tcps->line_taken = g->line_taken;
 //	tcps->e1 = g->e1;
 //	tcps->sz_l1 = g->sz_l1;
 //	tcps->bpp1 = g->bpp1;
 //	tcps->tile_data_ptr = g->tile_data_ptr;
-
+	tcps->mip_map = g->mip_map;
+	tcps->recursion = g->recursion;
+	tcps->lights = g->lights;
+	tcps->hitli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
+	tcps->ctrli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 }
 
 

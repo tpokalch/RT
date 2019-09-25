@@ -14,10 +14,11 @@
 
 int			brg(t_vector a)
 {
-	int			ret;
+//	int			ret;
 
-	ret = a.z + a.y * 256 + a.x * 65536;
-	return (ret);
+//	ret = a.z + a.y * 256 + a.x * 65536;
+	return (a.z + a.y * 256 + a.x * 65536);
+//	return (ret);
 }
 
 t_vector	rgb(int c)
@@ -66,5 +67,5 @@ int			color(int b, t_vector v)
 	v.x = lround(b * v.x);
 	v.y = lround(b * v.y);
 	v.z = lround(b * v.z);
-	return (brg(v));
+	return(v.z + v.y * 256 + v.x * 65536);
 }

@@ -75,7 +75,7 @@ void		draw_func(t_global *g)
 
 	while (i < WIDTH / 2)
 	{
-		mlx_pixel_put(g->mlx_ptr, g->win_ptr, i + WIDTH / 2, HEIGHT / 2- i % 10, 0xFFFFFF);
+		mlx_pixel_put(g->mlx_ptr, g->win_ptr, i + WIDTH / 2, HEIGHT / 2- 20 * acos(i / (float)20), 0xFFFFFF);
 		i++;
 	}
 }
@@ -115,8 +115,8 @@ int		main(int argc, char **argv)
 //	mlx_put_image_to_window (g.mlx_ptr, g.win_ptr, g.tile_data_ptr, 0, 0);
 //	printf("%d\n", *(g.tile_data_ptr + 2));
 //	screen(700, 700, &g);
-	printf("initing g\n");
 //	ginit(&g);
+
 	copy_tcps(&g);
 	printf("hi\n");
 	t_tile a;

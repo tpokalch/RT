@@ -17,10 +17,14 @@
 #include "libft/libft.h"
 #include <pthread.h>
 #include <fcntl.h>
+#include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 400
-#define CORES 8
+#define HEIGHT 200
+#define TASK 20
+#define STRIPS HEIGHT / TASK
+#define CORES 1
+#define M_T 6.28318530718
 
 typedef	struct	s_vector t_vector;
 
@@ -49,6 +53,7 @@ typedef	struct		s_colbri
 	t_vector col;
 	int	bri;
 }			t_colbri;
+
 
 int				brg(t_vector rgb);
 int				inside_cone(t_vector p, t_object o, t_global *g);
@@ -124,9 +129,9 @@ t_dstpst			hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 void				alias(int *dst, int *a, int w, int h, int xmax, int ymax);
 
 t_dstpst			*NANI(t_dstpst *t);
-int					obstructed(t_vector hit, t_object obj, t_global *g);
+void					obstructed(t_colbri *i, t_vector hit, t_vector *hitli, t_object obj, t_global *g);
 t_vector			rotate(t_vector ray, t_vector angle);
-void				init_vector(t_vector *i, double x, double y, double z);
+void				init_vector(t_vector *current, double x, double y, double z);
 int				con(t_global *g);
 t_vector			rgb(int c);
 t_vector			base(t_vector c);
@@ -144,8 +149,9 @@ t_vector			**initialize_points(int height);
 t_vector			**create_points(char *filename, t_vector *ptdim, t_global *g);
 void				free_points(t_vector **pts);
 double				mymod(double x, int m);
+double				myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g);
 int				myintmod(int x, int m);
-
+int				left(t_vector a, t_vector b, t_vector nrm, t_global *g);
 
 typedef	struct		s_tile
 {
@@ -183,6 +189,7 @@ typedef struct		s_object
 	t_vector		**pts;
 	t_object		*tris;
 	double			re;
+	double			trans;
 	t_vector		ptdim;
 	t_object		*frame;
 	t_vector		box[8];
@@ -217,7 +224,7 @@ typedef struct		s_global
 	t_vector		*ray;
 	t_vector		*li;
 	t_vector		*cam_pos;
-	double			liz;
+	double			*liz;
 	t_vector		*angle;
 	t_vector		*normal;
 	t_object		*obj;
@@ -230,5 +237,13 @@ typedef struct		s_global
 	int				core;
 	int				prim;
 	int				ambient;
+	int				my_line;
+	int				*line_taken;//size of number of tasks
+	int				mip_map;
+	pthread_mutex_t			mutex;
+	int				recursion;
+	int				lights;
+	t_vector			*hitli;
+	t_vector			*ctrli;
 	t_global		*tcps[CORES];
 }				t_global;
