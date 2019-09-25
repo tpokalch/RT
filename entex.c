@@ -322,8 +322,8 @@ int		start_threads(void *f, t_global *g)
 
 
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
-//	printf("%f frames second\n",CLOCKS_PER_SEC / (float)(clock() - t));
+//	printf("%f frames second\n",CLOCKS_PER_SEC / (double)(clock() - t));
 	t[1] = clock();
-	printf("fps %f\n",1 / ((float)(t[1] - t[0]) / (float)CLOCKS_PER_SEC));
+	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
 	return (1);
 }

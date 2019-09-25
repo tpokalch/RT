@@ -78,7 +78,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_object obj, t_gl
 		printf("obstructed %d times\n", obsc);
 	if (obsc > 0)
 //		cur->bri = g->ambient + (g->lights - obsc) * g->step_bri;
-		cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (float)g->lights;
+		cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
 	if (con(g))
 		printf("returning bri is %d\n", cur->bri);
 //	return (0);

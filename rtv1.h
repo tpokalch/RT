@@ -23,7 +23,7 @@
 #define HEIGHT 200
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 1
+#define CORES 8
 #define M_T 6.28318530718
 
 typedef	struct	s_vector t_vector;

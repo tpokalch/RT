@@ -31,7 +31,7 @@ void		ginit(t_global *g)
 	g->liz[2] = g->li[2].z;
 
 	g->ambient = 50;
-//	g->step_bri = (255 - g->ambient) / (float)g->lights;
+//	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
 	init_vector(&g->_0015, 0, 0, 15);
@@ -254,7 +254,7 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 		ret[retc].base[0] = norm(diff(ret[retc].bd1, ret[retc].bd3));
 		ret[retc].base[2] = norm(diff(ret[retc].bd2, ret[retc].bd3));
 		ret[retc].base[1] = norm(cross(diff(ret[retc].bd1, ret[retc].bd3), diff(ret[retc].bd2, ret[retc].bd3)));
-//		ret[retc].base[1] = scale(-1, norm(cross(diff(ret[retc + 1].bd1, ret[retc + 1].bd3), diff(ret[retc + 1].bd2, ret[retc + 1].bd3))));
+//		ret[retc].base[1] = scale(-1, norm(cross(diff(ret[retc].bd1, ret[retc ].bd3), diff(ret[retc].bd2, ret[retc].bd3))));
 
 
 

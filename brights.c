@@ -124,7 +124,7 @@ t_vector		mip_col(double x, double y, double dst2, t_object obj, t_global *g)
 
 	tilelow = floor(tilen);
 	tilehi = ceil(tilen);
-	float weight[2];
+	double weight[2];
 
 	weight[0] = 1 - (tilen - tilelow);
 	weight[1] = 1 - (tilehi - tilen);
@@ -315,7 +315,7 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 
 /*	while(++i < g->lights)
 		retorig.bri += round(255 * dot(norm(hitli[i]), nrm));
-	retorig.bri = round(retorig.bri / float(g->lights));
+	retorig.bri = round(retorig.bri / double(g->lights));
 */
 
 //	ret.bri = 255 * dot(norm(hitli), nrm);
@@ -394,7 +394,9 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 		printf("acos is %f\n", acos(dot(obj.base[0], proj)));
 	}
 //	x = lround(obj.tile[0].w * M_2_PI * (M_PI + (1 - 2 * (det(proj, obj.base[0]) < 0)) * acos(dot(obj.base[0], proj))));
-	x = obj.tile[0].w2 * /*(1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) **/ M_1_PI * myacos(dot(proj, obj.base[0]));
+//	x = obj.tile[0].w2 * /*(1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) **/ M_1_PI * myacos(dot(proj, obj.base[0]));
+	x = obj.tile[0].w2 * (/*1 - (1 - 2 * (det(proj, obj.base[2]) < 0))*/ 1 * M_1_PI * myacos(proj, obj.base[2], obj.base[1], g));
+
 
 
 
@@ -543,7 +545,10 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 	else
 	{
-		x = obj.tile[0].w2 * (1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) * M_1_PI * acos(dot(proj, obj.base[0])));
+		x = obj.tile[0].w2 * /* (1 - (1 - 2 * (det(proj, obj.base[0]) < 0)) */ M_1_PI * myacos(proj, obj.base[0], obj.base[1], g);
+//		x = obj.tile[0].w2 * (/*1 - (1 - 2 * (det(proj, obj.base[2]) < 0))*/ 1 * M_1_PI * myacos(proj, obj.base[2], obj.base[1], g));
+
+
 		y = myintmod(xdst, obj.tile[0].h);	
 		ret.col = base255(rgb(*(obj.tile[0].data_ptr + lround(y) * obj.tile[0].w + lround(x))));
 	}
@@ -601,7 +606,7 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 		ret.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
-	ret.bri = round(ret.bri / (float)g->lights);
+	ret.bri = round(ret.bri / (double)g->lights);
 
 
 
@@ -666,7 +671,7 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 	while(++i < g->lights)
 		retorig.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
-	retorig.bri = round(retorig.bri / (float)g->lights);
+	retorig.bri = round(retorig.bri / (double)g->lights);
 	obstructed(&ret, hit, g->hitli, obj, g);
 /*	if (0 && obstructed(hit, hitli, obj, g))
 	{
@@ -687,6 +692,7 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 //		x = obj.tile[0].w2 * (/*1 - (1 - 2 * (det(proj, obj.base[2]) < 0))*/ 1 * M_1_PI * acos(dot(proj, obj.base[2])));
 		y = obj.tile[0].h * (1/*1 - 2 * (det(nrm, obj.base[1]) < 0)*/) * M_1_PI * acos(dot(nrm, obj.base[1]));
 		x = obj.tile[0].w2 * (/*1 - (1 - 2 * (det(proj, obj.base[2]) < 0))*/ 1 * M_1_PI * myacos(proj, obj.base[2], obj.base[1], g));
+
 //		y = obj.tile[0].h * (1/*1 - 2 * (det(nrm, obj.base[1]) < 0)*/) * M_1_PI * myacos(nrm, obj.base[1], obj.base[2], g);
 //	printf("x y is %f, %f\n", x, y);
 		if (con(g))
@@ -699,8 +705,8 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 	if (con(g))
 	{
-		printf("x acos is %d\n", myacos(proj, obj.base[2], obj.base[1], g));
-		printf("y acos is %d\n", myacos(nrm, obj.base[1], obj.base[0], g));
+		printf("x acos is %f\n", myacos(proj, obj.base[2], obj.base[1], g));
+		printf("y acos is %f\n", myacos(nrm, obj.base[1], obj.base[0], g));
 
 	}
 //	y = lround(obj.tile[0].h2 * (1 - (dot(obj.base[1], nrm))));
@@ -947,7 +953,7 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 		printf("orient > 0? %f, %d\n", dot(diff(hit, *g->cam_pos), obj.base[1]), obj.cam_pos);
 	while(++i < g->lights)
 		ret.bri += fmax(round(255 * dot(norm(g->hitli[i]), obj.base[1])), g->ambient);
-	ret.bri = round(ret.bri / (float)g->lights);
+	ret.bri = round(ret.bri / (double)g->lights);
 
 
 //	hitli = diff(*g->li, hit);

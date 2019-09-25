@@ -3,7 +3,7 @@
 
 double           myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g)
 {
-        float ret;
+        double ret;
 
         ret = acos(dot(ax, v));
 //      if (left(v, ax, nrm, g))
