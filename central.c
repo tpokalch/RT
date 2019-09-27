@@ -101,7 +101,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			{
 				if (con(g))
 					printf("doing %d spec\n", i);
-				do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
+				do_1_spec(&tmp, cur, hit, hitli, nrm, reflrayv, obj, i, g);
 			}
 		}
 		specscal = g->lights - obsc;
@@ -230,6 +230,8 @@ void		*toimg(void *tcp)
 		while (++i < WIDTH)
 			if (g->hits[j][i]->obj.name != NULL)
 			{
+//				printf("now object %d %s\n", g->hits[j][i]->obj.id, g->hits[j][i]->obj.name);
+//				printf("color is %f,%f,%f\n", g->hits[j][i]->obj.color.z, g->hits[j][i]->obj.color.y, g->hits[j][i]->obj.color.z);
 				bright = (g->hits[j][i])->obj.
 				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
@@ -299,7 +301,7 @@ void		*recalc(void *p)
 	t_colbri bright;
 	t_dstpst ret;
 	int jheight;
-
+	
 //	printf("now recalcong\n");
 	g = (t_global *)p;
 
@@ -352,6 +354,8 @@ void		*recalc(void *p)
 //			printf("obj cam pos is %d\n", ret.obj.cam_pos);
 			if (g->hits[j][i]->obj.name != NULL)
 			{
+//				printf("now object %d %s\n", g->hits[j][i]->obj.id, g->hits[j][i]->obj.name);
+//				printf("color is %f,%f,%f\n", g->hits[j][i]->obj.color.z, g->hits[j][i]->obj.color.y, g->hits[j][i]->obj.color.z);	
 //				printf("calculating bright\n");
 				bright = g->hits[j][i]->obj.
 				bright(*g->cam_pos, g->hits[j][i]->hit, (g->hits)[j][i]->obj, g);

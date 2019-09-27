@@ -20,12 +20,12 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 300
-#define WIDTH_2 150
+#define HEIGHT 200
+#define WIDTH_2 100
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 4
+#define CORES 1
 #define M_T 6.28318530718
 
 typedef	struct	s_vector t_vector;
@@ -160,7 +160,7 @@ double				tothe2(double x, int e);
 
 void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g);
 
-void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g);
+void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector *hitli, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g);
 
 typedef	struct		s_tile
 {
