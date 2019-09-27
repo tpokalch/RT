@@ -20,10 +20,12 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 200
+#define HEIGHT 300
+#define WIDTH_2 150
+#define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 8
+#define CORES 4
 #define M_T 6.28318530718
 
 typedef	struct	s_vector t_vector;
@@ -51,6 +53,8 @@ typedef struct		s_dstpst	t_dstpst;
 typedef	struct		s_colbri
 {
 	t_vector col;
+	t_vector colself;
+	t_vector nrm;
 	int	bri;
 }			t_colbri;
 
@@ -129,7 +133,7 @@ t_dstpst			hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 void				alias(int *dst, int *a, int w, int h, int xmax, int ymax);
 
 t_dstpst			*NANI(t_dstpst *t);
-void					obstructed(t_colbri *i, t_vector hit, t_vector *hitli, t_object obj, t_global *g);
+void					obstructed(t_colbri *i, t_vector hit, t_vector *hitli, t_vector reflrayv, t_vector nrm, t_object obj, t_global *g);
 t_vector			rotate(t_vector ray, t_vector angle);
 void				init_vector(t_vector *current, double x, double y, double z);
 int				con(t_global *g);
@@ -152,6 +156,11 @@ double				mymod(double x, int m);
 double				myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g);
 int				myintmod(int x, int m);
 int				left(t_vector a, t_vector b, t_vector nrm, t_global *g);
+double				tothe2(double x, int e);
+
+void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g);
+
+void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g);
 
 typedef	struct		s_tile
 {
@@ -180,6 +189,7 @@ typedef struct		s_object
 	t_vector		bd2;
 	t_vector		bd3;
 	t_vector		base[3];
+	t_vector		nr;
 	t_tile			tile[15];
 	t_vector		*ctr;
 	t_vector		ang;
@@ -190,6 +200,7 @@ typedef struct		s_object
 	t_object		*tris;
 	double			re;
 	double			trans;
+	int			spec;
 	t_vector		ptdim;
 	t_object		*frame;
 	t_vector		box[8];
@@ -220,6 +231,7 @@ typedef struct		s_global
 	int				light_switch;
 	t_dstpst		cone[2];
 	t_vector		_0015;
+	t_vector		white;
 	t_vector		base[3];
 	t_vector		*ray;
 	t_vector		*li;
@@ -244,6 +256,9 @@ typedef struct		s_global
 	int				recursion;
 	int				lights;
 	t_vector			*hitli;
+	t_vector			*savehitli;
+	t_vector			prev;
+	double				*cosa;
 	t_vector			*ctrli;
 	t_global		*tcps[CORES];
 }				t_global;

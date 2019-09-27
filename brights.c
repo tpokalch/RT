@@ -68,19 +68,30 @@ t_colbri		trans(t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global 
 	return (ret);
 }
 
-
-t_colbri		refl(t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global *g)
+t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
 {
-	t_vector camhit;
-	t_vector camhitx;
+	t_vector ray;
 	t_vector refl;
+	t_vector rayx;
+
+	ray = diff(end, st);
+	rayx = diff(ray, scale(dot(ray, nrm), nrm));
+	refl = diff(scale(2, rayx), ray);
+	return (refl);
+}
+
+t_colbri		refl(t_vector refl, t_vector hit, t_vector nrm, t_object obj, t_global *g)
+{
+//	t_vector camhit;
+//	t_vector camhitx;
+//	t_vector refl;
 	t_dstpst temp;
 	t_objecthit reflobj;
 	t_colbri ret;
 
-	camhit = diff(hit, st);
-	camhitx = diff(camhit, scale(dot(camhit, nrm), nrm));
-	refl = diff(scale(2, camhitx), camhit);
+//	camhit = diff(hit, st);
+//	camhitx = diff(camhit, scale(dot(camhit, nrm), nrm));
+//	refl = diff(scale(2, camhitx), camhit);
 
 	objecthit(&temp, hit, sum(refl, hit), g->obj, g->argc + 1, g);
 
@@ -96,7 +107,7 @@ t_colbri		refl(t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global *
 		return (ret);
 	}
 	ret = reflobj.obj.bright(hit, reflobj.hit, reflobj.obj, g);
-
+	ret.col = scale(ret.bri / (double)255, ret.col);
 	return (ret);
 }
 
@@ -443,22 +454,32 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_globa
 	t_dstpst	t;
 	int		retobs;
 	t_vector hitli = diff(*g->li, hit);
+	int		i;
 
 	hit0 = diff(hit, *obj.ctr);
 	vrt = obj.base[1];
 	vrt = scale(dot(hit0, vrt), vrt);
 	nrm = norm(diff(hit0, vrt));
+	ret.bri = 0;
+	i = -1;
+	while (++i < g->lights)
+		g->hitli[i] = diff(g->li[i], hit);
+	i = -1;	
 	if (obj.cam_pos)
 	{
 		t = obj.hit(*g->cam_pos, *g->li, diff(*g->li, *g->cam_pos),obj, g);
 		if (t.dst < 1)
 		{
-			ret.bri = 0;
+			ret.bri = g->ambient;
 			return (ret);
 		}
 		nrm = scale(-1, nrm);
 	}
-	ret.bri = 255 * dot(norm(hitli), nrm);
+//	ret.bri = 255 * dot(norm(hitli), nrm);
+	while(++i < g->lights)
+		ret.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
+	ret.bri = round(ret.bri / (double)g->lights);
+//	obstructed(&ret, hit, g->hitli, obj, g);
 	ret.col = obj.color;
 /*	if (obstructed(hit, hitli, obj, g))
 	{
@@ -486,11 +507,17 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	t_dstpst	t;
 	int		retobs;
 	t_vector hitli = diff(*g->li, hit);
+	int		i;
 
 	hit0 = diff(hit, *obj.ctr);
 	vrt = obj.base[1];
 	vrt = scale(dot(hit0, vrt), vrt);
 	nrm = norm(diff(hit0, vrt));
+
+	i = -1;
+	while (++i < g->lights)
+		g->hitli[i] = diff(g->li[i], hit);
+	i = -1;	
 	if (obj.cam_pos)
 	{
 		t = obj.hit(*g->cam_pos, *g->li, diff(*g->li, *g->cam_pos),obj, g);
@@ -501,7 +528,11 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 		}
 		nrm = scale(-1, nrm);
 	}
-	ret.bri = 255 * dot(norm(hitli), nrm);
+	while(++i < g->lights)
+		ret.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
+	ret.bri = round(ret.bri / (double)g->lights);
+//	obstructed(&ret, hit, g->hitli, obj, g);
+//	ret.bri = 255 * dot(norm(hitli), nrm);
 	if (obj.tile[0].data_ptr)
 	{
 		double x;
@@ -530,7 +561,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 		printf("xdst is %f\n", xdst);
 		printf("tile h is %d\n", obj.tile[0].h);
 	}
-	y = mymod(xdst, obj.tile[0].h);
+//	y = mymod(xdst, obj.tile[0].h);
 
 	if (con(g))
 	{
@@ -553,7 +584,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 		ret.col = base255(rgb(*(obj.tile[0].data_ptr + lround(y) * obj.tile[0].w + lround(x))));
 	}
 	}
-	else
+//	else
 /*		ret.col = obj.color;
 	if (obstructed(hit, hitli, obj, g))
 	{
@@ -568,6 +599,40 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
+void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g)
+{
+	if (con(g))
+	{
+		printf("doing spec\n");
+		printf("tmp is %f,%f,%f\n", tmp->col.x, tmp->col.y, tmp->col.z);
+	}
+	g->cosa[i] = dot(norm(g->hitli[i]),norm(reflrayv));
+	if (g->cosa[i] > 0)
+	{
+		g->cosa[i] = tothe2(g->cosa[i], obj.spec);
+		tmp->col = sum(tmp->col, sum(scale(g->cosa[i], g->white), scale((1 - g->cosa[i]), ret->col)));
+	}
+	else
+		tmp->col = sum(tmp->col, ret->col);
+}
+
+void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g)
+{
+//		t_vector reflrayv;
+		double	cosa;
+		double cosa3;
+		int	i;
+		t_colbri tmp;
+
+//		reflrayv = reflray(st, hit, nrm, g);
+		init_vector(&tmp.col, 0, 0, 0);
+		i = -1;
+		while (++i < g->lights)
+			do_1_spec(&tmp, ret, hit, nrm, reflrayv, obj, i, g);
+		tmp.col = scale(1 / (double)g->lights, tmp.col);
+		ret->col = tmp.col;	
+}
+	
 t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
 	t_colbri		ret;
@@ -579,113 +644,57 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	t_vector ctrhit;
 	t_vector *hitli; 
 	int i;
+	t_colbri retorig;
+	t_vector reflrayv;
 
-	ret.bri = 0;
+	retorig.bri = 0;
 	i = -1;
 		while (++i < g->lights)
 			g->hitli[i] = diff(g->li[i], hit);	
 	i = -1;
 	if (con(g))
 		printf("______start BRI SPHERE func______\n");
-	nrm = norm(diff(hit, *obj.ctr));
+	nrm = obj.nr;
 	if (obj.cam_pos)
 	{
-//		printf("hi\n");
+		printf("hi\n");
 		ctrli = diff(*g->li, *obj.ctr);
 		if (dot(ctrli, ctrli) > obj.rd2)
 		{
-//			printf("ji\n");
 			ret.col = obj.color;
 			ret.bri = g->ambient;
 			return (ret);
 		}
 		nrm = scale(-1, nrm);
 	}
-//	ret.bri = (round(255 * dot(norm(diff(*g->li, hit)), nrm)));
-	while(++i < g->lights)
-		ret.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
+	while (++i < g->lights)
+		retorig.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
-	ret.bri = round(ret.bri / (double)g->lights);
+	retorig.bri = round(retorig.bri / (double)g->lights);
 
+	ret.col = obj.color;
+	ret.colself = obj.color;
 
-
-/*	if (obstructed(hit, hitli, obj, g))
+	if (obj.spec > 0)
 	{
-		retobs = g->ambient;
-		ret.bri = fmin(ret.bri, retobs);
+		reflrayv = reflray(st, hit, nrm, g);
+//		do_spec(&ret, hit, nrm, reflrayv, obj, g);
 	}
-*/
-	obstructed(&ret, hit, g->hitli, obj, g);
+	ret.bri = retorig.bri;
+	obstructed(&ret, hit, g->hitli, reflrayv, nrm, obj, g);
 	if (ret.bri < g->ambient)
 		ret.bri = g->ambient;
-	ret.col = obj.color;
 	return (ret);
 }
 
-t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_vector		do_tile(t_colbri *tileo, t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global *g)
 {
-	t_colbri		ret;
-	t_vector	nrm;
-	t_vector	ctrli;
-	t_colbri	ret2;
-	int		retobs;
-	double		x;
-	double		y;
-	t_vector	proj;
-	t_vector	ctrhit;
-	t_vector	*hitli; 
-	t_colbri	retorig;
-	t_colbri	transo;
-	t_colbri	reo;
-	t_colbri	tileo;
-	int i;
+		t_vector ctrhit;
+		t_vector proj;
+		double x;
+		double y;
 
-	retorig.bri = 0;
-	i = -1;
-	while (++i < g->lights)
-		g->hitli[i] = diff(g->li[i], hit);
-	i = -1;
-	if (con(g))
-		printf("______start BRI SPHERE func______\n");
-	nrm = norm(diff(hit, *obj.ctr));
-	if (obj.cam_pos)
-	{
-	/*
-		if (!obj.trans)
-		{
-			while (++i < g->lights)
-				g->ctrli[i] = diff(g->li[i], *obj.ctr);
-			if (dot(ctrli, ctrli) > obj.rd2)
-			{
-				ret.col = obj.color;
-				ret.bri = g->ambient;
-				return (ret);
-			}
-		}
-*/
-		nrm = scale(-1, nrm);
-	}
-	if (con(g))
-		printf("HI\n");
-
-	while(++i < g->lights)
-		retorig.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
-	retorig.bri = round(retorig.bri / (double)g->lights);
-	obstructed(&ret, hit, g->hitli, obj, g);
-/*	if (0 && obstructed(hit, hitli, obj, g))
-	{
-		retobs = g->ambient;
-		retorig.bri = fmin(retorig.bri, retobs);
-	}*/
-//	else
-//		ret = color(ret, obj.color);
-	if (con(g))
-		printf("ambient is %d\n", g->ambient);
-	if (retorig.bri < g->ambient)
-		retorig.bri = g->ambient;
-	if (obj.tile[0].data_ptr)
-	{
 		ctrhit = diff(hit, *obj.ctr);
 		proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit),obj.base[1]));
 		proj = norm(proj);
@@ -714,25 +723,108 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	if (con(g))
 		printf("x, y is %f, %f\n", x, y);
 	if (g->mip_map)
-		tileo.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
+		tileo->col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
 	else
-		tileo.col = base255(rgb(*(obj.tile[0].data_ptr + lround(y)* obj.tile[0].w + lround(x))));
+		tileo->col = base255(rgb(*(obj.tile[0].data_ptr + lround(y)* obj.tile[0].w + lround(x))));
+	return (tileo->col);
+}
+	
+t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
+{
+	t_colbri		ret;
+	t_vector	nrm;
+	t_vector	ctrli;
+	int		retobs;
+	t_vector	proj;
+	t_vector	ctrhit;
+	t_vector	*hitli; 
+	t_colbri	retorig;
+	t_colbri	transo;
+	t_colbri	reo;
+	t_colbri	tileo;
+	t_colbri	speco;
+	int i;
+	t_vector reflrayv;
+	
+	retorig.bri = 0;
+	i = -1;
+	while (++i < g->lights)
+		g->hitli[i] = diff(g->li[i], hit);
+	i = -1;
+	if (con(g))
+		printf("______start BRI SPHERE func______\n");
+	nrm = norm(diff(hit, *obj.ctr));
+	ret.nrm = nrm;
+	if (obj.cam_pos)
+	{
+	/*
+		if (!obj.trans)
+		{
+			while (++i < g->lights)
+				g->ctrli[i] = diff(g->li[i], *obj.ctr);
+			if (dot(ctrli, ctrli) > obj.rd2)
+			{
+				ret.col = obj.color;
+				ret.bri = g->ambient;
+				return (ret);
+			}
+		}
+*/
+		nrm = scale(-1, nrm);
+	}
+	if (con(g))
+		printf("HI\n");
+
+	while(++i < g->lights)
+		retorig.bri += fmax(round(255 * dot(norm(g->hitli[i]), nrm)), g->ambient);
+	retorig.bri = round(retorig.bri / (double)g->lights);
+/*	if (0 && obstructed(hit, hitli, obj, g))
+	{
+		retobs = g->ambient;
+		retorig.bri = fmin(retorig.bri, retobs);
+	}*/
+//	else
+//		ret = color(ret, obj.color);
+	if (con(g))
+		printf("ambient is %d\n", g->ambient);
+	if (retorig.bri < g->ambient)
+		retorig.bri = g->ambient;
+	if (obj.tile[0].data_ptr)
+	{
+		ret.colself = do_tile(&tileo, st, hit, nrm, obj, g);
+		tileo.bri = retorig.bri;
 	}
 	else
-		tileo.col = obj.color;	
-	tileo.bri = retorig.bri;
+	{
+		ret.colself = obj.color;
+		tileo.col = obj.color;
+		tileo.bri = retorig.bri;
+	}
+	if (obj.spec || obj.re)
+		reflrayv = reflray(st, hit, nrm, g);
 	if (obj.re > 0)
 	{
-		if (g->recursion < 20)
+		t_vector savehitli;
+		i = -1;
+		while (++i < g->lights)
+			g->savehitli[i] = g->hitli[i];
+		t_vector reflrayv1;
+
+		reflrayv1 = reflrayv;
+		if (g->recursion < 3)
 		{
 			g->recursion++;
-			reo = refl(st, hit, nrm, obj, g);
-			reo.bri = ((1 - obj.re) * tileo.bri + obj.re * reo.bri);
+			reo = refl(reflrayv1, hit, nrm, obj, g);
+//			reo.bri = ((1 - obj.re) * tileo.bri + obj.re * reo.bri);
+				reo.bri = tileo.bri;
 			reo.col = sum(scale(1 - obj.re, tileo.col), scale(obj.re, reo.col));
 
 //			printf("recursion is %d\n", recursion);
 		}
 		g->recursion = 0;
+		i = -1;
+		while (++i < g->lights)
+			g->hitli[i] = g->savehitli[i];
 	}
 	else
 	{
@@ -756,9 +848,52 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 	else
 	{
-		ret.col = reo.col;
-		ret.bri = reo.bri;
+		transo.col = reo.col;
+		transo.bri = reo.bri;
 	}
+	if (obj.spec > 0)
+	{
+//		do_spec(&transo, hit, nrm, reflrayv, obj, g);
+/*		double	cosa;
+		double cosa3;
+		int	i;
+
+		init_vector(&ret.col, 0, 0, 0);
+		i = -1;
+		if (con(g))
+			printf("hitli is %f,%f,%f\n", g->hitli[0].x, g->hitli[0].y, g->hitli[0].z);
+		while (++i < g->lights)
+		{
+			g->cosa[i] = dot(norm(g->hitli[i]),norm(reflrayv));		
+			if (con(g))
+			{
+				printf("transo col is %f,%f,%f\n", transo.col.x, transo.col.y, transo.col.z);
+				printf("reflrayv %f,%f,%f\n", reflrayv.x, reflrayv.y, reflrayv.z);
+			}
+			if (g->cosa[i] > 0)
+			{
+				if (con(g))
+					printf("cos %d is %f\n", i, g->cosa[i]);
+				g->cosa[i] = tothe2(g->cosa[i], obj.spec);
+				ret.col = sum(ret.col, sum(scale(g->cosa[i], g->white), scale((1 - g->cosa[i]), transo.col)));
+			}
+			else
+				ret.col = sum(ret.col, transo.col);
+		}
+		ret.col = scale(1 / (double)g->lights, ret.col);
+		if (con(g))
+		{
+			printf("white is %f, %f, %f\n", g->white.x, g->white.y, g->white.z);
+			printf("cosa3 is %f\n", cosa3);
+			printf("ret is %f,%f,%f\n", ret.col.x, ret.col.y, ret.col.z);
+		}
+*/
+	}
+	ret.col = transo.col;
+	ret.bri = transo.bri;
+	ret.bri = fmax(ret.bri, g->ambient);
+	obstructed(&ret, hit, g->hitli, reflrayv, nrm, obj, g);
+
 	if (con(g))
 		printf("returning col %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
 	return (ret);
@@ -935,6 +1070,7 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 	int			tempbri;
 	t_vector		hitli;
 	t_vector	v;
+	t_vector	reflrayv;
 	
 	ret.bri = 0;
 	i = -1;
@@ -964,6 +1100,7 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 		init_vector(&ret.col, 0, 0, 0);
 	else
 		ret.col = obj.color;
+	ret.colself = ret.col;
 /*	if (obstructed(hit, hitli, obj, g))
 	{
 		retobs = g->ambient;
@@ -971,7 +1108,9 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 		ret.bri = fmin(tempbri, retobs);
 	}
 */
-	obstructed(&ret, hit, g->hitli, obj, g);
+	if (obj.spec)
+		reflrayv = reflray(st, hit, obj.base[1], g);	
+	obstructed(&ret, hit, g->hitli, reflrayv, obj.base[1], obj, g);
 	if (ret.bri < g->ambient)
 	{
 		ret.bri = g->ambient;
@@ -994,9 +1133,13 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 	double		y;
 	t_colbri	retorig;
 	t_vector hitli = diff(*g->li, hit);
+	t_vector	reflrayv;
 
-	i = 0;
-
+	i = -1;
+	while (++i < g->lights)
+		g->hitli[i] = diff(g->li[i], hit);
+	i = -1;
+	
 	if (/*dot(diff(hit, st), obj.base[1]) > 0*/ obj.cam_pos)
 	{
 		if (con(g))
@@ -1008,7 +1151,9 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 //	if (con(g))
 //		printf("orient > 0? %f\n", dot(diff(hit, *g->cam_pos), obj.base[1]));
-	retorig.bri = round(255 * dot(norm(hitli), obj.base[1]));
+	while(++i < g->lights)
+		retorig.bri += fmax(round(255 * dot(norm(g->hitli[i]), obj.base[1])), g->ambient);
+//	retorig.bri = round(255 * dot(norm(hitli), obj.base[1]));
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
 //	printf("x y is %d, %d\n", x, y);
@@ -1024,6 +1169,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 
 		retorig.col = base(rgb(*(obj.tile[0].data_ptr + lround(y) * obj.tile[0].w + lround(x))));
 //		ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
+		ret.colself = retorig.col;
 	}
 	else
 	{
@@ -1033,6 +1179,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 			init_vector(&retorig.col, 0, 0, 0);
 		else
 			retorig.col = obj.color;
+		ret.colself = retorig.col;
 	}
 	if (obj.re > 0)
 	{
@@ -1052,7 +1199,9 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 		ret.bri = fmin(tempbri, retobs);
 	}
 */
-//	obstructed(&ret, hit, g->hitli, obj, g);
+	if (obj.spec)
+		reflrayv = reflray(st, hit, obj.base[1], g);	
+	obstructed(&ret, hit, g->hitli, reflrayv, obj.base[1], obj, g);
 	if (ret.bri < g->ambient && (ret.bri = g->ambient))
 	{
 		if (con(g))

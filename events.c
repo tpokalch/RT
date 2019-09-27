@@ -166,8 +166,8 @@ int		mouse_move(int x, int y, void *param)
 //			printf("hello\n");
 //			ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
 			block = g->liz[g->light_switch - 1] / g->ray->z;
-			p.x = (-WIDTH / 2 + x) * block;
-			p.y = (-y + HEIGHT / 2) * block;
+			p.x = (x - WIDTH_2) * block;
+			p.y = (HEIGHT_2 - y) * block;
 			p.z = g->liz[g->light_switch - 1];
 			g->li[g->light_switch - 1] = sum(*g->cam_pos, rotate(p, *g->angle));
 			start_threads(toimg, g);
@@ -175,8 +175,8 @@ int		mouse_move(int x, int y, void *param)
 	else if (g->light_switch > g->lights)
 	{
 //		ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
-		p.y = /*sin*/((-WIDTH / 2 + x )* 0.0045);
-		p.x = /*sin*/(0.0045 * (y - HEIGHT / 2));
+		p.y = /*sin*/((x - WIDTH_2)* 0.0045);
+		p.x = /*sin*/(0.0045 * (y - HEIGHT_2));
 		p.z = 0;
 //		*g->normal = rotate(g->_0015, p);
 //		*g->angle = sum(p, *g->angle);

@@ -12,7 +12,7 @@
 
 #include "rtv1.h"
 
-void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_object obj, t_global *g)
+void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv, t_vector nrm, t_object obj, t_global *g)
 {
 	int i;
 //	int	objn;
@@ -20,13 +20,17 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_object obj, t_gl
 	t_dstpst	t;
 	t_vector ray;
 	int	obsc;
+	t_colbri tmp;
+	int obss[g->lights];
+	int	specscal;
 
+	ft_bzero(obss, 4 * g->lights);
+	init_vector(&tmp.col, 0, 0, 0);
 	obsc = 0;
 	i = 0;
 	if (con(g))
 	{
-			printf("starting bri is %d\n", cur->bri);
-	
+			printf("starting bri is %d col %f,%f,%f\n", cur->bri, cur->col.x, cur->col.y, cur->col.z);
 			printf("hit is at %f,%f,%f\n", hit.x, hit.y, hit.z);
 			printf("li is at %f,%f,%f\n", g->li->x, g->li->y, g->li->z);
 	}
@@ -42,42 +46,74 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_object obj, t_gl
 		{
 			if (iobjn[1] == 0)
 				iobjn[1] = (iobjn[1] + 1) % (g->argc + 1);
-			if (obj.id != g->obj[iobjn[1]].id)
+			if (obj.id != g->obj[iobjn[1]].id || 0)
 			{
 				t = g->obj[iobjn[1]].hit(hit, g->li[i], ray, g->obj[iobjn[1]], g);
-				if (t.dst < 0.000001)
+				if (t.dst /*/ sqrt(dot(ray, ray))*/ < 0.000001)
 				{
-//					return (0);
-//					return ;
+					if (con(g))
+						printf("doing 1 spec %d\n", i);
+//					if (obj.spec)
+//						do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
 					i++;
 					break;
 				}
+/*
 				if (ft_strequ(g->obj[iobjn[1]].name, "cone")
 					&& inside_cone(g->li[i], g->obj[iobjn[1]], g)
 					&& !inside_cone(*g->cam_pos, g->obj[iobjn[1]], g))
 					obsc++;
 //					return (1);
+*/
 				if (t.dst < 1)
 				{
 					g->prim = iobjn[1];
 					if (con(g))
 					{
 					printf("obstructed by %d %s\n",g->obj[iobjn[1]].id ,g->obj[iobjn[1]].name); 
-					printf("dst is %f\n", t.dst);
+					printf("dst is %f, ray length is %f\n", t.dst, dot(ray, ray));
+					printf("dst / ray length is %f\n", t.dst / sqrt(dot(ray, ray)));
 					}
 					obsc++;
+					obss[i] = 1;
 //					return (1);
 				}
+			/*	else
+				{
+					if (con(g))
+						printf("doing 1 spec\n");
+					if (obj.spec)
+						do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
+
+				}
+				*/
 			}
 			iobjn[1] = (iobjn[1] + 1) % (g->argc + 1);
 		}
 		i++;
 	}
-//	printf("cycle ended\n");
+	i = -1;
+	if (obj.spec)
+	{
+		while (++i < g->lights)
+		{
+			if (obss[i] == 0)
+			{
+				if (con(g))
+					printf("doing %d spec\n", i);
+				do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
+			}
+		}
+		specscal = g->lights - obsc;
+		if (obsc < g->lights)
+		{
+			tmp.col = scale(1 / (double)specscal, tmp.col);
+			cur->col = tmp.col;
+		}
+	}
 	if (con(g))
 		printf("obstructed %d times\n", obsc);
 	if (obsc > 0)
-//		cur->bri = g->ambient + (g->lights - obsc) * g->step_bri;
 		cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
 	if (con(g))
 		printf("returning bri is %d\n", cur->bri);
@@ -186,13 +222,9 @@ void		*toimg(void *tcp)
 
 	g = tcp;
 	end = (g->core + 1) * HEIGHT / CORES;
-	j = -1;
-	if (CORES > 0)
-		j = g->core * HEIGHT / CORES - 1;
-
+	j = g->core * HEIGHT / CORES - 1;
 	jheight = j * HEIGHT;
-
-	while (++j < end && (i = -1))
+	while ((++j < end) && (i = -1))
 	{
 		jheight += HEIGHT; 
 		while (++i < WIDTH)
@@ -214,13 +246,17 @@ void		*move(void *p)
 	int end;
 	t_colbri bright;
 	t_dstpst ret;
+	int	jheight;
 
 	g = (t_global *)p;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;
 //	j = g->my_line - 1;
 //	end = j + TASK + 1;
+	jheight = j * HEIGHT;
 	while (++j < end && (i = -1))
+	{
+		jheight += HEIGHT;
 		while (++i < WIDTH)
 		{
 			objecthit(&ret, *g->cam_pos,
@@ -232,12 +268,14 @@ void		*move(void *p)
 			{
 				bright = (g->hits[j][i])->obj.bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
 				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
-				g->hits[j][i]->obj.color = bright.col;
-				g->data_ptr[j * HEIGHT + i] = color(bright.bri, bright.col);
+				g->hits[j][i]->obj.color = bright.colself;
+				g->hits[j][i]->obj.nr = bright.nrm;
+				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
 			else
-				g->data_ptr[j * HEIGHT + i] = 0;			
+				g->data_ptr[jheight + i] = 0;			
 		}
+	}
 /*
 	if ((g->my_line = empty_line(0, g->line_taken)) != -1 && (g->line_taken[g->my_line] = 1))
 	{
@@ -260,6 +298,7 @@ void		*recalc(void *p)
 	int end;
 	t_colbri bright;
 	t_dstpst ret;
+	int jheight;
 
 //	printf("now recalcong\n");
 	g = (t_global *)p;
@@ -272,6 +311,7 @@ void		*recalc(void *p)
 
 //	i = -1;
 //	printf("doing work %d-%d\n", j, end);
+	jheight = j * HEIGHT;
 	while (++j < end && (i = -1))
 	{
 		if (WIDTH > 2000)
@@ -293,13 +333,14 @@ void		*recalc(void *p)
 		else if (g->core == 7)
 			printf("core 8 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
 		}
+		jheight += HEIGHT;
 		while (++i < WIDTH)
 		{
 
 //for debug
-			init_vector(g->ray, i - WIDTH / 2, HEIGHT / 2 - j, g->ray->z);
+			init_vector(g->ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
 //
-			init_vector(&ray, i - WIDTH / 2, HEIGHT / 2 - j, g->ray->z);
+			init_vector(&ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
 //			printf("rotating vector\n");
 			ray = rotate(ray, *g->angle);
 			*g->rays[j][i] = ray;
@@ -316,13 +357,14 @@ void		*recalc(void *p)
 				bright(*g->cam_pos, g->hits[j][i]->hit, (g->hits)[j][i]->obj, g);
 //				printf("bright is %d\n", bright.bri);
 //				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
-				g->hits[j][i]->obj.color = bright.col;
+				g->hits[j][i]->obj.color = bright.colself;
+				g->hits[j][i]->obj.nr = bright.nrm;
 //				if (i == 0)
 //					printf("writing line\n");
-				g->data_ptr[j * HEIGHT + i] = color(bright.bri, bright.col);
+				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
 			else
-				g->data_ptr[j * HEIGHT + i] = 0;
+				g->data_ptr[jheight + i] = 0;
 		}
 	}
 //	printf("core %d is executing line %d - %d says empty line is %d\n", g->core, g->my_line - 1, end, empty_line(0, g->line_taken));

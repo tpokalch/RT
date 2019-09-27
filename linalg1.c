@@ -153,6 +153,16 @@ t_vector			rotate3(t_vector base[3], t_vector ang)
 	return (ret)
 */
 
+double				tothe2(double x, int e)
+{
+	int i;
+
+	i = -1;
+	while (++i < e)
+		x = x * x;
+	return (x);
+}
+
 t_dstpst			*NANI(t_dstpst *t)
 {
 	t->dst = NAN;

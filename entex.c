@@ -287,8 +287,8 @@ int		start_threads(void *f, t_global *g)
 //	ft_bzero(g->line_taken, 4 * STRIPS);
 	while (++i < CORES)
 	{
-		g->tcps[i]->line_taken[i] = 1;
-		g->tcps[i]->my_line = i * TASK;
+//		g->tcps[i]->line_taken[i] = 1;
+//		g->tcps[i]->my_line = i * TASK;
 		pthread_create(&g->tid[i], NULL, f, g->tcps[i]);
 	}
 
