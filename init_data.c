@@ -23,6 +23,7 @@ void		ginit(t_global *g)
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
 		init_vector(&g->li[i], 402, 400, 100);
+	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
 	i = -1;
@@ -488,7 +489,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
-	g->obj[i].re = 0.5;
+	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
 	init_vector(g->obj[i].ctr, 0, 0, 300);
 	printf("center is %f\n", g->obj[i].ctr->z);
@@ -499,36 +500,6 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-/*	
-	t_vector dir[8];
-
-	init_vector(&dir[0], 100, 100, 100);
-	init_vector(&dir[1], -100, 100, 100);
-	init_vector(&dir[2], 100, -100, 100);
-	init_vector(&dir[3], -100, -100, 100);
-
-	init_vector(&dir[4], 100, 100, -100);
-	init_vector(&dir[5], -100, 100, -100);
-	init_vector(&dir[6], 100, -100, -100);
-	init_vector(&dir[7], -100, -100, -100);
-
-
-
-
-
-
-
-
-	g->obj[i].box[0] = diff(*g->obj[i].ctr, dir[0]);
-	g->obj[i].box[1] = diff(*g->obj[i].ctr, dir[1]);
-	g->obj[i].box[2] = diff(*g->obj[i].ctr, dir[2]);
-	g->obj[i].box[3] = diff(*g->obj[i].ctr, dir[3]);
-	g->obj[i].box[4] = diff(*g->obj[i].ctr, dir[4]);
-	g->obj[i].box[5] = diff(*g->obj[i].ctr, dir[5]);
-	g->obj[i].box[6] = diff(*g->obj[i].ctr, dir[6]);
-	g->obj[i].box[7] = diff(*g->obj[i].ctr, dir[7]);
-*/
-
 	printf("hello\n");
 //	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 	g->obj[i].tile[0].data_ptr = NULL;

@@ -77,6 +77,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 					}
 					obsc++;
 					obss[i] = 1;
+					break;
 //					return (1);
 				}
 			/*	else

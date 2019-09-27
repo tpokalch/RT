@@ -21,32 +21,35 @@ t_colbri		trans(t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global 
 	t_vector	end;
 	t_vector	start;
 
-//	g->obj[obj.id].name = NULL;
-
-//	start = hit;
-//	end = scale(2, start);
+//	g->recursion++;
+//	if (g->recursion > 4)
+//		return (ret);
+//NEED TO MAKE ANOTJER RECURSION LIMIT
+	g->recursion++;
+//TEMPORARI SOLUTION. DONT KNOW WHY doesn't work WORKS YET
+//no fix
 	ray = diff(hit, st);
-//	end = sum(scale(2, ray), st);
 	if (con(g))
+	{
 		printf("_______inside trans______\n");
-	if (con(g))
 		printf("obj re is %f\n", obj.re);
+		printf("calling objecthi\n");
+	}
 	objecthit(&temp, hit, sum(ray, hit), g->obj, g->argc + 1, g);
+	if (con(g))
+		printf("objecthit done\n");
 	transobj.hit = sum(scale(temp.dst, ray), hit);
 	transobj.obj = temp.obj;
 	
 //WJY THIS BUG? DOENST RETURN THE COMPLETE OBJECT SPECIFICATIONS
 	transobj.obj.cam_pos = 0;
 	if (con(g))
+	{
 		printf("obj trans is %f\n", obj.trans);
-	if (con(g))
 		printf("trans of transobj is %f\n", transobj.obj.trans);
-	if (con(g))
 		printf("trans hit %d %s\n", transobj.obj.id, transobj.obj.name);
-
-	if (con(g))
 		printf("hit %f,%f,%f\n", transobj.hit.x, transobj.hit.y, transobj.hit.z);
-
+	}
 
 	if (transobj.obj.name == NULL)
 	{
@@ -58,7 +61,7 @@ t_colbri		trans(t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global 
 		return (ret);
 	}
 	if (con(g))
-		printf("calling bruhgt\n");
+		printf("calling brihgt\n");
 //will be infinite recursion if this is refl
 	ret = transobj.obj.bright(hit, transobj.hit, transobj.obj, g);
 	if (con(g))
@@ -812,12 +815,16 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	int		i;
 	t_vector	reflrayv;
 	t_vector	hitli[g->lights];
+	static int rec = 0;
 
+	rec++;
 	if (con(g))
+	{
 		printf("______start BRI SPHERE func______\n");
+		printf("rec is %d\n", rec);
+	}
 	init_hitli(hitli, hit, g);
 	nrm = scale(1 / (double)obj.rd, diff(hit, *obj.ctr));
-	ret.nrm = nrm;
 	if (obj.cam_pos)
 	{
 	/*
@@ -835,8 +842,9 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 */
 	//	printf("changing nr\n");
 		nrm = scale(-1, nrm);
-		ret.nrm = nrm;	
 	}
+	ret.nrm = nrm;
+	obj.nr = nrm;
 	init_bri(&tileo.bri, hitli, nrm, g);
 	if (con(g))
 	{
@@ -862,11 +870,11 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		reo.col = tileo.col;
 		reo.bri = tileo.bri;
 	}
-//	printf("hi1\n");
 	if (con(g))
-		printf("colbri after re is %f,%f,%f bri %d\n", reo.col.x, reo.col.y, reo.col.z, reo.bri);	
-	if (con(g))
-		printf("trans %f\n", obj.trans);	
+	{
+		printf("colbri after re is %f,%f,%f bri %d\n", reo.col.x, reo.col.y, reo.col.z, reo.bri);
+		printf("trans %f\n", obj.trans);
+	}
 	if (obj.trans > 0)
 	{
 		if (con(g))
@@ -874,6 +882,7 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		transo = trans(st, hit, nrm, obj, g);
 //		printf("object got\n");
 		transo.bri = ((1 - obj.trans) * reo.bri + obj.trans * transo.bri);
+		transo.bri = reo.bri;
 		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
 		ret.col = transo.col;
 		ret.bri = transo.bri;
@@ -881,59 +890,21 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 	else
 	{
-		transo.col = reo.col;
-		transo.bri = reo.bri;
+		ret.col = reo.col;
+		ret.bri = reo.bri;
 	}
 	if (con(g))
-		printf("colbri after trans is %f,%f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);	
-/*
-	if (obj.spec > 0)
-	{
-//		do_spec(&transo, hit, nrm, reflrayv, obj, g);
-		double	cosa;
-		double cosa3;
-		int	i;
-
-		init_vector(&ret.col, 0, 0, 0);
-		i = -1;
-		if (con(g))
-			printf("hitli is %f,%f,%f\n", g->hitli[0].x, g->hitli[0].y, g->hitli[0].z);
-		while (++i < g->lights)
-		{
-			g->cosa[i] = dot(norm(g->hitli[i]),norm(reflrayv));		
-			if (con(g))
-			{
-				printf("transo col is %f,%f,%f\n", transo.col.x, transo.col.y, transo.col.z);
-				printf("reflrayv %f,%f,%f\n", reflrayv.x, reflrayv.y, reflrayv.z);
-			}
-			if (g->cosa[i] > 0)
-			{
-				if (con(g))
-					printf("cos %d is %f\n", i, g->cosa[i]);
-				g->cosa[i] = tothe2(g->cosa[i], obj.spec);
-				ret.col = sum(ret.col, sum(scale(g->cosa[i], g->white), scale((1 - g->cosa[i]), transo.col)));
-			}
-			else
-				ret.col = sum(ret.col, transo.col);
-		}
-		ret.col = scale(1 / (double)g->lights, ret.col);
-		if (con(g))
-		{
-			printf("white is %f, %f, %f\n", g->white.x, g->white.y, g->white.z);
-			printf("cosa3 is %f\n", cosa3);
-			printf("ret is %f,%f,%f\n", ret.col.x, ret.col.y, ret.col.z);
-		}
-	}
-*/
-	ret.col = transo.col;
-	ret.bri = transo.bri;
-	ret.bri = fmax(ret.bri, g->ambient);
+		printf("colbri after trans is %f,%f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
+//	ret.col = transo.col;
+//	ret.bri = transo.bri;
+//	ret.bri = fmax(ret.bri, g->ambient);
 	if (con(g))
 		printf("calling obstructed\n");
 	obstructed(&ret, hit, hitli, reflrayv, nrm, obj, g);
 
 	if (con(g))
 		printf("returning col %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
+	rec = 0;
 	return (ret);
 }
 
