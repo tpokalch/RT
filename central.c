@@ -24,6 +24,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	int obss[g->lights];
 	int	specscal;
 
+//	printf("colself in the begining %f,%f,%f\n", cur->colself.x, cur->colself.y, cur->colself.z);
 	ft_bzero(obss, 4 * g->lights);
 	init_vector(&tmp.col, 0, 0, 0);
 	obsc = 0;
@@ -117,6 +118,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
 	if (con(g))
 		printf("returning bri is %d\n", cur->bri);
+//	printf("colself in the end %f,%f,%f\n", cur->colself.x, cur->colself.y, cur->colself.z);
 //	return (0);
 }
 
@@ -361,6 +363,7 @@ void		*recalc(void *p)
 				bright(*g->cam_pos, g->hits[j][i]->hit, (g->hits)[j][i]->obj, g);
 //				printf("bright is %d\n", bright.bri);
 //				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
+//				printf("writing %f,%f,%f inot color\n", bright.colself.x, bright.colself.y, bright.colself.z);
 				g->hits[j][i]->obj.color = bright.colself;
 				g->hits[j][i]->obj.nr = bright.nrm;
 //				if (i == 0)
