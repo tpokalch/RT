@@ -656,11 +656,7 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	t_vector reflrayv;
 	t_vector hitli[g->lights];
 
-	retorig.bri = 0;
-	i = -1;
-		while (++i < g->lights)
-			hitli[i] = diff(g->li[i], hit);	
-	i = -1;
+	init_hitli(hitli, hit, g);
 	if (con(g))
 		printf("______start BRI SPHERE func______\n");
 	nrm = obj.nr;
@@ -676,8 +672,7 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 		}
 //		nrm = scale(-1, nrm);
 	}
-	while (++i < g->lights)
-		retorig.bri += fmax(round(255 * dot(norm(hitli[i]), nrm)), g->ambient);
+	init_bri(&retorig.bri, hitli, nrm, g);
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
 	retorig.bri = round(retorig.bri / (double)g->lights);
@@ -685,8 +680,10 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	ret.col = obj.color;
 	ret.colself = obj.color;
 
-	if (obj.spec > 0)
+	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, nrm, g);
+	if (obj.re > 0)
+		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
 	ret.bri = retorig.bri;
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	if (ret.bri < g->ambient)
@@ -731,7 +728,12 @@ t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_vector
 	if (g->mip_map)
 		*tileocol = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
 	else
+	{
 		*tileocol = *(obj.tile[0].vectile + lround(y)* obj.tile[0].w + lround(x));
+//		*tileocol = base255(rgb(*(obj.tile[0].data_ptr + obj.tile[0].w * lround(y) + lround(x))));
+	}
+	if (con(g))
+		printf("color from tile is %f,%f,%f\n", tileocol->x, tileocol->y, tileocol->z);
 	return (*tileocol);
 }
 
@@ -1032,11 +1034,13 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 	}
 	if (con(g))
 		printf("orient > 0? %f, %d\n", dot(diff(hit, *g->cam_pos), obj.base[1]), obj.cam_pos);
-	init_bri(&ret.bri, hitli, obj.base[0], g);
+	init_bri(&ret.bri, hitli, obj.base[1], g);
 	ret.col = obj.color;
 	ret.colself = ret.col;
-	if (obj.spec)
+	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, obj.base[1], g);
+	if (obj.re)
+		do_re(reflrayv, &ret.col, ret.col, hit, obj.base[1], obj, g);
 	obj.nr = obj.base[1];
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	if (ret.bri < g->ambient)

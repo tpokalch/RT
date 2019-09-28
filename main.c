@@ -81,7 +81,7 @@ void		draw_vectile(t_vector *t, int w, int h, t_global *g)
 		i = 0;
 		while (i < w)
 		{
-			printf("we are at %d,%d\n", i, j);
+//			printf("we are at %d,%d\n", i, j);
 			mlx_pixel_put(g->mlx_ptr, g->win_ptr, i, j, brg(scale(255, *(t + j * h + i))));
 			i++;
 		}
