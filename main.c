@@ -69,6 +69,26 @@ void		screen(int *a, int x, int y, t_global *g)
 	}
 }
 
+void		draw_vectile(t_vector *t, int w, int h, t_global *g)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (j < h)
+	{
+		i = 0;
+		while (i < w)
+		{
+			printf("we are at %d,%d\n", i, j);
+			mlx_pixel_put(g->mlx_ptr, g->win_ptr, i, j, brg(scale(255, *(t + j * h + i))));
+			i++;
+		}
+		j++;
+	}
+}
+
 void		draw_func(t_global *g)
 {
 	int i = -WIDTH / 2;
@@ -131,6 +151,7 @@ int		main(int argc, char **argv)
 		i++;
 	}
 //	draw_func(&g);
+//	draw_vectile(g.obj[1].tile[0].vectile, g.obj[1].tile[0].w, g.obj[1].tile[0].h, &g);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd1.x, g.obj[1].tris[0].bd1.y, g.obj[1].tris[0].bd1.z);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd2.x, g.obj[1].tris[0].bd2.y, g.obj[1].tris[0].bd2.z);
 //	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd3.x, g.obj[1].tris[0].bd3.y, g.obj[1].tris[0].bd3.z);

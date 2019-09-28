@@ -27,6 +27,7 @@
 #define STRIPS HEIGHT / TASK
 #define CORES 4
 #define M_T 6.28318530718
+#define MAX_REC 5
 
 typedef	struct	s_vector t_vector;
 
@@ -173,6 +174,7 @@ typedef	struct		s_tile
 	int h2;
 	int mipq;
 	int *data_ptr;
+	t_vector *vectile;
 	void *ptr;
 }			t_tile;
 
