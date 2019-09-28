@@ -1242,12 +1242,15 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 //	printf("col now is %f,%f,%f, bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
 //	printf("colself before obs %f,%f,%f\n", ret.colself.x, ret.colself.y, ret.colself.z);
 	obstructed(&ret, hit, hitli, reflrayv, obj.base[1], obj, g);
+//most likely not needed
+/*
 	if (ret.bri < g->ambient && (ret.bri = g->ambient))
 	{
 		if (con(g))
 			printf("returning ambient bri\n");
 		return (ret);
 	}
+*/
 //	ret.colself = colself;	
 //	printf("col after obstructed returning %f,%f,%f, bri %d\n",ret.col.x, ret.col.y, ret.col.z, ret.bri);	
 //	printf("colself returning %f,%f,%f\n", ret.colself.x, ret.colself.y, ret.colself.z);

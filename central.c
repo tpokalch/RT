@@ -23,7 +23,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	t_colbri tmp;
 	int obss[g->lights];
 	int	specscal;
-
+	double soft[g->lights];
+	t_vector obstructed;
 //	printf("colself in the begining %f,%f,%f\n", cur->colself.x, cur->colself.y, cur->colself.z);
 	ft_bzero(obss, 4 * g->lights);
 	init_vector(&tmp.col, 0, 0, 0);
@@ -54,8 +55,6 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 				{
 					if (con(g))
 						printf("doing 1 spec %d\n", i);
-//					if (obj.spec)
-//						do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
 					i++;
 					break;
 				}
@@ -68,6 +67,15 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 */
 				if (t.dst < 1)
 				{
+		//added soft haphhazard;y
+					if (obj.soft)
+					{
+						obstructed = sum(scale(t.dst, ray), hit);
+						soft[i] = dot(norm(diff(obstructed, *g->obj[iobjn[1]].ctr))/*norm(diff(obstructed, hit))*/, norm(ray));
+						soft[i] = tothe2(soft[i], obj.soft);
+						if (con(g))
+							printf("soft is %f i is %d\n", soft[i], i);
+					}
 					g->prim = iobjn[1];
 					if (con(g))
 					{
@@ -78,17 +86,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 					obsc++;
 					obss[i] = 1;
 					break;
-//					return (1);
 				}
-			/*	else
-				{
-					if (con(g))
-						printf("doing 1 spec\n");
-					if (obj.spec)
-						do_1_spec(&tmp, cur, hit, nrm, reflrayv, obj, i, g);
-
-				}
-				*/
 			}
 			iobjn[1] = (iobjn[1] + 1) % (g->argc + 1);
 		}
@@ -115,8 +113,18 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	}
 	if (con(g))
 		printf("obstructed %d times\n", obsc);
+//recently changed added * (1 - soft) + g->amb
 	if (obsc > 0)
-		cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
+	{
+//			int a;
+	
+		if (obj.soft)
+		{
+//			a = round((fmax(g->ambient, cur->bri * (1 - soft[0])) + fmax(g->ambient, cur->bri * (1 - soft[1]))) / (g->lights - obsc));
+		}
+//		cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
+		cur->bri = fmax(g->ambient, cur->bri * (1 - soft[0])) + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
+	}
 	if (con(g))
 		printf("returning bri is %d\n", cur->bri);
 //	printf("colself in the end %f,%f,%f\n", cur->colself.x, cur->colself.y, cur->colself.z);
@@ -354,6 +362,7 @@ void		*recalc(void *p)
 //			printf("objecthit done\n");
 			g->hits[j][i]->obj = ret.obj;
 			g->hits[j][i]->hit = sum(scale(ret.dst, *g->rays[j][i]), *g->cam_pos);
+
 //			printf("obj cam pos is %d\n", ret.obj.cam_pos);
 			if (g->hits[j][i]->obj.name != NULL)
 			{

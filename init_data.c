@@ -32,7 +32,7 @@ void		ginit(t_global *g)
 //	g->liz[1] = g->li[1].z;
 //	g->liz[2] = g->li[2].z;
 
-	g->ambient = 90;
+	g->ambient = 60;
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -201,8 +201,9 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0.7;
-	g->obj[i].spec = 4;
+	g->obj[i].re = 0;
+	g->obj[i].spec = 0;
+	g->obj[i].soft = 1;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);

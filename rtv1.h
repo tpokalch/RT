@@ -20,8 +20,8 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 300
-#define WIDTH_2 150
+#define HEIGHT 400
+#define WIDTH_2 200
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
@@ -203,6 +203,7 @@ typedef struct		s_object
 	double			re;
 	double			trans;
 	int			spec;
+	int			soft;
 	t_vector		ptdim;
 	t_object		*frame;
 	t_vector		box[8];
