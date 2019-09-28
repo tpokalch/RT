@@ -347,21 +347,23 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 {
 	t_vector	nrm;
 //	t_vector	camforw;
-	t_vector	hit0;
+//	t_vector	hit0;
 	t_colbri			ret;
-	t_vector	ax;
+//	t_vector	ax;
+	t_vector	reflrayv;
 	int		retobs;
-	t_vector hitli = diff(*g->li, hit);
+	t_vector	hitli[g->lights];
 	int		i;
 	t_colbri	retorig;
 
-	i = 0;
-	retorig.bri = 0;
 //	printf("inside cone\n");
-	hit0 = diff(hit, *obj.ctr);
-	ax = scale(dot(hit0, obj.base[1]) * (1 + obj.rd2), obj.base[1]);
-	nrm = norm(diff(hit0, ax));
-//	camforw = diff(sum(*g->cam_pos, *g->normal), *g->cam_pos);
+//	hit0 = diff(hit, *obj.ctr);
+//	ax = scale(dot(hit0, obj.base[1]) * (1 + obj.rd2), obj.base[1]);
+
+	nrm = obj.nr;
+
+//	printf("obj color is %f,%f,%f\n", obj.color.x, obj.color.y, obj.color.z);
+	init_hitli(hitli, hit, g);
 	if (inside_cone(*g->cam_pos, obj, g))
 	{
 		if (!inside_cone(*g->li, obj, g))
@@ -369,35 +371,18 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 			ret.bri = g->ambient;
 			return (ret);
 		}
-		else
-			nrm = scale(-1, nrm);
 	}
 	else if (inside_cone(*g->li, obj, g))
 	{
 		ret.bri = g->ambient;
 		return (ret);
 	}
-
-/*	while(++i < g->lights)
-		retorig.bri += round(255 * dot(norm(hitli[i]), nrm));
-	retorig.bri = round(retorig.bri / double(g->lights));
-*/
-
-//	ret.bri = 255 * dot(norm(hitli), nrm);
-/*
-	if (obstructed(hit, hitli, obj, g))
-	{
-		retobs = g->ambient;
-		ret.bri = fmin(ret.bri, retobs);
-	}
-*/
-//	obstructed(&ret, hit, g->hitli, obj, g);
+	init_bri(&ret.bri, hitli, nrm, g);
+	if (obj.spec || obj.re)
+		reflrayv = reflray(st, hit, nrm, g);
 	ret.col = obj.color;
-	if (ret.bri < g->ambient)
-	{
-		ret.bri = g->ambient;
-		return (ret);
-	}
+	obstructed(&ret, hit, hitli, reflrayv, obj, g);
+//	printf("returning %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
 	return (ret);
 }
 
@@ -411,31 +396,26 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	t_colbri			ret;
 	t_vector	ax;
 	int		retobs;
-	t_vector hitli = diff(*g->li, hit);
+	t_vector	 hitli[g->lights];
+	t_vector	reflrayv;
 
-//	printf("inside cone\n");
 	hit0 = diff(hit, *obj.ctr);
 	ax = scale(dot(hit0, obj.base[1]) * (1 + obj.rd2), obj.base[1]);
 	nrm = norm(diff(hit0, ax));
-	camforw = diff(sum(*g->cam_pos, *g->normal), *g->cam_pos);
+
+	init_hitli(hitli, hit, g);
 	if (inside_cone(*g->cam_pos, obj, g))
 	{
-		if (!inside_cone(*g->li, obj, g))
-		{
-			ret.bri = g->ambient;
-			return (ret);
-		}
-		else
 		nrm = scale(-1, nrm);
+		if (!inside_cone(*g->li, obj, g))
+			ret.bri = g->ambient;
+		else
+			init_bri(&ret.bri, hitli, nrm, g);
 	}
-	else if (inside_cone(*g->li, obj, g))
-	{
-		ret.bri = g->ambient;
-		return (ret);
-	}
-
-	ret.bri = 255 * dot(norm(diff(diff(*g->li, *obj.ctr), hit0)), nrm);
-
+	else
+		init_bri(&ret.bri, hitli, nrm, g);
+	obj.nr = nrm;
+	ret.nrm = nrm;
 	if (obj.tile[0].data_ptr)
 	{
 		double x;
@@ -471,31 +451,19 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 //		printf("x is %d\n", x);
 //		printf("y is %d\n", y);
 	}	
-//	if (g->mip_map)
+	if (g->mip_map)
 		ret.col = mip_col(y, x, dot(diff(hit, *g->cam_pos), diff(hit, *g->cam_pos)), obj, g);
-//	else
-//		ret.col = base255(rgb(*(obj.tile[0].data_ptr + lround(y) * obj.tile[0].w + lround(x))));	
-
-/*
-	if (obstructed(hit, hitli, obj, g))
-	{
-		retobs = g->ambient;
-//		ret.bri = ret.bri;
-		ret.bri = fmin(ret.bri, retobs);
-	}
-*/
-
-//	obstructed(&ret, hit, g->hitli, obj, g);
+	else
+		ret.col = *(obj.tile[0].vectile + lround(y) * obj.tile[0].w + lround(x));
 	}
 	else
 		ret.col = obj.color;
-	if (ret.bri < g->ambient)
-	{
-		ret.bri = g->ambient;
-		return (ret);
-	}
-	
-//	ret.col = obj.color;
+	ret.colself = ret.col;
+	if (obj.re || obj.spec)
+		reflrayv = reflray(st, hit, nrm, g);
+	if (obj.re)
+		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
+	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	return (ret);
 }
 
@@ -798,19 +766,15 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	nrm = scale(1 / (double)obj.rd, diff(hit, *obj.ctr));
 	if (obj.cam_pos)
 	{
-	/*
 		if (!obj.trans)
 		{
-			while (++i < g->lights)
-				g->ctrli[i] = diff(g->li[i], *obj.ctr);
+			ctrli = diff(*g->li, *obj.ctr);
 			if (dot(ctrli, ctrli) > obj.rd2)
 			{
-				ret.col = obj.color;
+//				ret.col = obj.color;
 				ret.bri = g->ambient;
-				return (ret);
 			}
 		}
-*/
 	//	printf("changing nr\n");
 		nrm = scale(-1, nrm);
 	}

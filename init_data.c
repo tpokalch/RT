@@ -499,6 +499,7 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 		g->obj[i].simple_bright = &bright_cylinder;
 	else
 		g->obj[i].simple_bright = simple_bright_cylinder;
+
 }
 
 void		init_sphere(t_vector *ctr, int i, t_global *g)
@@ -594,6 +595,12 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
+	g->obj[i].re = 0.5;
+	g->obj[i].spec = 4;
+	g->obj[i].soft = 0;
+	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+
+/*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
 		"./tiles/blank.xpm",
@@ -611,7 +618,14 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	printf("finished getting addr\n");
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
-
-
+*/
+	if (g->obj[i].tile[0].data_ptr || g->obj[i].re || g->obj[i].trans || g->obj[i].spec)
+		g->obj[i].bright = &bright_cone;
+	else
+		g->obj[i].bright = &simple_bright_cone;
+	if (g->obj[i].re || g->obj[i].trans)
+		g->obj[i].simple_bright = &bright_cone;
+	else
+		g->obj[i].simple_bright = simple_bright_cone;
 }
 
