@@ -662,7 +662,7 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	nrm = obj.nr;
 	if (obj.cam_pos)
 	{
-		printf("hi\n");
+//		printf("hi\n");
 		ctrli = diff(*g->li, *obj.ctr);
 		if (dot(ctrli, ctrli) > obj.rd2)
 		{
@@ -675,8 +675,6 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	init_bri(&retorig.bri, hitli, nrm, g);
 	if (con(g))
 		printf("bri is %d\n", ret.bri);
-	retorig.bri = round(retorig.bri / (double)g->lights);
-
 	ret.col = obj.color;
 	ret.colself = obj.color;
 
@@ -739,6 +737,22 @@ t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_vector
 
 //this function takes the refl ray, the color it has to rewrite, the color without reflection, all else needs no exp
 
+void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_colbri reo, t_vector nrm, t_object obj, t_global *g)
+{
+		t_colbri transo;
+
+		transo = trans(st, hit, nrm, obj, g);
+		if (con(g))
+			printf("ater trans is %f, %f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
+		transo.col = base255(scale(transo.bri, transo.col));
+//		transo.col = base(scale(transo.bri, transo.col));
+		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
+		ret->col = transo.col;
+//		ret->bri = transo.bri;
+		ret->bri = (1 - obj.trans) * reo.bri + (obj.trans * transo.bri);
+}
+
+
 t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
 	t_colbri		ret;
@@ -789,14 +803,10 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		printf("ambient is %d\n", g->ambient);
 	}
 	if (obj.tile[0].data_ptr)
-	{
 		ret.colself = do_tile_sphere(&reo.col, st, hit, nrm, obj, g);
-//		reo.col = tileo.col;
-	}
 	else
 	{
 		ret.colself = obj.color;
-//		tileo.col = obj.color;
 		reo.col = obj.color;		
 	}
 	if (con(g))
@@ -805,44 +815,25 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 		reflrayv = reflray(st, hit, nrm, g);
 	if (obj.re)
 		do_re(reflrayv, &reo.col, reo.col, hit, nrm, obj, g);
-//	else
-//		reo.col = tileo.col;
-//	reo.bri = tileo.bri;
 	if (con(g))
 	{
 		printf("colbri after re is %f,%f,%f bri %d\n", reo.col.x, reo.col.y, reo.col.z, reo.bri);
 		printf("trans %f\n", obj.trans);
 	}
-	if (obj.trans > 0)
-	{
-		if (con(g))
-			printf("there is trans, calling trans\n");
-		transo = trans(st, hit, nrm, obj, g);
-		transo.col = base255(scale(transo.bri, transo.col));
-//		transo.bri = reo.bri;
-		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
-		ret.col = transo.col;
-		ret.bri = transo.bri;
-//		printf("trans done\n");
-	}
+	if (obj.trans)
+		do_trans(st, hit, &ret, reo, nrm, obj, g);
 	else
 	{
 		ret.col = reo.col;
 		ret.bri = reo.bri;
 	}
-//	ret.bri = reo.bri;
 	if (con(g))
 		printf("colbri after trans is %f,%f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
-//	ret.col = transo.col;
-//	ret.bri = transo.bri;
-//	ret.bri = fmax(ret.bri, g->ambient);
 	if (con(g))
 		printf("calling obstructed\n");
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
-
 	if (con(g))
 		printf("returning col %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
-	rec = 0;
 	g->recursion = 0;
 	return (ret);
 }

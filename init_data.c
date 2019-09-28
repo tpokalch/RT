@@ -19,7 +19,7 @@ void		ginit(t_global *g)
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	i = -1;
-	g->lights = 1;
+	g->lights = 2;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
 		init_vector(&g->li[i], 302, 200, 150);
@@ -32,7 +32,7 @@ void		ginit(t_global *g)
 //	g->liz[1] = g->li[1].z;
 //	g->liz[2] = g->li[2].z;
 
-	g->ambient = 60;
+	g->ambient = 90;
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -142,6 +142,8 @@ void		init_tile(int i, char *tile, t_object *obj, t_global *g)
 	printf("xpm image dimansions are %d,%d\n", obj[i].tile[0].w, obj[i].tile[0].h);
 	int k = 1;
 	obj[i].tile[0].vectile = norm_tile(obj[i].tile[0].data_ptr, obj[i].tile[0].w, obj[i].tile[0].h, g);
+	if (g->mip_map)
+	{
 	while (k < 10)
 	{
 //			printf("i is %d\n", k);
@@ -177,6 +179,7 @@ void		init_tile(int i, char *tile, t_object *obj, t_global *g)
 	k = 0;
 	obj[i].tile[0].mipq = fmin(log2(obj[i].tile[0].h), log2(obj[i].tile[0].w));
 	printf("tile quant is %d\n", obj[i].tile[0].mipq);
+	}
 }
 
 void		init_plane(t_vector *ctr, int i, t_global *g)
@@ -513,7 +516,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 0;
+	g->obj[i].spec = 4;
 	init_vector(g->obj[i].ctr, 0, 0, 300);
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd = 100;
@@ -524,7 +527,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	printf("hello\n");
-	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
+	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
 //	g->obj[i].tile[0].data_ptr = NULL;
 	if (g->obj[i].trans)
