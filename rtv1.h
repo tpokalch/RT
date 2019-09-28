@@ -20,8 +20,8 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 400
-#define WIDTH_2 200
+#define HEIGHT 300
+#define WIDTH_2 150
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
@@ -134,7 +134,7 @@ t_dstpst			hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 void				alias(int *dst, int *a, int w, int h, int xmax, int ymax);
 
 t_dstpst			*NANI(t_dstpst *t);
-void					obstructed(t_colbri *i, t_vector hit, t_vector *hitli, t_vector reflrayv, t_vector nrm, t_object obj, t_global *g);
+void					obstructed(t_colbri *i, t_vector hit, t_vector *hitli, t_vector reflrayv, t_object obj, t_global *g);
 t_vector			rotate(t_vector ray, t_vector angle);
 void				init_vector(t_vector *current, double x, double y, double z);
 int				con(t_global *g);
