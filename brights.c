@@ -141,6 +141,29 @@ t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
 }
 
 
+void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_colbri reo, t_vector nrm, t_object obj, t_global *g)
+{
+		t_colbri transo;
+
+		if (con(g))
+			printf("______START DO TRANS FUNC_____\n");
+		transo = trans(st, hit, nrm, obj, g);
+		if (con(g))
+			printf("ater trans is %f, %f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
+		transo.col = base255(scale(transo.bri, transo.col));
+//		transo.col = base(scale(transo.bri, transo.col));
+		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
+		ret->col = transo.col;
+
+		ret->bri = transo.bri;
+//		ret->bri = (1 - obj.trans) * reo.bri + (obj.trans * transo.bri);
+		if (con(g))
+			printf("______END DO TRANS FUNC_____\n");
+}
+
+
+
+
 t_vector		mip_col(double x, double y, double dst2, t_object obj, t_global *g)
 {
 	int		tilelow;
@@ -369,44 +392,27 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 		if (!inside_cone(*g->li, obj, g))
 		{
 			ret.bri = g->ambient;
-			return (ret);
+//			return (ret);
 		}
 	}
 	else if (inside_cone(*g->li, obj, g))
 	{
 		ret.bri = g->ambient;
-		return (ret);
+//		return (ret);
 	}
-	init_bri(&ret.bri, hitli, nrm, g);
+	else
+		init_bri(&ret.bri, hitli, nrm, g);
+	ret.col = obj.color;	
 	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, nrm, g);
-	ret.col = obj.color;
+	if (obj.re)
+		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
+	if (obj.trans)
+		do_trans(st, hit, &ret, ret, nrm, obj, g);
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 //	printf("returning %f,%f,%f bri %d\n", ret.col.x, ret.col.y, ret.col.z, ret.bri);
 	return (ret);
 }
-
-void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_colbri reo, t_vector nrm, t_object obj, t_global *g)
-{
-		t_colbri transo;
-
-		if (con(g))
-			printf("______START DO TRANS FUNC_____\n");
-		transo = trans(st, hit, nrm, obj, g);
-		if (con(g))
-			printf("ater trans is %f, %f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
-		transo.col = base255(scale(transo.bri, transo.col));
-//		transo.col = base(scale(transo.bri, transo.col));
-		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
-		ret->col = transo.col;
-
-		ret->bri = transo.bri;
-//		ret->bri = (1 - obj.trans) * reo.bri + (obj.trans * transo.bri);
-		if (con(g))
-			printf("______END DO TRANS FUNC_____\n");
-}
-
-
 
 t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
@@ -426,6 +432,7 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	init_hitli(hitli, hit, g);
 	if (inside_cone(*g->cam_pos, obj, g))
 	{
+		printf("inside cone\n");
 		nrm = scale(-1, nrm);
 		if (!inside_cone(*g->li, obj, g))
 			ret.bri = g->ambient;
@@ -434,6 +441,8 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	}
 	else
 		init_bri(&ret.bri, hitli, nrm, g);
+	if (con(g))
+		printf("bri is after init %d\n", ret.bri);
 	obj.nr = nrm;
 	ret.nrm = nrm;
 	if (obj.tile[0].data_ptr)
@@ -479,10 +488,16 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	else
 		ret.col = obj.color;
 	ret.colself = ret.col;
+	if (con(g))
+		printf("bri now %d\n", ret.bri);	
 	if (obj.re || obj.spec)
 		reflrayv = reflray(st, hit, nrm, g);
 	if (obj.re)
 		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
+	if (obj.trans)
+		do_trans(st, hit, &ret, ret, nrm, obj, g);
+	if (con(g))
+		printf("bri is in the end %d\n", ret.bri);	
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	return (ret);
 }
@@ -509,6 +524,7 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_globa
 
 	if (obj.re)
 		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
+
 //	else
 //		ret.col = ret.col;
 ///

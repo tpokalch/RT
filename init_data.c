@@ -589,7 +589,8 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 0;
+	g->obj[i].spec = 4;
+	g->obj[i].trans = 0;
 	g->obj[i].soft = 0;
 	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 

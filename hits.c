@@ -260,6 +260,7 @@ t_dstpst		hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_glob
 	t_vector abc;
 	t_global p;
 	double ret;
+	double min;
 
 	p = *g;
 	dx[0] = diff(st, *obj.ctr);
@@ -275,12 +276,21 @@ t_dstpst		hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_glob
 	g->cone[0].dst = (-abc.y - sqrt(dvxvdet.z)) /(2 * abc.x);
 	g->cone[1].dst = (-abc.y + sqrt(dvxvdet.z)) /(2 * abc.x);
 	ret = fmin(g->cone[0].dst, g->cone[1].dst);
-	if (ret < 0)
+	if (ret < 0.000001)
+	{
 		g->cone[0].dst = fmax(g->cone[1].dst, g->cone[0].dst);
-	if (g->cone[0].dst < 0.0000001)
-		return (*NANI(&g->cone[0]));
-	g->cone[0].obj = obj;
-
-
+		if (g->cone[0].dst < 0.0000001)
+			return (*NANI(&g->cone[0]));
+		g->cone[0].pst = 1;
+		g->cone[0].obj = obj;
+		return (g->cone[0]);
+	}
+	else
+	{
+		g->cone[0].obj = obj;
+		g->cone[0].dst = ret;
+//		g->con[0].pst = 0;//no need, 0 int the beginning
+		return (g->cone[0]);
+	}
 	return(g->cone[0]);
 }
