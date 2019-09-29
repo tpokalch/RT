@@ -157,11 +157,13 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 	{
 		if (con(g))
 		{
-//			printf("i is %d\n", i);
-//			printf("calling on %d %s hit\n", obj[i].id, obj[i].name);
+			printf("i is %d\n", i);
+			printf("calling on %d %s hit\n", obj[i].id, obj[i].name);
 		}
 //		printf("searching obj %d\n", i);
 		t_crt = obj[i].hit(st, end, ray, obj[i], g);
+		if (con(g))
+			printf("this was distance %f\n", t_crt.dst);
 //		printf("hit got \n");
 		if ((t_crt.dst >= 0.0000001) && (!legal_hit || t_crt.dst < closest_tmp))
 		{

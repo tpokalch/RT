@@ -208,7 +208,7 @@ t_dstpst		hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 	if (d.z < 0)
 		return (*NANI(&t));
 	t.dst = (-po[2].y - sqrt(d.z)) /(2 * po[2].x);
-	if (t.dst < 0 && (t.pst = 1))
+	if (t.dst < 0.000001 && (t.pst = 1))
 		t.dst = (-po[2].y + sqrt(d.z)) /(2 * po[2].x);
 	if (t.dst < 0.0000001)
 		return (*(NANI(&t)));

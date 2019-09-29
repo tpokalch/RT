@@ -386,6 +386,26 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 	return (ret);
 }
 
+void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_colbri reo, t_vector nrm, t_object obj, t_global *g)
+{
+		t_colbri transo;
+
+		if (con(g))
+			printf("______START DO TRANS FUNC_____\n");
+		transo = trans(st, hit, nrm, obj, g);
+		if (con(g))
+			printf("ater trans is %f, %f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
+		transo.col = base255(scale(transo.bri, transo.col));
+//		transo.col = base(scale(transo.bri, transo.col));
+		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
+		ret->col = transo.col;
+
+		ret->bri = transo.bri;
+//		ret->bri = (1 - obj.trans) * reo.bri + (obj.trans * transo.bri);
+		if (con(g))
+			printf("______END DO TRANS FUNC_____\n");
+}
+
 
 
 t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
@@ -483,9 +503,20 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_globa
 		ret.bri = g->ambient;
 	else
 		init_bri(&ret.bri, hitli, nrm, g);
+	ret.col = obj.color;
 	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, nrm, g);
-	ret.col = obj.color;
+
+	if (obj.re)
+		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
+//	else
+//		ret.col = ret.col;
+///
+	if (obj.trans)
+		do_trans(st, hit, &ret, ret, nrm, obj, g);
+
+
+//////
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	return (ret);
 }
@@ -581,22 +612,16 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	{
 		ret.colself = obj.color;
 	}
+//	t_vector savecolself;
 
+//	savecolself = ret.colself;
 	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, nrm, g);
 	if (obj.re)
 		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
-	else
-		ret.col = ret.col;
-	
-//	else
-/*		ret.col = obj.color;
-	if (obstructed(hit, hitli, obj, g))
-	{
-		retobs = g->ambient;
-		ret.bri = fmin(ret.bri, retobs);
-	}
-*/
+	if (obj.trans)
+		do_trans(st, hit, &ret, ret, nrm, obj, g);
+//	ret.colself = savecolself;
 	obstructed(&ret, hit, hitli, reflrayv, /*nrm, */obj, g);
 
 	if (ret.bri < g->ambient)
@@ -685,14 +710,17 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 
 	if (obj.spec || obj.re)
 		reflrayv = reflray(st, hit, nrm, g);
-	if (obj.re > 0)
+	if (obj.re)
 		do_re(reflrayv, &ret.col, ret.col, hit, nrm, obj, g);
 	ret.bri = retorig.bri;
+	if (obj.trans)
+		do_trans(st, hit, &ret, ret, nrm, obj, g);
 	obstructed(&ret, hit, hitli, reflrayv, obj, g);
 	if (ret.bri < g->ambient)
 		ret.bri = g->ambient;
 	return (ret);
 }
+
 
 t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_vector nrm, t_object obj, t_global *g)
 {
@@ -742,23 +770,6 @@ t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_vector
 }
 
 //this function takes the refl ray, the color it has to rewrite, the color without reflection, all else needs no exp
-
-void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_colbri reo, t_vector nrm, t_object obj, t_global *g)
-{
-		t_colbri transo;
-
-		transo = trans(st, hit, nrm, obj, g);
-		if (con(g))
-			printf("ater trans is %f, %f,%f bri %d\n", transo.col.x, transo.col.y, transo.col.z, transo.bri);
-		transo.col = base255(scale(transo.bri, transo.col));
-//		transo.col = base(scale(transo.bri, transo.col));
-		transo.col = sum(scale(1 - obj.trans, reo.col), scale(obj.trans, transo.col));
-		ret->col = transo.col;
-
-		ret->bri = transo.bri;
-//		ret->bri = (1 - obj.trans) * reo.bri + (obj.trans * transo.bri);
-}
-
 
 t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 {

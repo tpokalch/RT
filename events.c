@@ -37,7 +37,7 @@ int		key_press(int kk, void *param)
 	t_global *g;
 
 	g = param;
-	if (kk == 47)
+//	if (kk == 47)
 		shot.x = -WIDTH;
 //	ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
 	if (kk == 53)
@@ -162,7 +162,7 @@ int		mouse_move(int x, int y, void *param)
 	i = -1;
 	g = param;
 	mousex = x;
-	printf("shit is %f,%f\n", shot.x, shot.y);
+//	printf("shit is %f,%f\n", shot.x, shot.y);
 	if (g->light_switch >= 1 && g->light_switch <= g->lights)
 	{
 //			printf("hello\n");
