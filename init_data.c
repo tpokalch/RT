@@ -19,7 +19,7 @@ void		ginit(t_global *g)
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	i = -1;
-	g->lights = 2;
+	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
 		init_vector(&g->li[i], 302, 200, 150);
@@ -217,6 +217,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 
 	if (g->obj[i].trans)
 		g->obj[i].simple_bright = bright_plane;
+//	g->obj[i].simple_bright = bright_plane;
 }
 
 int		arrheight(void **a)

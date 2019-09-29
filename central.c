@@ -242,6 +242,11 @@ void		*toimg(void *tcp)
 	{
 		jheight += HEIGHT; 
 		while (++i < WIDTH)
+		{
+//for debug
+			init_vector(g->ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
+//
+	
 			if (g->hits[j][i]->obj.name != NULL)
 			{
 //				printf("now object %d %s\n", g->hits[j][i]->obj.id, g->hits[j][i]->obj.name);
@@ -250,6 +255,7 @@ void		*toimg(void *tcp)
 				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
+		}
 	}
 	return (NULL);
 }
