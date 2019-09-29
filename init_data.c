@@ -22,7 +22,7 @@ void		ginit(t_global *g)
 	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
-		init_vector(&g->li[i], 302, 200, 150);
+		init_vector(&g->li[i], -50, -350, -200);
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
@@ -42,7 +42,7 @@ void		ginit(t_global *g)
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-	init_vector(g->angle, 0.45, 0, 0);
+	init_vector(g->angle, 0.75, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
 	init_vector(g->normal, 0, 0, 20);
@@ -204,7 +204,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0;
+	g->obj[i].re = 0.5;
 	g->obj[i].spec = 4;
 	g->obj[i].soft = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
@@ -296,6 +296,7 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 		ret[retc + 1].base[0] = norm(diff(ret[retc + 1].bd1, ret[retc + 1].bd3));
 		ret[retc + 1].base[2] = norm(diff(ret[retc + 1].bd2, ret[retc + 1].bd3));
 		ret[retc + 1].base[1] = norm(cross(diff(ret[retc + 1].bd1, ret[retc + 1].bd3), diff(ret[retc + 1].bd2, ret[retc + 1].bd3)));
+	//	ret[retc].base[1] = scale(-1, ret[retc].base[1]);
 //	ret[retc + 1].base[1] = scale(-1, norm(cross(diff(ret[retc + 1].bd1, ret[retc + 1].bd3), diff(ret[retc + 1].bd2, ret[retc + 1].bd3))));
 
 
@@ -319,6 +320,9 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 
 		ret[retc].re = obj.re;
 		ret[retc + 1].re = obj.re;
+
+		ret[retc].trans = obj.trans;
+		ret[retc + 1].trans = obj.trans;
 
 		ret[retc].spec = obj.spec;
 		ret[retc + 1].spec = obj.spec;
@@ -372,8 +376,8 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].simple_bright = &simple_bright_plane;
 	g->obj[i].ctr = &ctr[i];
 	g->obj[i].ctr->x =/*270*/ 0;
-	g->obj[i].ctr->y =/*270*/ 10;
-	g->obj[i].ctr->z =/*270*/550;
+	g->obj[i].ctr->y =/*270*/ -300;
+	g->obj[i].ctr->z =/*270*/350;
 
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
@@ -389,10 +393,11 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].frame = init_frame(g->obj[i], g);
 	printf("frame name is %s\n", g->obj[i].frame->name);
-	init_tile(i, "./tiles/brick.xpm", g->obj, g);
-//	g->obj[i].tile[0].data_ptr = NULL;
+//	init_tile(i, "./tiles/brick.xpm", g->obj, g);
+	g->obj[i].tile[0].data_ptr = NULL;
 	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
+	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
 	g->obj[i].rd = g->obj[i].tris->rd - 1;
 }
