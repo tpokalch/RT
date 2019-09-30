@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 12:37:33 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/17 21:51:30 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 04:50:07 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,14 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 300
-#define WIDTH_2 150
+#define HEIGHT 400
+#define WIDTH_2 200
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
 #define CORES 1
 #define M_T 6.28318530718
-#define MAX_REC 5
+#define MAX_REC 3
 
 typedef	struct	s_vector t_vector;
 
@@ -162,6 +162,7 @@ double				tothe2(double x, int e);
 void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g);
 
 void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector *hitli, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g);
+double		len2(t_vector a);
 
 typedef	struct		s_tile
 {
@@ -256,12 +257,12 @@ typedef struct		s_global
 	int				*line_taken;//size of number of tasks
 	int				mip_map;
 	pthread_mutex_t			mutex;
-	int				recursion;
 	int				lights;
 	t_vector			*hitli;
 	t_vector			*savehitli;
 	t_vector			prev;
 	double				*cosa;
 	t_vector			*ctrli;
+	int					*recursion;
 	t_global		*tcps[CORES];
 }				t_global;

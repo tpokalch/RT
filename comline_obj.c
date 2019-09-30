@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 20:17:05 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/03 20:18:55 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 04:41:30 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,6 @@ int		fill_objects(t_vector *ctr, char **argv, t_global *g)
 				init_cylinder(ctr, iobjc[1], g);
 			else if (ft_strequ(*(argv + iobjc[0]), "cone"))
 				init_cone(ctr, iobjc[1], g);
-			else if (ft_strequ(*(argv + iobjc[0]), "spheror"))
-				init_spheror(ctr, iobjc[1], g);
 			fill_obj(argv + iobjc[0] + 1, iobjc[1], g);
 			g->obj[iobjc[1]].base[1] = rotate(g->base[1], g->obj[iobjc[1]].ang);
 			g->obj[iobjc[1]].base[0] = rotate(g->base[0], g->obj[iobjc[1]].ang);

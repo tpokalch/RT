@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 15:51:47 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/08/28 21:38:21 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 04:40:40 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void		ginit(t_global *g)
 	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
-		init_vector(&g->li[i], -50, -350, -200);
+		init_vector(&g->li[i], -50, 100, 200);
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
@@ -42,13 +42,13 @@ void		ginit(t_global *g)
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-	init_vector(g->angle, 0.75, 0, 0);
+	init_vector(g->angle, 0.45, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
 	init_vector(g->normal, 0, 0, 20);
 	*g->normal = rotate(*g->normal, *g->angle);
 //	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
-	init_vector(g->cam_pos, 0, 0, 100);
+	init_vector(g->cam_pos, 0, 50, 0);
 	init_vector(&g->white, 1, 1, 1);
 	g->light_switch = 0;
 	g->objn = 0;
@@ -475,11 +475,11 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.z = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
-	init_vector(&g->obj[i].base[2], 0, 0, 1);	
+	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	g->obj[i].spec = 4;
-	g->obj[i].re = 0;
-	g->obj[i].trans = 0.5;
-/*
+	g->obj[i].re = 0.5;
+	g->obj[i].trans = 0;
+	/*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
 		"./tiles/blank.xpm",
@@ -536,40 +536,6 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].simple_bright = simple_bright_sphere;
 }
 
-void		init_spheror(t_vector *ctr, int i, t_global *g)
-{
-	g->obj[i].name = "spheror";
-	g->obj[i].id = i;
-	g->obj[i].hit = &hit_sphere;
-	g->obj[i].bright = &bright_spheror;
-	g->obj[i].simple_bright = &simple_bright_spheror;
-	g->obj[i].bright = &bright_spheror;
-	g->obj[i].ctr = &ctr[i];
-	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].ctr->x = 0;
-	g->obj[i].ctr->y = 0;
-	g->obj[i].ctr->z = 300;
-	printf("center is %f\n", g->obj[i].ctr->z);
-	g->obj[i].rd = 100;
-	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
-	g->obj[i].color = rgb(0x010000);
-	g->obj[i].ang.x = 0;
-	g->obj[i].ang.y = 0;
-	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0;
-	init_vector(&g->obj[i].base[0], 1, 0, 0);
-	init_vector(&g->obj[i].base[1], 0, 1, 0);
-	init_vector(&g->obj[i].base[2], 0, 0, 1);
-
-//	init_tile(i,"./tiles/earth.xpm", g->obj, g);
-//	g->obj[i].tile[0].data_ptr = NULL;
-	if (g->obj[i].tile[0].data_ptr || g->obj[i].re || g->obj[i].trans)
-		g->obj[i].bright = &bright_spheror;
-	else
-		g->obj[i].bright = &simple_bright_plane;
-
-}
-
 void		init_cone(t_vector *ctr, int i, t_global *g)
 {
 	g->obj[i].name = "cone";
@@ -597,8 +563,10 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	g->obj[i].spec = 4;
 	g->obj[i].trans = 0;
 	g->obj[i].soft = 0;
-	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+//	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
+	g->obj[i].tile[0].data_ptr = NULL;
+	
 /*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,

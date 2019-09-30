@@ -153,6 +153,11 @@ t_vector			rotate3(t_vector base[3], t_vector ang)
 	return (ret)
 */
 
+double				len2(t_vector a)
+{
+	return (dot(a, a));
+}
+
 double				tothe2(double x, int e)
 {
 	int i;
