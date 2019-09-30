@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 20:37:08 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/09/30 06:05:34 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 06:45:08 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ t_colbri		refl(t_vector refl, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
-void		do_re(t_vector reflrayv, t_vector *reocol, t_vector hit, t_object obj, t_global *g)
+void		do_re(t_vector reflrayv, t_vector *reocol,
+		t_vector hit, t_object obj, t_global *g)
 {
 	t_colbri reflcolbri;
 	t_vector tileocolo;
@@ -43,8 +44,7 @@ void		do_re(t_vector reflrayv, t_vector *reocol, t_vector hit, t_object obj, t_g
 		reflcolbri = refl(reflrayv, hit, obj, g);
 		*reocol = reflcolbri.col;
 		*reocol = sum(scale(1 - obj.re, tileocolo),
-			scale(obj.re, reflcolbri.col
-			/*base255(scale(reflcolbri.bri, reflcolbri.col))*/));
+			scale(obj.re, reflcolbri.col));
 	}
 }
 
@@ -59,9 +59,10 @@ t_colbri		trans(t_vector st, t_vector hit, t_object obj, t_global *g)
 	objecthit(&temp, hit, sum(ray, hit), g->obj, g->argc + 1, g);
 	transobj.hit = sum(scale(temp.dst, ray), hit);
 	transobj.obj = temp.obj;
-//
+/****************/
+/**what is this**/
+/****************/
 	transobj.obj.cam_pos = 0;
-//??
 	if (transobj.obj.name == NULL)
 	{
 		init_vector(&ret.col, 0, 0, 0);
@@ -84,7 +85,8 @@ t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
 	return (refl);
 }
 
-void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_object obj, t_global *g)
+void		do_trans(t_vector st, t_vector hit, t_colbri *ret,
+	t_object obj, t_global *g)
 {
 	t_colbri transo;
 
@@ -92,7 +94,8 @@ void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_object obj, t_global 
 		return ;
 	transo = trans(st, hit, obj, g);
 	transo.col = base255(scale(transo.bri, transo.col));
-	transo.col = sum(scale(1 - obj.trans, ret->col), scale(obj.trans, transo.col));
+	transo.col = sum(scale(1 - obj.trans, ret->col),
+		scale(obj.trans, transo.col));
 	ret->col = transo.col;
 	ret->bri = transo.bri;
 }
@@ -115,7 +118,7 @@ void		init_bri(int *bri, t_vector *hitli, t_vector nrm, t_global *g)
 
 	i = 0;
 	*bri = 0;
-	while(i < g->lights)
+	while (i < g->lights)
 	{
 		*bri += fmax(round(255 * dot(norm(hitli[i]), nrm)), g->ambient);
 		i++;
@@ -143,7 +146,8 @@ int		inside_cone(t_vector p, t_object obj, t_global *g)
 	return (dot(ptoaxperp, ptoaxperp) - cirad * cirad <= 0);
 }
 
-t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj,
+	t_global *g)
 {
 	t_vector	nrm;
 	t_colbri	ret;
@@ -172,18 +176,20 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g
 	return (ret);
 }
 
-void		do_tile_cone(t_colbri *ret, t_vector ctrhit, t_vector hit, t_object obj, t_global *g)
+void		do_tile_cone(t_colbri *ret, t_vector ctrhit,
+	t_vector hit, t_object obj, t_global *g)
 {
-	double x;
-	double y;
-	t_vector proj;
-
+	double		x;
+	double		y;
+	t_vector	proj;
 
 	proj = diff(ctrhit, scale(dot(obj.base[1], ctrhit), obj.base[1]));
 	proj = norm(proj);
-	x = obj.tile[0].w2 * (1 * M_1_PI * myacos(proj, obj.base[2], obj.base[1], g));
+	x = obj.tile[0].w2 * (1 * M_1_PI *
+		myacos(proj, obj.base[2], obj.base[1], g));
 	y = mymod(1 - dot(obj.base[1], diff(hit, *obj.ctr)), obj.tile[0].h);
-	ret->col = *(obj.tile[0].vectile + lround(y) * obj.tile[0].w + lround(x));
+	ret->col = *(obj.tile[0].vectile
+		+ lround(y) * obj.tile[0].w + lround(x));
 }
 
 t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
@@ -194,7 +200,8 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	t_vector	reflrayv;
 
 	hit0 = diff(hit, *obj.ctr);
-	obj.nr = norm(diff(hit0, scale(dot(hit0, obj.base[1]) * (1 + obj.rd2), obj.base[1])));
+	obj.nr = norm(diff(hit0, scale(dot(hit0, obj.base[1]) *
+		(1 + obj.rd2), obj.base[1])));
 	init_hitli(hitli, hit, g);
 	if (inside_cone(*g->cam_pos, obj, g))
 	{
@@ -222,7 +229,8 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
-t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri	simple_bright_cylinder(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_vector	nrm;
 	t_colbri	ret;
@@ -232,7 +240,8 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_globa
 
 	nrm = obj.nr;
 	init_hitli(hitli, hit, g);
-	if (obj.cam_pos && (t = obj.hit(*g->cam_pos, *g->li, diff(*g->li, *g->cam_pos),obj, g)).dst < 1)
+	if (obj.cam_pos && (t = obj.hit(*g->cam_pos,
+		*g->li, diff(*g->li, *g->cam_pos), obj, g)).dst < 1)
 		ret.bri = g->ambient;
 	else
 		init_bri(&ret.bri, hitli, nrm, g);
@@ -247,12 +256,13 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_globa
 	return (ret);
 }
 
-void	do_tile_cyl(t_vector *ret, t_vector hit, t_vector ctrhit, t_object *obj, t_global *g)
+void	do_tile_cyl(t_vector *ret, t_vector hit,
+	t_vector ctrhit, t_object *obj, t_global *g)
 {
-	double x;
-	double y;
-	t_vector proj;
-	double xdst;
+	double		x;
+	double		y;
+	t_vector	proj;
+	double		xdst;
 
 	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
 	proj = norm(proj);
@@ -260,17 +270,18 @@ void	do_tile_cyl(t_vector *ret, t_vector hit, t_vector ctrhit, t_object *obj, t_
 	* (1 - (1 - 2 * (det(proj, obj->base[0]) < 0))
 	* M_1_PI * acos(dot(proj, obj->base[0])));
 	xdst = dot(obj->base[1], diff(hit, *obj->ctr));
-	x = obj->tile[0].w2 *  M_1_PI
-	* myacos(proj, obj->base[0], obj->base[1], g);
+	x = obj->tile[0].w2 * M_1_PI
+		* myacos(proj, obj->base[0], obj->base[1], g);
 	y = myintmod(xdst, obj->tile[0].h);
-	obj->color = *(obj->tile[0].vectile + lround(y) * obj->tile[0].w + lround(x));
+	obj->color = *(obj->tile[0].vectile +
+		lround(y) * obj->tile[0].w + lround(x));
 	*ret = obj->color;
 }
 
-t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri	bright_cylinder(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_vector	vrt;
-	t_dstpst	t;
 	t_vector	ctrhit;
 	t_colbri	ret;
 	t_vector	hitli[g->lights];
@@ -279,14 +290,13 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	ctrhit = diff(hit, *obj.ctr);
 	vrt = scale(dot(ctrhit, obj.base[1]), obj.base[1]);
 	obj.nr = norm(diff(ctrhit, obj.base[1]));
-
 	g->recursion[obj.id]++;
 	init_hitli(hitli, hit, g);
 	if (obj.cam_pos)
 	{
-		t = obj.hit(*g->cam_pos, *g->li, diff(*g->li, *g->cam_pos), obj, g);
 		obj.nr = scale(-1, obj.nr);
-		if (t.dst < 1)
+		if (obj.hit(*g->cam_pos, *g->li,
+			diff(*g->li, *g->cam_pos), obj, g).dst < 1)
 			ret.bri = g->ambient;
 		else
 			init_bri(&ret.bri, hitli, obj.nr, g);
@@ -310,19 +320,22 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
-void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector hit, t_vector *hitli, t_vector nrm, t_vector reflrayv, t_object obj, int i, t_global *g)
+void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector *hitli,
+	t_vector reflrayv, t_object obj, int i, t_global *g)
 {
 	g->cosa[i] = dot(norm(hitli[i]), norm(reflrayv));
 	if (g->cosa[i] > 0)
 	{
 		g->cosa[i] = tothe2(g->cosa[i], obj.spec);
-		tmp->col = sum(tmp->col, sum(scale(g->cosa[i], g->white), scale((1 - g->cosa[i]), ret->col)));
+		tmp->col = sum(tmp->col, sum(scale(g->cosa[i], g->white),
+					scale((1 - g->cosa[i]), ret->col)));
 	}
 	else
 		tmp->col = sum(tmp->col, ret->col);
 }
 
-void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g)
+void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm,
+	t_vector reflrayv, t_object obj, t_global *g)
 {
 	double		cosa;
 	double		cosa3;
@@ -336,12 +349,13 @@ void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_ob
 	init_vector(&tmp.col, 0, 0, 0);
 	i = -1;
 	while (++i < g->lights)
-		do_1_spec(&tmp, ret, hit, hitli, nrm, reflrayv, obj, i, g);
+		do_1_spec(&tmp, ret, hitli, reflrayv, obj, i, g);
 	tmp.col = scale(1 / (double)g->lights, tmp.col);
 	ret->col = tmp.col;
 }
 
-t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri	simple_bright_sphere(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_colbri		ret;
 	t_vector		reflrayv;
@@ -368,7 +382,8 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global 
 	return (ret);
 }
 
-t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_object *obj, t_global *g)
+t_vector		do_tile_sphere(t_vector *tileocol,
+		t_vector hit, t_object *obj, t_global *g)
 {
 	t_vector	ctrhit;
 	t_vector	proj;
@@ -379,8 +394,9 @@ t_vector		do_tile_sphere(t_vector *tileocol, t_vector st, t_vector hit, t_object
 	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
 	proj = norm(proj);
 	y = obj->tile[0].h * M_1_PI * acos(dot(obj->nr, obj->base[1]));
-	x = obj->tile[0].w2 *  M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
-	*tileocol = *(obj->tile[0].vectile + lround(y) * obj->tile[0].w + lround(x));
+	x = obj->tile[0].w2 * M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
+	*tileocol = *(obj->tile[0].vectile
+		+ lround(y) * obj->tile[0].w + lround(x));
 	obj->color = *tileocol;
 	return (*tileocol);
 }
@@ -404,7 +420,7 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	if (!obj.trans)
 		init_bri(&ret.bri, hitli, obj.nr, g);
 	if (obj.tile[0].data_ptr)
-		ret.colself = do_tile_sphere(&ret.col, st, hit, &obj, g);
+		ret.colself = do_tile_sphere(&ret.col, hit, &obj, g);
 	else
 		ret.col = obj.color;
 	ret.colself = obj.color;
@@ -418,7 +434,9 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g)
 	g->recursion[obj.id] = 0;
 	return (ret);
 }
-t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
+
+t_colbri		simple_bright_plane(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_colbri	ret;
 	t_vector	reflrayv;
@@ -438,7 +456,8 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global 
 	return (ret);
 }
 
-void			do_tile_plane(t_colbri *retorig, t_vector hit, t_object *obj, t_global *g)
+void			do_tile_plane(t_colbri *retorig, t_vector hit,
+	t_object *obj, t_global *g)
 {
 	t_vector	ctrhit;
 	int			x;
@@ -447,13 +466,13 @@ void			do_tile_plane(t_colbri *retorig, t_vector hit, t_object *obj, t_global *g
 	ctrhit = diff(hit, *obj->ctr);
 	x = mymod(ctrhit.x, obj->tile[0].w);
 	y = mymod(ctrhit.z, obj->tile[0].h);
-
 	retorig->col = base(rgb(*(obj->tile[0].data_ptr +
 	lround(y) * obj->tile[0].w + lround(x))));
 	obj->color = retorig->col;
 }
 
-t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri		bright_plane(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_colbri	ret;
 	t_vector	reflrayv;
@@ -466,7 +485,8 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 	init_bri(&ret.bri, hitli, obj.base[1], g);
 	if (obj.tile[0].data_ptr)
 		do_tile_plane(&ret, hit, &obj, g);
-	else if (lround(fabs(hit.x) / (double)80) % 2 == lround(fabs(hit.z) / (double)80) % 2)
+	else if (lround(fabs(hit.x) / (double)80) % 2
+		== lround(fabs(hit.z) / (double)80) % 2)
 		init_vector(&obj.color, 1, 0, 0.5);
 	ret.col = obj.color;
 	ret.colself = ret.col;
@@ -479,7 +499,8 @@ t_colbri		bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
-t_colbri		simple_bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g)
+t_colbri		simple_bright_tri(t_vector st, t_vector hit,
+	t_object obj, t_global *g)
 {
 	t_colbri	ret;
 	t_vector	hitli[g->lights];

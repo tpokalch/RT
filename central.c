@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 20:10:51 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/09/30 02:19:56 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 06:26:19 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			{
 				if (con(g))
 					printf("doing %d spec\n", i);
-				do_1_spec(&tmp, cur, hit, hitli, nrm, reflrayv, obj, i, g);
+				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
 			}
 		}
 		specscal = g->lights - obsc;
