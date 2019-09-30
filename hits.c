@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 20:35:53 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/07/03 20:53:22 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 05:19:48 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,28 +102,15 @@ t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	t_dstpst t;
 	t_dstpst framecheck;
 
-	if (con(g))
-		printf("finding complex hit\n");
-//	printf("how many tris the are %d\n", obj.rd);
-//	printf("frame radius is %d\n", (*(obj.frame)).rd2);
-
 	framecheck = hit_sphere(st, end, ray, *(obj.frame), g);
 //	printf("frame checked\n");
-	if (con(g))
-		printf("frame hit at %f\n", framecheck.dst);
-
 	if (framecheck.obj.name == NULL)
 	{
-		if (con(g))
-			printf("miss frame\n");
-			return (*(NANI(&t)));
+		return (*(NANI(&t)));
 	}
 
 //	else
 //		return (framecheck);
-	if (con(g))
-		printf("now objecthiting tris\n");
-
 //	printf("base 1 of first tri %f\n", obj.tris->base[1].yz;
 
 	objecthit(&t, st, end, obj.tris, obj.rd, g);
@@ -157,13 +144,6 @@ t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	t_dstpst t;
 	t_global p;
 
-	if (con(g))
-		printf("___START HIT SPHERE FUNC\n");
-//	printf("hitting sphere\n");
-//	if (con(g))
-//		printf("hit box sphere %d\n", hit_box(st, end, ray, obj, g));
-//	if (!hit_box(st, end, ray, obj, g))
-//		return (*NANI(&t));
 	p = *g;
 	t.pst = 0;
 	dx[0] = ray;
@@ -175,15 +155,10 @@ t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (det < 0)
 		return (*(NANI(&t)));
 	t.dst = (-abc.y- sqrt(det)) /(2 * abc.x);
-	if (t.dst <= 0.000001 && (t.pst = 1) /*&& printf("vhsnging to inside\n")*/)
+	if (t.dst <= 0.000001 && (t.pst = 1))
 		t.dst = (-abc.y+ sqrt(det)) / (2 * abc.x);
-	if (con(g))
-		printf("t is 0?%d t is %f\n", t.dst == 0, t.dst);
 	if (t.dst <= 0.000001)
 		return (*NANI(&t));
-
-	if (con(g))
-		printf("inside hit sphere returning t = %f\n", t.dst);
 	t.obj = obj;
 	return (t);
 }

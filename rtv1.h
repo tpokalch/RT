@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 12:37:33 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/09/30 04:50:07 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 05:40:43 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,12 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 400
-#define WIDTH_2 200
+#define HEIGHT 300
+#define WIDTH_2 150
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 1
+#define CORES 4
 #define M_T 6.28318530718
 #define MAX_REC 3
 

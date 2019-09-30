@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 15:51:47 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/09/30 04:40:40 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 05:36:28 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void		ginit(t_global *g)
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	i = -1;
-	g->lights = 1;
+	g->lights = 2;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
 		init_vector(&g->li[i], -50, 100, 200);
@@ -477,8 +477,8 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	g->obj[i].spec = 4;
-	g->obj[i].re = 0.5;
-	g->obj[i].trans = 0;
+	g->obj[i].re = 0;
+	g->obj[i].trans = 0.5;
 	/*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
@@ -515,8 +515,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].simple_bright = &simple_bright_sphere;
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0;
-	g->obj[i].re = 0.5;
+	g->obj[i].trans = 0.5;
+	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
 	init_vector(g->obj[i].ctr, 0, 0, 300);
 	printf("center is %f\n", g->obj[i].ctr->z);
@@ -559,13 +559,13 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
-	g->obj[i].re = 0.5;
+	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
-	g->obj[i].trans = 0;
+	g->obj[i].trans = 0.5;
 	g->obj[i].soft = 0;
-//	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
-	g->obj[i].tile[0].data_ptr = NULL;
+//	g->obj[i].tile[0].data_ptr = NULL;
 	
 /*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
