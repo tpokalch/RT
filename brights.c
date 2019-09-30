@@ -6,7 +6,7 @@
 /*   By: tpokalch <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 20:37:08 by tpokalch          #+#    #+#             */
-/*   Updated: 2019/09/30 06:45:08 by tpokalch         ###   ########.fr       */
+/*   Updated: 2019/09/30 06:46:49 by tpokalch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,6 @@ t_colbri		trans(t_vector st, t_vector hit, t_object obj, t_global *g)
 	objecthit(&temp, hit, sum(ray, hit), g->obj, g->argc + 1, g);
 	transobj.hit = sum(scale(temp.dst, ray), hit);
 	transobj.obj = temp.obj;
-/****************/
-/**what is this**/
-/****************/
-	transobj.obj.cam_pos = 0;
 	if (transobj.obj.name == NULL)
 	{
 		init_vector(&ret.col, 0, 0, 0);
