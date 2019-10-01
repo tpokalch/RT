@@ -20,14 +20,14 @@
 #include <time.h>
 
 #define WIDTH HEIGHT
-#define HEIGHT 300
-#define WIDTH_2 150
+#define HEIGHT 200
+#define WIDTH_2 100
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
 #define CORES 4
 #define M_T 6.28318530718
-#define MAX_REC 3
+#define MAX_REC 5
 
 typedef	struct	s_vector t_vector;
 
@@ -54,8 +54,6 @@ typedef struct		s_dstpst	t_dstpst;
 typedef	struct		s_colbri
 {
 	t_vector col;
-	t_vector colself;
-	t_vector nrm;
 	int	bri;
 }			t_colbri;
 
@@ -107,24 +105,19 @@ void				*toimg(void *tcp);
 void				objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc, t_global *g);
 
 t_dstpst			hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
-t_colbri					bright_spheror(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					simple_bright_spheror(t_vector st, t_vector hit, t_object obj, t_global *g);
-
-
-t_colbri				simple_bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri				bright_plane(t_vector st, t_vector hit, t_object obj, t_global *g);
-
-t_colbri					bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					simple_bright_sphere(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri				simple_bright_plane(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri				bright_plane(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					simple_bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g);
 
 t_dstpst			hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
 t_dstpst			hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
-t_colbri					bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					simple_bright_cylinder(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					simple_bright_cone(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g);
-t_colbri					simple_bright_tri(t_vector st, t_vector hit, t_object obj, t_global *g);
+t_colbri					bright_cylinder(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					simple_bright_cylinder(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					simple_bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					bright_tri(t_vector st, t_vector hit, t_object *obj, t_global *g);
+t_colbri					simple_bright_tri(t_vector st, t_vector hit, t_object *obj, t_global *g);
 
 
 t_dstpst			hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g);
@@ -185,8 +178,8 @@ typedef struct		s_object
 	int				id;
 	int				cam_pos;
 	t_dstpst		(*hit)(t_vector, t_vector, t_vector, t_object, t_global *g);
-	t_colbri				(*bright)(t_vector, t_vector, t_object, struct s_global *);
-	t_colbri				(*simple_bright)(t_vector, t_vector, t_object, struct s_global *);
+	t_colbri				(*bright)(t_vector, t_vector, t_object *, struct s_global *);
+	t_colbri				(*simple_bright)(t_vector, t_vector, t_object *, struct s_global *);
 
 	t_vector		bd1;
 	t_vector		bd2;

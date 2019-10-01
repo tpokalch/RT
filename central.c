@@ -25,6 +25,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	int obss[g->lights];
 	int	specscal;
 	double soft[g->lights];
+	int	darken[g->lights];
 	t_vector obstructed;
 //	printf("colself in the begining %f,%f,%f\n", cur->colself.x, cur->colself.y, cur->colself.z);
 	ft_bzero(obss, 4 * g->lights);
@@ -122,8 +123,16 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	
 		if (obj.soft)
 		{
+			int briscale;
+			briscale = (cur->bri - g->ambient) / g->lights;
 //			a = round((fmax(g->ambient, cur->bri * (1 - soft[0])) + fmax(g->ambient, cur->bri * (1 - soft[1]))) / (g->lights - obsc));
-		cur->bri = fmax(g->ambient, cur->bri * (1 - soft[0])) + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
+			i = -1;
+			while (++i < g->lights)
+				darken[i] = (briscale) * soft[i];
+//		cur->bri = fmax(g->ambient, cur->bri * (1 - soft[0])) + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
+			i = -1;
+			while (++i < g->lights)
+				cur->bri = cur->bri - darken[i];
 		}
 		else
 			cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
@@ -254,7 +263,7 @@ void		*toimg(void *tcp)
 //				printf("now object %d %s\n", g->hits[j][i]->obj.id, g->hits[j][i]->obj.name);
 //				printf("color is %f,%f,%f\n", g->hits[j][i]->obj.color.z, g->hits[j][i]->obj.color.y, g->hits[j][i]->obj.color.z);
 				bright = (g->hits[j][i])->obj.
-				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
+				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, &(g->hits)[j][i]->obj, g);
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
 		}
@@ -290,10 +299,10 @@ void		*move(void *p)
 			g->hits[j][i]->obj = ret.obj;
 			if (g->hits[j][i]->obj.name != NULL)
 			{
-				bright = (g->hits[j][i])->obj.bright(*g->cam_pos, (g->hits[j][i])->hit, (g->hits)[j][i]->obj, g);
+				bright = (g->hits[j][i])->obj.bright(*g->cam_pos, (g->hits[j][i])->hit, &(g->hits)[j][i]->obj, g);
 				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
-				g->hits[j][i]->obj.color = bright.colself;
-				g->hits[j][i]->obj.nr = bright.nrm;
+//				g->hits[j][i]->obj.color = bright.colself;
+//				g->hits[j][i]->obj.nr = bright.nrm;
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
 			}
 			else
@@ -381,12 +390,15 @@ void		*recalc(void *p)
 //				printf("color is %f,%f,%f\n", g->hits[j][i]->obj.color.z, g->hits[j][i]->obj.color.y, g->hits[j][i]->obj.color.z);	
 //				printf("calculating bright\n");
 				bright = g->hits[j][i]->obj.
-				bright(*g->cam_pos, g->hits[j][i]->hit, (g->hits)[j][i]->obj, g);
+				bright(*g->cam_pos, g->hits[j][i]->hit, &(g->hits)[j][i]->obj, g);
 //				printf("bright is %d\n", bright.bri);
 //				g->hits[j][i]->obj.bright = g->hits[j][i]->obj.simple_bright;
 //				printf("writing %f,%f,%f inot color\n", bright.colself.x, bright.colself.y, bright.colself.z);
-				g->hits[j][i]->obj.color = bright.colself;
-				g->hits[j][i]->obj.nr = bright.nrm;
+//comenting for now
+//				g->hits[j][i]->obj.color = bright.colself;
+//				g->hits[j][i]->obj.nr = bright.nrm;
+
+//
 //				if (i == 0)
 //					printf("writing line\n");
 				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
