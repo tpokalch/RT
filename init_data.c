@@ -516,7 +516,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].simple_bright = &simple_bright_sphere;
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0;
+	g->obj[i].trans = 0.5;
 	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
 	init_vector(g->obj[i].ctr, 0, 0, 300);

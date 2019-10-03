@@ -89,7 +89,7 @@ void		do_trans(t_vector st, t_vector hit, t_colbri *ret,
 	if (g->recursion[obj.id] > MAX_REC)
 		return ;
 	transo = trans(st, hit, obj, g);
-	transo.col = base255(scale(transo.bri, transo.col));
+//	transo.col = base255(scale(transo.bri, transo.col));
 	transo.col = sum(scale(1 - obj.trans, ret->col),
 		scale(obj.trans, transo.col));
 	ret->col = transo.col;
