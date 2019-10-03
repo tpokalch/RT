@@ -44,13 +44,6 @@ void	save_im(int *a, int *c, int w, int h)
 	}
 }
 
-int	co(int x, int y, t_global *g)
-{
-	x = x - WIDTH / 2;
-	y = -y + HEIGHT / 2;
-	return (g->ray->x == x && g->ray->y == y);
-}
-
 int	myintmod(int x, int m)
 {
 	int ret;
@@ -70,6 +63,41 @@ double	mymod(double x, int m)
 	if (x >= 0)
 		return (ret);
 	return (ret + m);
+}
+
+int		mid_col(int *a, int w, int h, int x, int y)
+{
+	t_vector vret;
+	int s;
+	int ret;
+
+	s = 1;
+//	ret = *(a + y * w + x);
+	vret = rgb(*(a + y * w + x));
+	if (x < w - 1)
+	{
+//		ret = ret + *(a + y * w + x + 1);
+		vret = sum(vret, rgb(*(a + y * w + x + 1)));
+		s++;
+	}
+	if (y < h - 1)
+	{
+		vret = sum(vret, rgb(*(a + y * w + x + w)));
+//		ret = ret + *(a + (y + 1) * w + x);
+		s++;
+	}
+	if (y < h - 1 && y < h - 1)
+	{
+		vret = sum(vret, rgb(*(a + y * w + x + 1 + w)));
+//		ret = ret + *(a + (y + 1) * w + x + 1);
+		s++;
+	}
+	vret = scale(1 / (double)s, vret);
+	vret.x = lround(vret.x);
+	vret.y = lround(vret.y);
+	vret.z = lround(vret.z);
+//	ret = ret / s;
+	return (/*ret*/brg(vret));
 }
 
 void	rewrite_pix(int *a, int *o, int x, int y, int w, int h, int xmax, int ymax, t_global *g)
@@ -195,68 +223,6 @@ void	smooth(int *a, int w, int h, int xmax, int ymax, t_global *g)
 	}
 }
 
-void		white(int *a, int w, int h, int c)
-{
-	int i;
-	int j;
-
-	i = 0;
-	j = 0;
-	t_vector v;
-	while (j < h)
-	{
-		i = 0;
-		while (i < w)
-		{
-//			if (j < HEIGHT / 2)
-//			{
-//				init_vector(&v, i, i, i);
-				*(a + j * w + i) = c;
-//			}
-//			else
-//				*(a + j * w + i) = 0xFF0000;
-			i++;
-		}
-		j++;
-	}
-}
-
-int		mid_col(int *a, int w, int h, int x, int y)
-{
-	t_vector vret;
-	int s;
-	int ret;
-
-	s = 1;
-//	ret = *(a + y * w + x);
-	vret = rgb(*(a + y * w + x));
-	if (x < w - 1)
-	{
-//		ret = ret + *(a + y * w + x + 1);
-		vret = sum(vret, rgb(*(a + y * w + x + 1)));
-		s++;
-	}
-	if (y < h - 1)
-	{
-		vret = sum(vret, rgb(*(a + y * w + x + w)));
-//		ret = ret + *(a + (y + 1) * w + x);
-		s++;
-	}
-	if (y < h - 1 && y < h - 1)
-	{
-		vret = sum(vret, rgb(*(a + y * w + x + 1 + w)));
-//		ret = ret + *(a + (y + 1) * w + x + 1);
-		s++;
-	}
-	vret = scale(1 / (double)s, vret);
-	vret.x = lround(vret.x);
-	vret.y = lround(vret.y);
-	vret.z = lround(vret.z);
-//	ret = ret / s;
-	return (/*ret*/brg(vret));
-}
-
-
 void		alias(int *dst, int *a, int w, int xmax, int ymax, int h)
 {
 	int mid;
@@ -284,14 +250,8 @@ int		start_threads(void *f, t_global *g)
 
 	t[0] = clock();
 	i = -1;
-//	ft_bzero(g->line_taken, 4 * STRIPS);
 	while (++i < CORES)
-	{
-//		g->tcps[i]->line_taken[i] = 1;
-//		g->tcps[i]->my_line = i * TASK;
 		pthread_create(&g->tid[i], NULL, f, g->tcps[i]);
-	}
-
 	i = -1;
 	while (++i < CORES)
 	{
@@ -299,16 +259,8 @@ int		start_threads(void *f, t_global *g)
 			printf("joining cores\n");
 		pthread_join(g->tid[i], NULL);
 	}
-
 	i = -1;
 //	debug(g);
-//	white(g->data_ptr);
-//	while (++i < mousex / 10)
-//		smooth(g->data_ptr, g);
-//smooth(g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT, g);
-
-//	alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
-//	printf("doing alias1\n");
 	if (WIDTH > 2500)
 	{
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
@@ -316,13 +268,7 @@ int		start_threads(void *f, t_global *g)
 	}
 	if (WIDTH > 750)
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
-
-//	printf("putting image to window\n");
-
-
-
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
-//	printf("%f frames second\n",CLOCKS_PER_SEC / (double)(clock() - t));
 	t[1] = clock();
 	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
 	return (1);

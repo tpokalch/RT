@@ -199,6 +199,7 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	t_vector	hitli[g->lights];
 	t_vector	reflrayv;
 
+	g->recursion[obj->id]++;
 	hit0 = diff(hit, *obj->ctr);
 	obj->nr = norm(diff(hit0, scale(dot(hit0, obj->base[1]) *
 		(1 + obj->rd2), obj->base[1])));
@@ -226,6 +227,7 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	if (obj->trans)
 		do_trans(st, hit, &ret, *obj, g);
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
+	g->recursion[obj->id] = 0;
 	return (ret);
 }
 
@@ -290,10 +292,10 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit,
 	t_vector	hitli[g->lights];
 	t_vector	reflrayv;
 
+	g->recursion[obj->id]++;	
 	ctrhit = diff(hit, *obj->ctr);
 	obj->nr = scale(dot(ctrhit, obj->base[1]), obj->base[1]);
 	obj->nr = norm(diff(ctrhit, obj->nr));
-	g->recursion[obj->id]++;
 	init_hitli(hitli, hit, g);
 	if (obj->cam_pos)
 	{
@@ -393,14 +395,18 @@ t_vector		do_tile_sphere(t_vector hit, t_object *obj, t_global *g)
 	t_vector	proj;
 	double		x;
 	double		y;
+	t_tile		*tile;
 
+	tile = obj->tile;
 	ctrhit = diff(hit, *obj->ctr);
 	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
 	proj = norm(proj);
-	y = obj->tile[0].h * M_1_PI * acos(dot(obj->nr, obj->base[1]));
-	x = obj->tile[0].w2 * M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
-	obj->color = *(obj->tile[0].vectile
-		+ lround(y) * obj->tile[0].w + lround(x));;
+	y = tile[0].h * M_1_PI * acos(dot(obj->nr, obj->base[1]));
+	x = tile[0].w2 * M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
+	if (round(x) >= tile[0].w2)
+		x--;
+	obj->color = *(tile[0].vectile
+		+ lround(y) * tile[0].w + lround(x));;
 	return (obj->color);
 }
 
@@ -489,11 +495,12 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 		== lround(fabs(hit.z) / (double)80) % 2)
 		init_vector(&obj->color, 1, 0, 0.5);
 	ret.col = obj->color;
-//	ret.colself = ret.col;
 	if (obj->spec || obj->re)
 		reflrayv = reflray(st, hit, obj->base[1], g);
 	if (obj->re)
 		do_re(reflrayv, &ret.col, hit, *obj, g);
+	if (obj->trans)
+		do_trans(st, hit, &ret, *obj, g);	
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	g->recursion[obj->id] = 0;
 	return (ret);
