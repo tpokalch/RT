@@ -48,6 +48,21 @@ void		do_re(t_vector reflrayv, t_vector *reocol,
 	}
 }
 
+
+t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
+{
+	t_vector	ray;
+	t_vector	refl;
+	t_vector	rayx;
+
+	ray = diff(end, st);
+	rayx = diff(ray, scale(dot(ray, nrm), nrm));
+	refl = diff(scale(2, rayx), ray);
+	return (refl);
+}
+
+
+
 t_colbri		trans(t_vector st, t_vector hit, t_object obj, t_global *g)
 {
 	t_dstpst	temp;
@@ -69,31 +84,20 @@ t_colbri		trans(t_vector st, t_vector hit, t_object obj, t_global *g)
 	return (ret);
 }
 
-t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
-{
-	t_vector	ray;
-	t_vector	refl;
-	t_vector	rayx;
-
-	ray = diff(end, st);
-	rayx = diff(ray, scale(dot(ray, nrm), nrm));
-	refl = diff(scale(2, rayx), ray);
-	return (refl);
-}
-
 void		do_trans(t_vector st, t_vector hit, t_colbri *ret,
 	t_object obj, t_global *g)
 {
 	t_colbri transo;
+	int		origbri;
 
+	origbri = ret->bri;
 	if (g->recursion[obj.id] > MAX_REC)
 		return ;
 	transo = trans(st, hit, obj, g);
-//	transo.col = base255(scale(transo.bri, transo.col));
 	transo.col = sum(scale(1 - obj.trans, ret->col),
 		scale(obj.trans, transo.col));
 	ret->col = transo.col;
-	ret->bri = transo.bri;
+	ret->bri = transo.bri * obj.trans + origbri * (1 - obj.trans);
 }
 
 void		init_hitli(t_vector *hitli, t_vector hit, t_global *g)
@@ -427,7 +431,7 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
 		else
 			init_bri(&ret.bri, hitli, obj->nr, g);	
 	}
-	else if (!obj->trans)
+	else
 		init_bri(&ret.bri, hitli, obj->nr, g);
 	if (obj->tile[0].data_ptr)
 		do_tile_sphere(hit, obj, g);
@@ -438,6 +442,8 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
 		do_re(reflrayv, &ret.col, hit, *obj, g);
 	if (obj->trans)
 		do_trans(st, hit, &ret, *obj, g);
+	if (con(g))
+		printf("orig bri is %d\n", ret.bri);
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	g->recursion[obj->id] = 0;
 	return (ret);
