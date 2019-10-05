@@ -25,7 +25,7 @@
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 1
+#define CORES 4
 #define M_T 6.28318530718
 #define MAX_REC 5
 
@@ -152,6 +152,11 @@ int				myintmod(int x, int m);
 int				left(t_vector a, t_vector b, t_vector nrm, t_global *g);
 double				tothe2(double x, int e);
 
+void		do_tile_sphere(t_vector hit, t_object *obj, t_global *g);
+void		do_re(t_vector refl, t_vector hit, t_vector *retcol, t_object obj, t_global *g);
+void		do_trans(t_vector st, t_vector hit, t_colbri *ret, t_object obj, t_global *g);
+
+
 void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm, t_vector reflrayv, t_object obj, t_global *g);
 
 void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector *hitli, t_vector reflrayv, t_object obj, int i, t_global *g);
@@ -192,6 +197,7 @@ typedef struct		s_object
 	t_vector		color;
 	int				rd;
 	int				rd2;
+	void			(*prop[3])();
 	t_vector		**pts;
 	t_object		*tris;
 	double			re;

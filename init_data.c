@@ -19,7 +19,7 @@ void		ginit(t_global *g)
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	i = -1;
-	g->lights = 2;
+	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
 		init_vector(&g->li[i], -50, 100, 200);
@@ -516,9 +516,16 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].simple_bright = &simple_bright_sphere;
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0.9;
-	g->obj[i].re = 0;
+	g->obj[i].trans = 0;
+	g->obj[i].re = 0.5;
 	g->obj[i].spec = 4;
+	g->obj[i].prop[0] = do_tile_sphere;
+	g->obj[i].prop[1] = do_re;
+	g->obj[i].prop[2] = do_trans;
+
+//(t_vector *)do_tile_sphere(t_vector, t_object *, t_global *);
+
+
 	init_vector(g->obj[i].ctr, 0, 0, 300);
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd = 100;
