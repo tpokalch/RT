@@ -32,7 +32,7 @@ void		ginit(t_global *g)
 //	g->liz[1] = g->li[1].z;
 //	g->liz[2] = g->li[2].z;
 
-	g->ambient = 50;
+	g->ambient = 70;
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -42,13 +42,13 @@ void		ginit(t_global *g)
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-	init_vector(g->angle, 0.45, 0, 0);
-//	init_vector(g->angle, 0, 0, 0);
+//	init_vector(g->angle, 0.45, 0, 0);
+	init_vector(g->angle, 0, 0, 0);
 
 	init_vector(g->normal, 0, 0, 20);
 	*g->normal = rotate(*g->normal, *g->angle);
 //	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
-	init_vector(g->cam_pos, 0, 50, 0);
+	init_vector(g->cam_pos, 0, 0, 0);
 	init_vector(&g->white, 1, 1, 1);
 	g->light_switch = 0;
 	g->objn = 0;
@@ -61,12 +61,9 @@ void		ginit(t_global *g)
 	g->line_taken = (int *)malloc(sizeof(int) * HEIGHT);
 	ft_bzero(g->line_taken, 4 * WIDTH);
 	g->recursion = 0;
-//	while (++i < WIDTH)
-//		printf("the line taken is %d\n", g->line_taken[i]);
 	i = -1;
 	while (++i < CORES)
 		g->tcps[i] = (t_global *)malloc(sizeof(t_global));
-//	copy_tcps(g);
 	printf("end ginit\n");
 }
 
@@ -207,7 +204,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].re = 0;
 	g->obj[i].spec = 0;
 	g->obj[i].soft = 0;
-	g->obj[i].trans = 0;
+	g->obj[i].trans = 0.5;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
