@@ -442,15 +442,12 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	if (obj->spec || obj->re)
 		reflrayv = reflray(st, hit, obj->nr, g);
 	if (obj->tile[0].data_ptr)
-		obj->prop[0](hit, obj, g);
-//		do_tile_sphere(hit, obj, g);
+		do_tile_sphere(hit, obj, g);
 	ret.col = obj->color;
 	if (obj->re)
-		obj->prop[1](reflrayv, hit, &ret.col, *obj, g);
-//		do_re(reflrayv, &ret.col, hit, *obj, g);
+		do_re(reflrayv, hit, &ret.col, *obj, g);
 	if (obj->trans)
-//		do_trans(st, hit, &ret, *obj, g);
-		obj->prop[2](st, hit, &ret, *obj, g);
+		do_trans(st, hit, &ret, *obj, g);
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	g->recursion[obj->id] = 0;
 	return (ret);
@@ -470,6 +467,8 @@ t_colbri		simple_bright_plane(t_vector st, t_vector hit,
 		reflrayv = reflray(st, hit, obj->base[1], g);
 	if (obj->re)
 		do_re(reflrayv, hit, &ret.col, *obj, g);
+	if (obj->trans)
+		do_trans(st, hit, &ret, *obj, g);
 	obj->nr = obj->base[1];
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	return (ret);

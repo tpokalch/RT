@@ -6,17 +6,11 @@ double           myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g)
         double ret;
 
         ret = acos(dot(ax, v));
-//      if (left(v, ax, nrm, g))
-//              return (acos(dot(ax, v)));
-//      return (acos(dot(ax, v)));
-        if (con(g))
-                printf("left %d\n", left(v, ax, nrm, g));
         if (left(v, ax, nrm, g))
                 return (M_T - ret);
         if (ret > M_PI)
                 return (M_T - ret);
         return (ret);
-        return(M_T - acos(dot(ax, v)));
 }
 
 void		init_vector(t_vector *i, double x, double y, double z)
@@ -30,9 +24,9 @@ t_vector		cross(t_vector a, t_vector b)
 {
 	t_vector ret;
 
-	ret.x = -a.y * b.z + a.z * b.y;
-	ret.y = -a.z * b.x + a.x * b.z;
-	ret.z = -a.x * b.y + a.y * b.x;
+	ret.x = a.z * b.y - a.y * b.z;
+	ret.y = a.x * b.z - a.z * b.x;
+	ret.z = a.y * b.x - a.x * b.y;
 
 //	ret = scale(-1, ret);
 //	if (con(g))
@@ -142,16 +136,6 @@ t_vector		rotate(t_vector ray, t_vector angle)
 	init_vector(&ret, dot(row[0], ray), dot(row[1], ray), dot(row[2], ray));
 	return (ret);
 }
-/*
-t_vector			rotate3(t_vector base[3], t_vector ang)
-{
-	t_vector ret[3];
-
-	ret[0] = rotate(base[0], ang);
-	ret[0] = rotate(base[0], ang);
-	ret[0] = rotate(base[0], ang);
-	return (ret)
-*/
 
 double				len2(t_vector a)
 {
