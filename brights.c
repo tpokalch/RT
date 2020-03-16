@@ -192,7 +192,7 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object *obj,
 	return (ret);
 }
 
-void		do_tile_cone(t_vector ctrhit,
+void		do_tile_cone(/*t_vector ctrhit,*/
 	t_vector hit, t_object *obj, t_global *g)
 {
 	double		x;
@@ -201,13 +201,25 @@ void		do_tile_cone(t_vector ctrhit,
 	t_tile		*objtile;
 
 	objtile = obj->tile;
-	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
+	proj = diff(obj->nr/*ctrhit*/, scale(dot(obj->base[1], obj->nr/*ctrhit*/), obj->base[1]));
 	proj = norm(proj);
 	x = objtile[0].w2 * (1 * M_1_PI *
 		myacos(proj, obj->base[2], obj->base[1], g));
 	y = mymod(1 - dot(obj->base[1], diff(hit, *obj->ctr)), objtile[0].h);
 	obj->color = *(objtile[0].vectile
 		+ lround(y) * objtile[0].w + lround(x));
+}
+
+
+t_vector	get_normal_cone(t_vector point, t_object *obj)
+{
+	t_vector hit0;
+	t_vector ret;
+
+	hit0 = diff(point, *obj->ctr);
+	ret = norm(diff(hit0, scale(dot(hit0, obj->base[1]) *
+		(1 + obj->rd2), obj->base[1])));
+	return (ret);
 }
 
 t_colbri	bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g)
@@ -237,7 +249,7 @@ t_colbri	bright_cone(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	if (obj->re || obj->spec)
 		reflrayv = reflray(st, hit, obj->nr, g);
 	if (obj->tile[0].data_ptr)
-		do_tile_cone(hit0, hit, obj, g);
+		do_tile_cone(/*hit0, */hit, obj, g);
 	ret.col = obj->color;
 	if (obj->re)
 		do_re(reflrayv, hit, &ret.col, *obj, g);
@@ -277,7 +289,7 @@ t_colbri	simple_bright_cylinder(t_vector st, t_vector hit,
 	return (ret);
 }
 
-void	do_tile_cyl(t_vector hit, t_vector ctrhit,
+void	do_tile_cyl(t_vector hit, /*t_vector ctrhit,*/
 	 t_object *obj, t_global *g)
 {
 	double		x;
@@ -285,7 +297,7 @@ void	do_tile_cyl(t_vector hit, t_vector ctrhit,
 	t_vector	proj;
 	double		xdst;
 
-	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
+	proj = diff(obj->nr/*ctrhit*/, scale(dot(obj->base[1], obj->nr/*ctrhit*/), obj->base[1]));
 	proj = norm(proj);
 	x = obj->tile[0].w2
 	* (1 - (1 - 2 * (det(proj, obj->base[0]) < 0))
@@ -296,6 +308,17 @@ void	do_tile_cyl(t_vector hit, t_vector ctrhit,
 	y = myintmod(xdst, obj->tile[0].h);
 	obj->color = *(obj->tile[0].vectile +
 		lround(y) * obj->tile[0].w + lround(x));
+}
+
+t_vector	get_normal_cyl(t_vector point, t_object *obj)
+{
+	t_vector ctrhit;
+	t_vector ret;
+
+	ctrhit = diff(point, *obj->ctr);
+	ret = scale(dot(ctrhit, obj->base[1]), obj->base[1]);
+	ret = norm(diff(ctrhit, ret));	
+	return ret;
 }
 
 t_colbri	bright_cylinder(t_vector st, t_vector hit,
@@ -323,7 +346,7 @@ t_colbri	bright_cylinder(t_vector st, t_vector hit,
 	else
 		init_bri(&ret.bri, hitli, obj->nr, g);
 	if (obj->tile[0].data_ptr)
-		do_tile_cyl(hit, ctrhit, obj, g);
+		do_tile_cyl(hit, /*ctrhit, */obj, g);
 	ret.col = obj->color;
 	if (obj->spec || obj->re)
 		reflrayv = reflray(st, hit, obj->nr, g);
@@ -409,7 +432,8 @@ void		do_tile_sphere(t_vector hit, t_object *obj, t_global *g)
 	t_tile		*tile;
 
 	tile = obj->tile;
-	ctrhit = diff(hit, *obj->ctr);
+//	ctrhit = diff(hit, *obj->ctr);
+	ctrhit = obj->nr;
 	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
 	proj = norm(proj);
 	y = tile[0].h * M_1_PI * acos(dot(obj->nr, obj->base[1]));
@@ -418,6 +442,11 @@ void		do_tile_sphere(t_vector hit, t_object *obj, t_global *g)
 		x--;
 	obj->color = *(tile[0].vectile
 		+ lround(y) * tile[0].w + lround(x));;
+}
+
+t_vector	get_normal_sphere(t_vector hit, t_object *obj)
+{
+	return (scale(1 / (double)obj->rd, diff(hit, *obj->ctr)));
 }
 
 t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
@@ -429,6 +458,8 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	g->recursion[obj->id]++;
 	init_hitli(hitli, hit, g);
 	obj->nr = scale(1 / (double)obj->rd, diff(hit, *obj->ctr));
+	if (con(g))
+		printf("cam: %f, %f, %f, li: %f, %f, %f angle: %f,%f,%f\n",g->cam_pos->x, g->cam_pos->y, g->cam_pos->z, g->li->x, g->li->y, g->li->z, g->angle->x, g->angle->y, g->angle->z);
 	if (obj->cam_pos)
 	{
 		obj->nr = scale(-1, obj->nr);
@@ -489,6 +520,11 @@ void			do_tile_plane(t_colbri *retorig, t_vector hit,
 	obj->color = retorig->col;
 }
 
+t_vector	get_normal_plane(t_vector point, t_object *obj)
+{
+	return (obj->base[1]);
+}
+
 t_colbri		bright_plane(t_vector st, t_vector hit,
 	t_object *obj, t_global *g)
 {
@@ -507,7 +543,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 		do_tile_plane(&ret, hit, obj, g);
 	else if (lround(fabs(hit.x) / (double)80) % 2
 		== lround(fabs(hit.z) / (double)80) % 2)
-		init_vector(&obj->color, 1, 0, 0.5);
+		init_vector(&obj->color, 0,0.5, 0.5);
 	ret.col = obj->color;
 	if (obj->re)
 		do_re(reflrayv, hit, &ret.col, *obj, g);

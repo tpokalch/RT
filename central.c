@@ -51,10 +51,27 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 				}
 				if (t.dst < 1)
 				{
+//only for sphere
 					if (obj.soft)
 					{
+
 						obstructed = sum(scale(t.dst, ray), hit);
-						soft[i] = dot(norm(diff(obstructed, *g->obj[iobjn[1]].ctr))/*norm(diff(obstructed, hit))*/, norm(ray));
+
+						//for cyl 
+
+						t_vector ctrhit = diff(obstructed,  *g->obj[iobjn[1]].ctr);
+
+						t_vector cylNormal = scale(dot(ctrhit, g->obj[iobjn[1]].base[1]), g->obj[iobjn[1]].base[1]);
+
+						cylNormal = norm(diff(ctrhit,  cylNormal));   
+    					if (con(g))
+							printf("normal is %f, %f, %f\n", cylNormal.x, cylNormal.y, cylNormal.z);
+
+
+
+						t_vector normal = g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]]);
+						soft[i] = dot(norm(normal/*cylNormal*//*diff(obstructed, *g->obj[iobjn[1]].ctr)*/)/*norm(diff(obstructed, hit))*/, norm(ray));
+
 						soft[i] = tothe2(soft[i], obj.soft);
 					}
 					g->prim = iobjn[1];

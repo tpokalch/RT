@@ -102,7 +102,7 @@ int		move_phys(int keycode, t_global *g)
 		g->obj[g->objn].base[2] = rotate(g->base[2], g->obj[g->objn].ang);
 //		printf("base is %f,%f,%f\n", g->obj[g->objn].base[0].x, g->obj[g->objn].base[1].y, g->obj[g->objn].base[2].z);
 	}
-	campos(g);	
+//	campos(g);	
 	return (start_threads(move, g));
 }
 
@@ -126,14 +126,14 @@ int	move_obj(int kk, t_global *g)
 		else if (kk == 2 || kk == 124)
 			g->angle->y += 0.05;
 		*g->normal = rotate(g->_0015, *g->angle);
-		campos(g);
+	//	campos(g);
 		return (start_threads(recalc, g));
 	}
 	else if (kk == 1)
 		*g->cam_pos = diff(*g->cam_pos, *g->normal);
 	else if (kk == 13)
 		*g->cam_pos = sum(*g->cam_pos, *g->normal);
-	campos(g);
+//	campos(g);
 	return (start_threads(move, g));
 }
 
