@@ -25,7 +25,7 @@
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 8
+#define CORES 4
 #define M_T 6.28318530718
 #define MAX_REC 4
 

@@ -24,7 +24,9 @@ int		is_coords(char *argv)
 	while (*(argv + i) != '\0')
 	{
 		if (!(ft_isdigit(*(argv + i)))
-		&& (*(argv + i) != ',' && (*(argv + i) != '-')))
+		&& argv[i] != ','
+		&& argv[i] != '-'
+		&& argv[i] != '.')
 			return (putstr("not numbers present in coords\n", 0));
 		if (*(argv + i) == ',')
 			coma_count++;
@@ -48,9 +50,15 @@ void		vectorify(void *obj_coord, char **argv)
 		i++;
 	if (i == 3)
 	{
+/*
 		ret.x = ft_atoi(*(split + 0));
 		ret.y = ft_atoi(*(split + 1));
 		ret.z = ft_atoi(*(split + 2));
+*/
+		ret.x = atof(*(split + 0));
+		ret.y = atof(*(split + 1));
+		ret.z = atof(*(split + 2));
+		
 		*(t_vector *)obj_coord = ret;
 	}
 	else if (i == 1)
