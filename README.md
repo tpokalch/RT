@@ -6,7 +6,7 @@ This is a somewhat complex raytracing implementation. It supports  reflection, t
 
 Click on video below:
 
-[![rtdemo](https://i.imgur.com/q7SEQnL.jpg)](https://www.youtube.com/watch?v=3ymJMfN1hsI&feature=youtu.be)
+[![rtdemo](https://i.imgur.com/qXSK70v.jpg](https://www.youtube.com/watch?v=3ymJMfN1hsI&feature=youtu.be)
 
 
 
