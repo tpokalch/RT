@@ -22,7 +22,8 @@ void		ginit(t_global *g)
 	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
-		init_vector(&g->li[i], 500.2, 502.13, 200.46);
+		init_vector(&g->li[i], 800.2, 302.13, 100.46);
+
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
@@ -43,7 +44,7 @@ void		ginit(t_global *g)
 	init_vector(&g->base[2], 0, 0, 1);
 
 //	init_vector(g->angle, 0.45, -0.5, 0);
-	init_vector(g->angle, 0.6, -0.2, 0);
+	init_vector(g->angle, 0.4, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
 	init_vector(g->normal, 0, 0, 20);
@@ -219,7 +220,6 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].tile[0].data_ptr = NULL;
 
-//	init_tile(i,"./tiles/julia.xpm", g->obj, g);
 
 
 
@@ -486,8 +486,8 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	g->obj[i].spec = 4;
-	g->obj[i].re = 0.4;
-	g->obj[i].trans = 0;
+	g->obj[i].re = 0;
+	g->obj[i].trans = 0.5;
 	g->obj[i].soft = 1;
 
 	/*
@@ -510,11 +510,10 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 //	g->obj[i].tile[0].data_ptr = NULL;
 
 
-	init_tile(i,"./tiles/julia.xpm", g->obj, g);
 
 
 
-//	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
 
@@ -554,9 +553,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	printf("hello\n");
-//	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
+	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
 //	init_tile(i,"./tiles/blank.xpm", g->obj, g);
-	init_tile(i,"./tiles/julia.xpm", g->obj, g);
 
 
 //	g->obj[i].tile[0].data_ptr = NULL;
@@ -586,10 +584,10 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
-	g->obj[i].re = 0;
+	g->obj[i].re = 0.5;
 	g->obj[i].spec = 0;
 	g->obj[i].trans = 0;
-	g->obj[i].soft = 3;
+	g->obj[i].soft = 1;
 	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
 //	g->obj[i].tile[0].data_ptr = NULL;
