@@ -22,7 +22,7 @@ void		ginit(t_global *g)
 	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
-		init_vector(&g->li[i], 800.2, 302.13, 100.46);
+		init_vector(&g->li[i], 50.2, 102.13, 50.46);
 
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
@@ -33,7 +33,8 @@ void		ginit(t_global *g)
 //	g->liz[1] = g->li[1].z;
 //	g->liz[2] = g->li[2].z;
 
-	g->ambient = 60;
+	g->ambient = 65;
+
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -209,7 +210,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.z = 0;
 	g->obj[i].re = 0.6;
 	g->obj[i].spec = 4;
-	g->obj[i].soft = 1;
+	g->obj[i].soft = 0;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
@@ -404,7 +405,7 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 	g->obj[i].tile[0].data_ptr = NULL;
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 4;
+	g->obj[i].spec = 5;
 	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
 	g->obj[i].rd = g->obj[i].tris->rd - 1;
@@ -485,10 +486,11 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	g->obj[i].spec = 4;
+	g->obj[i].spec = 5;
 	g->obj[i].re = 0;
-	g->obj[i].trans = 0.5;
-	g->obj[i].soft = 1;
+	g->obj[i].trans = 0;
+	g->obj[i].soft = 0;
+
 
 	/*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
@@ -511,9 +513,8 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 
 
 
-
-
 	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
 
@@ -533,8 +534,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 4;
-	g->obj[i].soft = 1;
+	g->obj[i].spec = 5;
+	g->obj[i].soft = 0;
 
 	g->obj[i].prop[0] = do_tile_sphere;
 	g->obj[i].prop[1] = do_re;
@@ -552,9 +553,9 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	printf("hello\n");
-	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
-//	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+
+//	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
+	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
 
 //	g->obj[i].tile[0].data_ptr = NULL;
@@ -585,9 +586,9 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 0;
+	g->obj[i].spec = 5;
 	g->obj[i].trans = 0;
-	g->obj[i].soft = 1;
+	g->obj[i].soft = 0;
 	init_tile(i,"./tiles/blank.xpm", g->obj, g);
 
 //	g->obj[i].tile[0].data_ptr = NULL;

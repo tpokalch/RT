@@ -22,6 +22,7 @@
 #define WIDTH HEIGHT
 #define HEIGHT 300
 #define WIDTH_2 150
+
 #define HEIGHT_2 WIDTH_2
 #define TASK 20
 #define STRIPS HEIGHT / TASK
