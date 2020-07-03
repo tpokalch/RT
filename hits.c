@@ -155,6 +155,8 @@ t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	if (det < 0)
 		return (*(NANI(&t)));
 	t.dst = (-abc.y- sqrt(det)) /(2 * abc.x);
+	//t.pst is called for every pixel, optimize to check only
+	//once!
 	if (t.dst <= 0.000001 && (t.pst = 1))
 		t.dst = (-abc.y+ sqrt(det)) / (2 * abc.x);
 	if (t.dst <= 0.000001)

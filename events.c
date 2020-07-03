@@ -186,7 +186,15 @@ int		mouse_move(int x, int y, void *param)
 //		*g->normal = rotate(g->_0015, p);
 //		*g->angle = sum(p, *g->angle);
 		*g->angle = p;
+
+//		ideally normal changes only when the key is pressed
+//		and doesn't change untill mouse_move->key_press
+//		muse move should set int can_change to 1
+//		key press should change normal and
+//		set int can change to 0
+
 		*g->normal = rotate(g->_0015, p);	
+
 		start_threads(recalc, g);
 	}
 	return (1);

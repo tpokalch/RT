@@ -25,7 +25,8 @@ $(NAME):
 	clang -g $(FLAGS) -I libft/includes -o free_points.o -c free_points.c
 
 
-	gcc -I /usr/local/include $(OBJ) -o rtv1 -L /usr/local/lib/ -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
+#	deleted gcc -I /usr/local/include
+	gcc $(OBJ) -o rtv1 -L /usr/local/lib/ -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
 
 clean:
 #	make -C libft/ clean

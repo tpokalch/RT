@@ -113,6 +113,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		else
 			cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
 	}
+	//gamma correct
+	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
 }
 
 void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc, t_global *g)

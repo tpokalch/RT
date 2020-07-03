@@ -64,7 +64,7 @@ void		do_re(t_vector reflrayv, t_vector hit,
 	}
 }
 
-
+//can be done faster
 t_vector		reflray(t_vector st, t_vector end, t_vector nrm, t_global *g)
 {
 	t_vector	ray;

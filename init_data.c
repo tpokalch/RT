@@ -405,7 +405,7 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 	g->obj[i].tile[0].data_ptr = NULL;
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 5;
+	g->obj[i].spec = 0;
 	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
 	g->obj[i].rd = g->obj[i].tris->rd - 1;
@@ -534,7 +534,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
 	g->obj[i].re = 0.5;
-	g->obj[i].spec = 5;
+	g->obj[i].spec = 4;
 	g->obj[i].soft = 0;
 
 	g->obj[i].prop[0] = do_tile_sphere;
