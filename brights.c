@@ -381,7 +381,9 @@ void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector *hitli,
 					scale((1 - g->cosa[i]), ret->col)));
 	}
 	else
+//		do same thing as if cosa == 0
 		tmp->col = sum(tmp->col, ret->col);
+
 }
 
 void		do_spec(t_colbri *ret, t_vector hit, t_vector nrm,

@@ -22,8 +22,7 @@ void		ginit(t_global *g)
 	g->lights = 1;
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 	while(++i < g->lights)
-		init_vector(&g->li[i], 50.2, 102.13, 50.46);
-
+		init_vector(&g->li[i], 50.2, 102.13, 200.46);
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
@@ -44,13 +43,13 @@ void		ginit(t_global *g)
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-//	init_vector(g->angle, 0.45, -0.5, 0);
-	init_vector(g->angle, 0.4, 0, 0);
+	init_vector(g->angle, 0.45, -0.5, 0);
+//	init_vector(g->angle, 0.4, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
 	init_vector(g->normal, 0, 0, 20);
 	*g->normal = rotate(*g->normal, *g->angle);
-//	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
+	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
 //	init_vector(g->cam_pos, 109.86, -6.69, 33.44);
 	init_vector(g->cam_pos, 0, 0, 0);
 
@@ -203,14 +202,16 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ctr->y = -200;
 	g->obj[i].ctr->z = 0;
 	g->obj[i].rd = 10;
-	g->obj[i].color = rgb(0x010101);
+//	g->obj[i].color = rgb(0x010101);
+	g->obj[i].color = rgb(0x010100);
+
 
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0.6;
+	g->obj[i].re = 0.6; //0.6 is good
 	g->obj[i].spec = 4;
-	g->obj[i].soft = 0;
+	g->obj[i].soft = 1;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
@@ -486,8 +487,8 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	g->obj[i].spec = 5;
-	g->obj[i].re = 0;
+	g->obj[i].spec = 4;
+	g->obj[i].re = 0.5;
 	g->obj[i].trans = 0;
 	g->obj[i].soft = 0;
 

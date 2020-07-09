@@ -14,6 +14,11 @@
 
 void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv, /*t_vector nrm,*/ t_object obj, t_global *g)
 {
+	//gamma correct
+	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
+
+
+
 	int i;
 //	int	objn;
 	t_vector nrm;
@@ -22,7 +27,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	t_vector ray;
 	int	obsc;
 	t_colbri tmp;
-	int obss[g->lights];
+	int obss[g->lights]; // used in do 1 spec. obss[i] == 1 if that obect is obstructed from light[i]
 	int	specscal;
 	double soft[g->lights];
 	int	darken[g->lights];
@@ -51,28 +56,13 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 				}
 				if (t.dst < 1)
 				{
-//only for sphere
 					if (obj.soft)
 					{
-
 						obstructed = sum(scale(t.dst, ray), hit);
-
-						//for cyl 
-
-						t_vector ctrhit = diff(obstructed,  *g->obj[iobjn[1]].ctr);
-
-						t_vector cylNormal = scale(dot(ctrhit, g->obj[iobjn[1]].base[1]), g->obj[iobjn[1]].base[1]);
-
-						cylNormal = norm(diff(ctrhit,  cylNormal));   
-    					if (con(g))
-							printf("normal is %f, %f, %f\n", cylNormal.x, cylNormal.y, cylNormal.z);
-
-
-
-						t_vector normal = g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]]);
-						soft[i] = dot(norm(normal/*cylNormal*//*diff(obstructed, *g->obj[iobjn[1]].ctr)*/)/*norm(diff(obstructed, hit))*/, norm(ray));
-
+						t_vector ctrhit = diff(obstructed,  *g->obj[iobjn[1]].ctr); 
+						soft[i] = dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray));
 						soft[i] = tothe2(soft[i], obj.soft);
+//						double soft = normal_to_the_obhect * hitli, so between 0 and 1
 					}
 					g->prim = iobjn[1];
 					obsc++;
@@ -84,37 +74,67 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		}
 		i++;
 	}
-	i = -1;
-	if (obj.spec)
+
+	if (obsc > 0) //if it is obscured from at least 1 of the lights
 	{
-		while (++i < g->lights)
-			if (obss[i] == 0)
-				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
-		specscal = g->lights - obsc;
-		if (obsc < g->lights)
-		{
-			tmp.col = scale(1 / (double)specscal, tmp.col);
-			cur->col = tmp.col;
-		}
-	}
-	if (obsc > 0)
-	{
-		if (obj.soft)
+		//bug: when plane takes soft
+		//shadows from sphere and the
+		//light is inside sphere
+		//the plane isn't obstructed fully from
+		//light by sphere
+		if (obj.soft) // DRAWS SOFT SHADOWS
 		{
 			int briscale;
 			briscale = (cur->bri - g->ambient) / g->lights;
 			i = -1;
 			while (++i < g->lights)
 			{
-				darken[i] = (briscale) * soft[i];
-				cur->bri = cur->bri - darken[i];
+				cur->bri = cur->bri - briscale * soft[i];
+//				when soft == 1, bri is the darkest
 			}
-		}
+		}//		DRAWS REGUALR SHADOWS
 		else
 			cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
 	}
-	//gamma correct
-	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
+
+
+	i = -1;
+	if (obj.spec)
+	{
+		while (++i < g->lights)
+			if (obss[i] == 0)
+			{
+//				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
+		g->cosa[i] = dot(norm(hitli[i]), norm(reflrayv));
+//		g->cosa[i] = g->cosa[i] - soft[i]; 
+		if (g->cosa[i] > 0)
+		{
+			g->cosa[i] = tothe2(g->cosa[i], obj.spec);
+						//dirty trick to make it look like
+//						the specular white light is mixed
+//						with the color after the color is mixed
+//						with brightness. here it is divided by bri
+//						so that it cancels out when bri * col
+//						in recalc
+			tmp.col = sum(tmp.col, sum(scale(255 * g->cosa[i] / cur->bri, g->white),
+			scale((1 - g->cosa[i]), cur->col)));
+		}
+		else
+//			do same thing as if cosa == 0
+       		         tmp.col = sum(tmp.col, cur->col);
+		}
+		if (obsc < g->lights)
+		{
+			specscal = g->lights - obsc;
+			tmp.col = scale(1 / (double)specscal, tmp.col);
+			cur->col = tmp.col;
+		}
+	}
+	if (con(g))
+	{
+	printf("final color is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
+	printf("final brigh is %d\n", cur->bri);
+	}
 }
 
 void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc, t_global *g)
@@ -150,15 +170,15 @@ void		*toimg(void *tcp)
  	t_colbri	bright;
 	t_global *g;
 	int end;
-	int jheight;
+	int jwidth;
 
 	g = tcp;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;
-	jheight = j * HEIGHT;
+	jwidth = j * WIDTH;
 	while ((++j < end) && (i = -1))
 	{
-		jheight += HEIGHT; 
+		jwidth += WIDTH; 
 		while (++i < WIDTH)
 		{
 //for debug
@@ -168,14 +188,14 @@ void		*toimg(void *tcp)
 			{
 				bright = (g->hits[j][i])->obj.
 				simple_bright(*g->cam_pos, (g->hits[j][i])->hit, &(g->hits)[j][i]->obj, g);
-				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
+				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
 			}
 		}
 	}
 	return (NULL);
 }
 
-void		move_row(int j, int jheight, t_global *g)
+void		move_row(int j, int jwidth, t_global *g)
 {
 		int i;
 		t_dstpst ret;
@@ -192,10 +212,10 @@ void		move_row(int j, int jheight, t_global *g)
 			if (g->hits[j][i]->obj.name != NULL)
 			{
 				bright = ret.obj.bright(*g->cam_pos, (g->hits[j][i])->hit, &(g->hits)[j][i]->obj, g);
-				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
+				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
 			}
 			else
-				g->data_ptr[jheight + i] = 0;			
+				g->data_ptr[jwidth + i] = 0;			
 		}
 }
 
@@ -205,16 +225,16 @@ void		*move(void *p)
 	int j;
 	int end;
 	t_dstpst ret;
-	int	jheight;
+	int	jwidth;
 
 	g = (t_global *)p;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;
-	jheight = j * HEIGHT;
+	jwidth = j * WIDTH;
 	while (++j < end)
 	{
-		jheight += HEIGHT;
-		move_row(j, jheight, g);
+		jwidth += WIDTH;
+		move_row(j, jwidth, g);
 	}
 	return (NULL);
 }
@@ -240,7 +260,7 @@ void		do_load(int j, t_global *g)
 			printf("core 8 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
 }
 
-void		recalc_row(int jheight, int j, t_global *g)
+void		recalc_row(int jwidth, int j, t_global *g)
 {
 		t_vector ray;
 		t_dstpst ret;
@@ -265,10 +285,10 @@ void		recalc_row(int jheight, int j, t_global *g)
 			{
 				bright = g->hits[j][i]->obj.
 				bright(*g->cam_pos, g->hits[j][i]->hit, &(g->hits)[j][i]->obj, g);
-				g->data_ptr[jheight + i] = color(bright.bri, bright.col);
+				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
 			}
 			else
-				g->data_ptr[jheight + i] = 0;
+				g->data_ptr[jwidth + i] = 0;
 		}
 }	
 
@@ -277,16 +297,16 @@ void		*recalc(void *p)
 	t_global *g;
 	int j;
 	int end;
-	int jheight;
-	
+	int jwidth;
+
 	g = (t_global *)p;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;
-	jheight = j * HEIGHT;
+	jwidth = j * WIDTH;
 	while (++j < end)
 	{
-		jheight += HEIGHT;	
-		recalc_row(jheight, j, g);
+		jwidth += WIDTH;
+		recalc_row(jwidth, j, g);
 	}
 	return (NULL);
 }
