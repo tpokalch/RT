@@ -22,7 +22,8 @@ int		mouse_press(int button, int x, int y, void *param)
 //		a = g->obj[g->objn];
 //		printf("object is %d %s %f, %f, %f\n%f,%f, %f\n", g->objn, a.name, a.ctr->x, a.ctr->y, a.ctr->z, a.nr.x, a.nr.y, a.nr.z);
 		printf("mouse press -> realc\n");
-		start_threads(recalc, g);
+		start_threads(toimg, g);
+//	start_threads(recalc, g);
 	}
 	return (1);
 }

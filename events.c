@@ -41,7 +41,9 @@ int		key_press(int kk, void *param)
 
 	g = param;
 //	if (kk == 47)
-		shot.x = -WIDTH;
+//	comment this to keep shot constant
+//	uncomment to keep shot only 1 frame
+//		shot.x = -WIDTH;
 //	ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
 	if (kk == 53)
 	{//	system("leaks -s rtv1");
@@ -54,7 +56,7 @@ int		key_press(int kk, void *param)
 		return(move_obj(kk, g));
 	else if (kk == 16)
 		g->objn = (g->objn + 1) % (g->argc + 1);
-	else if (kk == 4 || kk == 5)
+	else if (kk == 4 || kk == 5) //camera perspective
 	{
 		g->ray->z = fabs(g->ray->z + 10 * (2 * (kk == 4) - 1));
 		copy_tcps(g);
@@ -166,7 +168,7 @@ int		mouse_move(int x, int y, void *param)
 	g = param;
 	mousex = x;
 //	printf("shit is %f,%f\n", shot.x, shot.y);
-	if (g->light_switch >= 1 && g->light_switch <= g->lights)
+	if (g->light_switch >= 1 && g->light_switch <= g->lights) //move light
 	{
 //			printf("hello\n");
 //			ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
@@ -177,7 +179,7 @@ int		mouse_move(int x, int y, void *param)
 			g->li[g->light_switch - 1] = sum(*g->cam_pos, rotate(p, *g->angle));
 			start_threads(toimg, g);
 	}
-	else if (g->light_switch > g->lights)
+	else if (g->light_switch > g->lights) //move cam
 	{
 //		ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
 		p.y = /*sin*/((x - WIDTH_2)* 0.0045);

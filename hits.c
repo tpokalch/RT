@@ -204,7 +204,7 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 //		printf("we are hitting tri\n");
 
 //	printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
-	t.dst = -dot(diff(st, obj.bd1), obj.base[1]) / dot(ray, obj.base[1]);
+	t.dst = dot(diff(obj.bd1, st), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.000001)
 	{
 //		if (con(g))

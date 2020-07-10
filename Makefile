@@ -27,7 +27,7 @@ $(NAME):
 
 #	deleted gcc -I /usr/local/include
 	gcc $(OBJ) -o rtv1 -L /usr/local/lib/ -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
-
+	
 clean:
 #	make -C libft/ clean
 	rm -rf $(OBJ)
@@ -37,3 +37,4 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean all
+	rm -rf $(OBJ)

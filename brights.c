@@ -377,8 +377,9 @@ void		do_1_spec(t_colbri *tmp, t_colbri *ret, t_vector *hitli,
 	if (g->cosa[i] > 0)
 	{
 		g->cosa[i] = tothe2(g->cosa[i], obj.spec);
-		tmp->col = sum(tmp->col, sum(scale(g->cosa[i], g->white),
-					scale((1 - g->cosa[i]), ret->col)));
+//				dirty trick, see central for explenation of do_1_spec
+		tmp->col = sum(tmp->col, sum(scale(255 * g->cosa[i] / ret->bri, g->white),
+					scale((1 -  g->cosa[i]), ret->col)));
 	}
 	else
 //		do same thing as if cosa == 0

@@ -19,23 +19,25 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 
 
 
-	int i;
+	int i = 0;
 //	int	objn;
 	t_vector nrm;
 	int	iobjn[2];
+	double cosa[1];
 	t_dstpst	t;
 	t_vector ray;
-	int	obsc;
 	t_colbri tmp;
+	int	obsc = 0; // how many ones there are in obss. from how many lights it is shielded
 	int obss[g->lights]; // used in do 1 spec. obss[i] == 1 if that obect is obstructed from light[i]
 	int	specscal;
 	double soft[g->lights];
-	int	darken[g->lights];
+//	int	darken[g->lights];
 	t_vector obstructed;
-	ft_bzero(obss, 4 * g->lights);
+	ft_bzero(obss, sizeof(int) * g->lights);
+	ft_bzero(soft, sizeof(double) * g->lights);
+
 	init_vector(&tmp.col, 0, 0, 0);
-	obsc = 0;
-	i = 0;
+	cosa[0] = 0;
 	obj.nr = nrm;
 	while(i < g->lights)
 	{
@@ -60,8 +62,16 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 					{
 						obstructed = sum(scale(t.dst, ray), hit);
 						t_vector ctrhit = diff(obstructed,  *g->obj[iobjn[1]].ctr); 
-						soft[i] = dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray));
+						soft[i] = fmax(0, -dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray)));
+//						soft[i] = dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray));
+						if (con(g))
+							printf("normal is %f, %f, %f\n",
+							norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])).x,
+							norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])).y,
+							norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])).z);
 						soft[i] = tothe2(soft[i], obj.soft);
+//						soft[i] = sqrt(soft[i]);
+//						soft[i] = pow(soft[i], 1.5);
 //						double soft = normal_to_the_obhect * hitli, so between 0 and 1
 					}
 					g->prim = iobjn[1];
@@ -75,6 +85,53 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		i++;
 	}
 
+	i = -1;
+	if (obj.spec)
+	{
+		while (++i < g->lights)
+//			if (obss[i] == 0)
+			{
+//				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
+			cosa[i] = dot(norm(hitli[i]), norm(reflrayv));
+//						soft ^ n for more difussion
+			cosa[i] = fmax(0, cosa[i] - soft[i] * soft[i]);
+			if (con(g)) {
+				printf("cosa[0] is %f\n", cosa[0]);
+
+
+				printf("soft[i] is %f\n", soft[i]);
+			}
+		if (cosa[i] > 0)
+		{
+			cosa[i] = tothe2(cosa[i], obj.spec);
+			if (con(g))
+				printf("cosa[0] is %f\n", cosa[0]);
+
+
+						//dirty trick to make it look like
+//						the specular white light is mixed
+//						with the color after the color is mixed
+//						with brightness. here it is divided by bri
+//						so that it cancels out when bri * col
+//						in recalc
+
+			tmp.col = sum(tmp.col, sum(scale(255 * cosa[i] / cur->bri, g->white),
+				scale((1 - cosa[i]), cur->col)));
+		}
+		else
+//			do same thing as if cosa == 0
+       		         tmp.col = sum(tmp.col, cur->col);
+		}
+//		if (obsc < g->lights)
+		{
+//			if (!obj.soft)
+//				specscal = g->lights - obsc;
+//			else
+				specscal = g->lights;
+			tmp.col = scale(1 / (double)specscal, tmp.col);
+			cur->col = tmp.col;
+		}
+	}
 	if (obsc > 0) //if it is obscured from at least 1 of the lights
 	{
 		//bug: when plane takes soft
@@ -89,7 +146,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			i = -1;
 			while (++i < g->lights)
 			{
-				cur->bri = cur->bri - briscale * soft[i];
+				cur->bri = cur->bri - briscale * (soft[i] );
 //				when soft == 1, bri is the darkest
 			}
 		}//		DRAWS REGUALR SHADOWS
@@ -97,43 +154,12 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
 	}
 
-
-	i = -1;
-	if (obj.spec)
-	{
-		while (++i < g->lights)
-			if (obss[i] == 0)
-			{
-//				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
-		g->cosa[i] = dot(norm(hitli[i]), norm(reflrayv));
-//		g->cosa[i] = g->cosa[i] - soft[i]; 
-		if (g->cosa[i] > 0)
-		{
-			g->cosa[i] = tothe2(g->cosa[i], obj.spec);
-						//dirty trick to make it look like
-//						the specular white light is mixed
-//						with the color after the color is mixed
-//						with brightness. here it is divided by bri
-//						so that it cancels out when bri * col
-//						in recalc
-			tmp.col = sum(tmp.col, sum(scale(255 * g->cosa[i] / cur->bri, g->white),
-			scale((1 - g->cosa[i]), cur->col)));
-		}
-		else
-//			do same thing as if cosa == 0
-       		         tmp.col = sum(tmp.col, cur->col);
-		}
-		if (obsc < g->lights)
-		{
-			specscal = g->lights - obsc;
-			tmp.col = scale(1 / (double)specscal, tmp.col);
-			cur->col = tmp.col;
-		}
-	}
 	if (con(g))
 	{
-	printf("final color is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
-	printf("final brigh is %d\n", cur->bri);
+		printf("obstruction counter is %d\n", obsc);
+		printf("cosa[0] is %f\n", cosa[0]);
+		printf("final color is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
+		printf("final brigh is %d\n", cur->bri);
 	}
 }
 
@@ -204,6 +230,9 @@ void		move_row(int j, int jwidth, t_global *g)
 		i = -1;
 		while (++i < WIDTH)
 		{
+//for debug
+			init_vector(g->ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
+//
 			objecthit(&ret, *g->cam_pos,
 			sum(*g->rays[j][i], *g->cam_pos), g->obj, g->argc + 1,
 			g);
@@ -243,21 +272,21 @@ void		do_load(int j, t_global *g)
 {
 
 		if (g->core == 0)
-			printf("core 1 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 1 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 1)
-			printf("core 2 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 2 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 2)
-			printf("core 3 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 3 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 3)
-			printf("core 4 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 4 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 4)
-			printf("core 5 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 5 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 5)
-			printf("core 6 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 6 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 6)
-			printf("core 7 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 7 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 7)
-			printf("core 8 = %fp\n", j / (double)(HEIGHT / (double)CORES) + 1 - g->core);
+			printf("core 8 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 }
 
 void		recalc_row(int jwidth, int j, t_global *g)
