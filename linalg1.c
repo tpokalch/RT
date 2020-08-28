@@ -3,14 +3,17 @@
 
 double           myacos(t_vector ax, t_vector v, t_vector nrm, t_global *g)
 {
-        double ret;
+	double ret;
 
-        ret = acos(dot(ax, v));
-        if (left(v, ax, nrm, g))
-                return (M_T - ret);
-        if (ret > M_PI)
-                return (M_T - ret);
-        return (ret);
+	ret = acos(dot(ax, v));
+        if (ret > M_PI || left(v, ax, nrm, g))
+	{	if (con(g))
+			printf("returning %f angle from acos\n", M_T - ret);
+		return (M_T - ret);
+	}
+	if (con(g))
+		printf("returning %f angle from acos\n", ret); 
+	return (ret);
 }
 
 void		init_vector(t_vector *i, double x, double y, double z)
@@ -36,47 +39,6 @@ t_vector		cross(t_vector a, t_vector b)
 
 int			left(t_vector a, t_vector b, t_vector nr, t_global *g)
 {
-/*	t_vector norma;
-	t_vector b_p;
-	t_vector newbas[2];
-
-	a = norm(a);
-	b = norm(b);
-	newbas[0] = a;
-	b_p.y = dot(a, b);
-	newbas[1] = norm(diff(b, scale(b_p.y, a)));
-	b_p.x = dot(newbas[1], b);
-	a.y = dot(newbas[0], a);
-	a.x = dot(newbas[1], a);
-	if (con(g))
-	{
-		printf("a is %f,%f,%f\n", a.x, a.y, a.z);
-		printf("b is %f,%f,%f\n", b.x, b.y, b.z);
-	}
-#if0
-	b_p.y = dot(norm(a), b);
-	b_p.x = dot(b, norm(diff(b, scale(b_p.y, norm(a)))));
-	b_p.x = dot(b, diff(b, scale(b_p.y, norm(a))));
-	b_p.x = dot(b, diff(b, scale(dot(b, norm(a)), a)));
-	b = b_p;
-#endif
-	if (con(g))
-		printf("b_p is %f,%f\n", b.x, b.y);
-//	a.x = 0;
-//	a.y = dot(a, norm(a));
-	if (con(g))
-		printf("a_p is %f, %f", a.x, a.y);
-	if (con(g))
-		printf("left %f\n", a.x * b.y - a.y * b.x); 
-*/
-	if (con(g))
-	{
-//		printf("bound is %f, %f, %f\n", b.x, b.y, b.z);
-//		printf("point is %f, %f, %f\n", a.x, a.y, a.z);
-//		printf("x y %f\n", a.x * b.y - a.y * b.x);
-//		printf("y z %f\n", a.y * b.z - a.z * b.y);
-//		printf("z x %f\n",  a.x * b.z - a.z * b.x);
-	}
 	return (dot(cross(b, a), nr) >= -0.000004);
 }
 
@@ -155,6 +117,6 @@ double				tothe2(double x, int e)
 t_dstpst			*NANI(t_dstpst *t)
 {
 	t->dst = NAN;
-	t->obj.name = NULL;
+	t->obj.name = nothing;
 	return (t);
 }

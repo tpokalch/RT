@@ -12,7 +12,7 @@
 
 #include "rtv1.h"
 
-int 		hit_quad(t_vector st, t_vector end, t_vector ray, t_vector quad[4], t_global *g)
+int 		hit_quad(t_vector st, t_vector end,  t_vector ray, t_vector quad[4], t_global *g)
 {
 	t_vector tri[2][3];
 	t_object obj[2];
@@ -44,7 +44,7 @@ int 		hit_quad(t_vector st, t_vector end, t_vector ray, t_vector quad[4], t_glob
 	return ((hit[0].dst > 0 || hit[0].dst <= 0) || (hit[1].dst > 0 || hit[1].dst <= 0));
 }
 
-int		hit_box(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+int		hit_box(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_vector	quad[6][4];
 
@@ -83,7 +83,7 @@ int		hit_box(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 	int i = 0;
 	while (i < 6)
 	{
-		hit[i] = hit_quad(stm end, ray, quad[i]);
+		hit[i] = hit_quad(stm  ray, quad[i]);
 		printf("
 		i++;
 
@@ -97,54 +97,42 @@ int		hit_box(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
 		hit_quad(st, end, ray, quad[5], g));
 }
 
-t_dstpst	hit_complex(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst	hit_complex(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_dstpst t;
 	t_dstpst framecheck;
 
 	framecheck = hit_sphere(st, end, ray, *(obj.frame), g);
-//	printf("frame checked\n");
-	if (framecheck.obj.name == NULL)
+	if (framecheck.obj.name == nothing)
+		return (*(NANI(&t)));
+	objecthit(&t, st, end, obj.tris, obj.rd, g);
+	if (t.obj.name == nothing)
 	{
 		return (*(NANI(&t)));
 	}
-
-//	else
-//		return (framecheck);
-//	printf("base 1 of first tri %f\n", obj.tris->base[1].yz;
-
-	objecthit(&t, st, end, obj.tris, obj.rd, g);
-	if (t.obj.name == NULL)
-		return (*(NANI(&t)));
-//	t.obj = obj;
-//	printf("returning %d %s\n", t.obj.id, t.obj.name);
 	return (t);
 }
 
-t_dstpst	hit_plane(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst	hit_plane(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 
 {
 	t_dstpst t;
-	t_global p;
 
-	p = *g;
 	t.dst = -dot(diff(st, *obj.ctr), obj.base[1]) / dot(ray, obj.base[1]);
-	if (t.dst < 0.0000001)
+	if (t.dst < 0.0000001 || isinf(t.dst))
 		return(*NANI(&t));
 	t.obj = obj;
 	t.pst = obj.cam_pos;
 	return (t);
 }
 
-t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst		hit_sphere(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_vector	dx[2];
 	t_vector	abc;
 	double det;
 	t_dstpst t;
-	t_global p;
 
-	p = *g;
 	t.pst = 0;
 	dx[0] = ray;
 	dx[1] = diff(st, *obj.ctr);
@@ -165,7 +153,7 @@ t_dstpst		hit_sphere(t_vector st, t_vector end, t_vector ray, t_object obj, t_gl
 	return (t);
 }
 
-t_dstpst		hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst		hit_cylinder(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_vector d;
 	t_vector po[4];
@@ -193,7 +181,7 @@ t_dstpst		hit_cylinder(t_vector st, t_vector end, t_vector ray, t_object obj, t_
 	return (t);
 }
 
-t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst	hit_tri(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_dstpst t;
 	t_global p;
@@ -225,12 +213,12 @@ t_dstpst	hit_tri(t_vector st, t_vector end, t_vector ray, t_object obj, t_global
 	}
 //	printf("assigning %d %s to obj\n", obj.id, obj.name);
 	if (con(g))
-		printf("tri hit, returning %d %s\n", obj.id, obj.name);
+		printf("tri hit, returning %d %d enum\n", obj.id, obj.name);
 	t.obj = obj;
 	return (t);
 }
 
-t_dstpst		hit_cone(t_vector st, t_vector end, t_vector ray, t_object obj, t_global *g)
+t_dstpst		hit_cone(t_vector st, t_vector end,  t_vector ray, t_object obj, t_global *g)
 {
 	t_vector dx[2];
 	t_vector dvxvdet;

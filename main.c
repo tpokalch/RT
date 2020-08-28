@@ -21,10 +21,20 @@ int		mouse_press(int button, int x, int y, void *param)
 		printf("\n%f, %f\n", shot.x, shot.y);
 //		a = g->obj[g->objn];
 //		printf("object is %d %s %f, %f, %f\n%f,%f, %f\n", g->objn, a.name, a.ctr->x, a.ctr->y, a.ctr->z, a.nr.x, a.nr.y, a.nr.z);
-		printf("mouse press -> realc\n");
-		start_threads(toimg, g);
-//	start_threads(recalc, g);
+		printf("\nmouse press -> realc\n");
+		start_threads(recalc, g);
+//		start_threads(toimg, g);
 	}
+	return (1);
+}
+
+int	loop(void *p)
+{
+	t_global *g = (t_global *)p;
+	g->li->x += 10;
+	*g->cam_pos = diff(*g->cam_pos, *g->normal);
+	printf("loop starting threads\n");
+	start_threads(move, g);
 	return (1);
 }
 
@@ -101,14 +111,20 @@ void		draw_func(t_global *g)
 	}
 }
 
+int fd; 
+
 int		main(int argc, char **argv)
 {
 	t_global g;
 	t_vector ctr[argc];
-	t_vector kenobi[5];
+	t_vector kenobi[6];
 	int h;
 	int w;
 
+	g.mlx_ptr = mlx_init();
+
+	if (RECORD_VIDEO)
+		fd = open("./video", O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
 	h = WIDTH;
 	w = HEIGHT;
 	g.cam_pos = &kenobi[0];
@@ -116,59 +132,29 @@ int		main(int argc, char **argv)
 	g.ray = &kenobi[2];
 	g.li = &kenobi[3];
 	g.normal = &kenobi[4];
-//	g.obj = (t_object *)malloc(sizeof(t_object) * (argc + 1));
-	g.mlx_ptr = mlx_init();
-
-    //    init_vector(&g.base[0], 1, 0, 0);
-  //      init_vector(&g.base[1], 0, 1, 0);
-//       init_vector(&g.base[2], 0, 0, 1);
-
+	g.right = &kenobi[5];
+	
+	printf("mlx init\n");
+	printf("ginit\n");
 	ginit(&g);
+	printf("check arg\n");
 	if (!check_arg(argv, argc, &g, ctr))
 		return (0);
+	printf("new image\n");
+	g.mlx_ptr = mlx_init();
+	// with mymlx window should be created always after mlx_init
+	// not necessery here, only for homogenity between versions
+	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
 	g.img_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
 	g.data_ptr = (int *)mlx_get_data_addr(g.img_ptr, &g.bpp, &g.sz_l, &g.e);
-	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
-//	g.tile_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
-//	g.tile_ptr = mlx_xpm_file_to_image(g.mlx_ptr, "./tiles/earth.xpm", &w, &h);
-//	printf("%d,%d\n", w, h);
-//	g.tile_data_ptr = (int *)mlx_get_data_addr(g.tile_ptr, &g.bpp1, &g.sz_l1, &g.e1);
-//	mlx_put_image_to_window (g.mlx_ptr, g.win_ptr, g.tile_data_ptr, 0, 0);
-//	printf("%d\n", *(g.tile_data_ptr + 2));
-//	screen(700, 700, &g);
-//	ginit(&g);
-
+//	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
 	copy_tcps(&g);
-	printf("hi\n");
-	t_tile a;
-
-	int i = 0;
-	while (i < 0)
-	{
-		a = g.obj[1].tile[2];
-		printf("h w is %d, %d\n", a.h, a.w);
-//		stretch(a.data_ptr, a.h);
-		screen(a.data_ptr, a.w, a.h, &g);
-		i++;
-	}
-//	draw_func(&g);
-//	draw_vectile(g.obj[1].tile[0].vectile, g.obj[1].tile[0].w, g.obj[1].tile[0].h, &g);
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd1.x, g.obj[1].tris[0].bd1.y, g.obj[1].tris[0].bd1.z);
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd2.x, g.obj[1].tris[0].bd2.y, g.obj[1].tris[0].bd2.z);
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[0].bd3.x, g.obj[1].tris[0].bd3.y, g.obj[1].tris[0].bd3.z);
-
-
-
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[1].bd1.x, g.obj[1].tris[1].bd1.y, g.obj[1].tris[1].bd1.z);
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[1].bd2.x, g.obj[1].tris[1].bd2.y, g.obj[1].tris[1].bd2.z);
-//	printf("first obj bounds is %f,%f,%f\n", g.obj[1].tris[1].bd3.x, g.obj[1].tris[1].bd3.y, g.obj[1].tris[1].bd3.z);
-//	printf("first complex obj is %d %s\n", g.obj[1].tris[0].id, g.obj[1].tris[0].name);
-//	printf("second complex obj is %d %s\n", g.obj[1].tris[1].id, g.obj[1].tris[1].name);
 
 	printf("starting threads\n");
 	start_threads(recalc, &g);
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
 	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
 	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);
+//	mlx_loop_hook(g.mlx_ptr, loop, &g);
 	mlx_loop(g.mlx_ptr);
 }

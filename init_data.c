@@ -18,14 +18,23 @@ void		ginit(t_global *g)
 	t_objecthit ***hits;
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
-	i = -1;
-	g->lights = 1;
+	g->lights = 1; //if more than 1, disable specular on plane!
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
+
+//	init_vector(&g->li[0], -180, 280, 370); // for many li
+//	init_vector(&g->li[0], -712, 312, 609);
+	init_vector(&g->li[0], -181, 150, 246);
+	i = 0;
 	while(++i < g->lights)
-		init_vector(&g->li[i], 50.2, 102.13, 200.46);
+		init_vector(&g->li[i], g->li[0].x + ((10 * i) % lround(sqrt(g->lights))  ) /*- 500 * (i >= g->lights / 2)*/, g->li[0].y +  i * 10 / lround(sqrt(g->lights)), g->li[0].z);
+
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
-	init_vector(&g->li[0], 295, 585, 888);
+//	init_vector(&g->li[0], -600, 100, 500);
+//	init_vector(&g->li[0], -600, 500, 800);
+//	init_vector(&g->li[0], -576, 211, 230);
+//	init_vector(&g->li[0], -446, -10, 1320);
+//	init_vector(&g->li[0], -667, -13, 1800);
 
 	g->liz = (double *)malloc(sizeof(double) * g->lights); 	
 	i = -1;
@@ -34,26 +43,38 @@ void		ginit(t_global *g)
 //	g->liz[1] = g->li[1].z;
 //	g->liz[2] = g->li[2].z;
 
-	g->ambient = 65;
+
+///	g->ambient = 100;
+	g->ambient = 80;
+
+//	g->ambient = 65;
+
+//	g->ambient = 10;
+
 
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
 	g->mip_map = 0;
 //	g->mutex = PTHREAD_MUTEX_INITIALIZER;
 	init_vector(&g->_0015, 0, 0, 15);
+	init_vector(&g->_1500, 15, 0, 0);
 
 	init_vector(&g->base[0], 1, 0, 0);
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-//	init_vector(g->angle, 0.45, -0.5, 0);
-	init_vector(g->angle, 0.4, 0, 0);
+	init_vector(g->angle, 0.3, -0.6, 0);
+//	init_vector(g->angle, 0.45, 0, 0); //look down
+//	init_vector(g->angle, 0.15, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
-	init_vector(g->normal, 0, 0, 20);
+
+	init_vector(g->normal, 0, 0, 7);
+	init_vector(g->right, 7, 0, 0);
+
 	*g->normal = rotate(*g->normal, *g->angle);
-	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
+//	init_vector(g->cam_pos, 0.135995, 100, 100.919620);
 //	init_vector(g->cam_pos, 109.86, -6.69, 33.44);
-	init_vector(g->cam_pos, 0, 0, 0);
+	init_vector(g->cam_pos, 0, 100, -400);
 
 	init_vector(&g->white, 1, 1, 1);
 	g->light_switch = 0;
@@ -64,8 +85,8 @@ void		ginit(t_global *g)
 	init_hits(hits);
 	g->hits = hits;
 	init_rays(&g->rays);
-	g->line_taken = (int *)malloc(sizeof(int) * HEIGHT);
-	ft_bzero(g->line_taken, 4 * WIDTH);
+//	g->line_taken = (int *)malloc(sizeof(int) * HEIGHT);
+//	ft_bzero(g->line_taken, 4 * WIDTH);
 	g->recursion = 0;
 	i = -1;
 	while (++i < CORES)
@@ -99,6 +120,37 @@ void		stretch(int *a, int d, int h)
 		j--;
 	}
 }
+t_vector		*norm_normal_map(int *tile, int w, int h, t_global *g)
+{
+	int i;
+	int j;
+	t_vector *ret;
+
+	i = 0;
+	j = 0;
+	ret = (t_vector *)malloc(sizeof(t_vector) * h * w);
+	while (j < w)
+	{
+		i = 0;
+		while (i < h)
+		{
+//			printf("copying at %d,%d\n", i, j);
+
+//			*(ret + j * h + i) = base(rgb(*(tile + j * h + i)));
+//			*(ret + j * h + i).x = (base255(rgb(*(tile + j * h + i))));
+
+			(ret + j * h + i)->x =  (base255(rgb(*(tile + j * h + i)))).x - 0.5;
+			(ret + j * h + i)->y =  ((base255(rgb(*(tile + j * h + i)))).z - 0.5);
+			(ret + j * h + i)->z =  (base255(rgb(*(tile + j * h + i)))).y - 0.5;
+			*(ret + j * h + i) = norm(*(ret + j * h + i));
+			i++;
+		}
+		j++;
+	}
+	return (ret);
+}
+
+
 
 t_vector		*norm_tile(int *tile, int w, int h, t_global *g)
 {
@@ -115,7 +167,9 @@ t_vector		*norm_tile(int *tile, int w, int h, t_global *g)
 		while (i < h)
 		{
 //			printf("copying at %d,%d\n", i, j);
-			*(ret + j * h + i) = base255(rgb(*(tile + j * h + i)));
+
+//			*(ret + j * h + i) = base(rgb(*(tile + j * h + i)));
+			*(ret + j * h + i) = (base255(rgb(*(tile + j * h + i))));
 			i++;
 		}
 		j++;
@@ -123,29 +177,52 @@ t_vector		*norm_tile(int *tile, int w, int h, t_global *g)
 	return (ret);
 }
 
-void		init_tile(int i, char *tile, t_object *obj, t_global *g)
+
+
+//		0 for tile, 1 for normal map
+void		init_tile(int type, char *tilename, t_tile *tile, t_global *g)
 {
 //	printf("writing xpm file\n");
-	obj[i].tile[0].ptr = mlx_xpm_file_to_image
+	tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
-		tile,
-		&obj[i].tile[0].w,
-		&obj[i].tile[0].h
+		tilename,
+		&tile[0].w,
+		&tile[0].h
 		);
 //	printf("coppying xpm adress\n");
-	obj[i].tile[0].data_ptr = (int *)mlx_get_data_addr
+	if (tile[0].ptr == NULL)
+	{
+		printf("ERROR LOADING TILE\n");
+		return ;
+	}
+	tile[0].data_ptr = (int *)mlx_get_data_addr
 		(
-		obj[i].tile[0].ptr,	
-		&obj[i].tile[0].bpp,
-		&obj[i].tile[0].sz_l,
-		&obj[i].tile[0].e
+		tile[0].ptr,	
+		&tile[0].bpp,
+		&tile[0].sz_l,
+		&tile[0].e
 		);
-	obj[i].tile[0].w2 = obj[i].tile[0].w / 2;
-	obj[i].tile[0].h2 = obj[i].tile[0].h / 2;
-	printf("xpm image dimansions are %d,%d\n", obj[i].tile[0].w, obj[i].tile[0].h);
+	if (tile[0].data_ptr == NULL)
+	{
+		printf("ERROR LOADING TILE 2\n");
+		return ;
+	}
+	
+	tile[0].w2 = tile[0].w / 2;
+	tile[0].h2 = tile[0].h / 2;
+	printf("xpm image dimansions are %d,%d\n", tile[0].w, tile[0].h);
 	int k = 1;
-	obj[i].tile[0].vectile = norm_tile(obj[i].tile[0].data_ptr, obj[i].tile[0].w, obj[i].tile[0].h, g);
-	if (g->mip_map)
+	if (type == 0)
+		tile[0].vectile = norm_tile(tile[0].data_ptr, tile[0].w, tile[0].h, g);
+	if (type == 1)
+		tile[0].vectile = norm_normal_map(tile[0].data_ptr, tile[0].w, tile[0].h, g);
+////////////////////
+//	tile[0].w2 *= 2;
+//	tile[0].w *= 2;
+
+
+
+/*	if (g->mip_map)
 	{
 	while (k < 10)
 	{
@@ -183,6 +260,7 @@ void		init_tile(int i, char *tile, t_object *obj, t_global *g)
 	obj[i].tile[0].mipq = fmin(log2(obj[i].tile[0].h), log2(obj[i].tile[0].w));
 	printf("tile quant is %d\n", obj[i].tile[0].mipq);
 	}
+*/
 }
 
 void		init_plane(t_vector *ctr, int i, t_global *g)
@@ -190,7 +268,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	t_object a;
 
 	a = g->obj[i];
-	g->obj[i].name = "plane";
+	g->obj[i].name = plane/*1*/;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_plane;
 	g->obj[i].bright = &bright_plane;
@@ -204,32 +282,55 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ctr->y = -200;
 	g->obj[i].ctr->z = 0;
 	g->obj[i].rd = 10;
-//	g->obj[i].color = rgb(0x010101);
-	g->obj[i].color = rgb(0x010100);
+	g->obj[i].color = rgb(0x010101);
+//	g->obj[i].color = rgb(0x010100);
 
 
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0.6; //0.6 is good
-	g->obj[i].spec = 4;
+	g->obj[i].re = 0; //0.6 is good
+	g->obj[i].spec = 7;
 	g->obj[i].soft = 1;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
 	printf("end init\n");
-//	init_tile(i,"./tiles/brick.xpm", g->obj, g);
-//	free(g->obj[i].tile[0].data_ptr);
 
 	g->obj[i].tile[0].data_ptr = NULL;
 
+//	init_tile(0,"./tiles/brick.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/normalmap.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/wheelnormal.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/glass_base.xpm", g->obj[i].tile, g);
+
+
+//	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
+	g->obj[i].normal_map.data_ptr = NULL;
+//	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
+//	init_tile(1,"./tiles/wheelnormal.xpm", &g->obj[i].normal_map, g);
+//	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
 
 
 
+//	init_tile(1,"./tiles/glass_normal.xpm", &g->obj[i].normal_map, g);
 //	if (g->obj[i].trans)
 //		g->obj[i].simple_bright = bright_plane;
 //	g->obj[i].simple_bright = bright_plane;
+
+//	campos(g);
+	printf("ctr is %f,%f,%f\n", g->obj[i].ctr->x, g->obj[i].ctr->y, g->obj[i].ctr->z); 
+	printf("cam_pos is %f,%f,%f\n", g->cam_pos->x, g->cam_pos->y, g->cam_pos->z); 
+
+	if (dot(diff(*g->obj[i].ctr, *g->cam_pos), g->obj[i].base[1]) > 0)
+	{
+		printf("_______CHANGE NORMALS\n");
+		g->obj[i].base[1] = scale(-1, g->obj[i].base[1]);
+//			      1==inside
+//		g->obj[i].cam_pos = 1;
+	}
+
 }
 
 int		arrheight(void **a)
@@ -290,8 +391,8 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 			ret[retc].id = g->argc + retc + 1;
 			ret[retc + 1].id = g->argc + retc + 2;
 
-			ret[retc].name = "tri";
-			ret[retc + 1].name = "tri";
+			ret[retc].name = tri/*5*/;
+			ret[retc + 1].name = tri/*5*/;
 //			printf("just inited %s\n", ret[retc].name);
 //		ret[retc].nr = norm(cross(diff(ret[retc].bd1, ret[retc].bd3), diff(ret[retc].bd2, ret[retc].bd3)));
 
@@ -356,7 +457,7 @@ t_object	*init_frame(t_object obj, t_global *g)
 	t_object *ret;
 
 	ret = (t_object *)malloc(sizeof(t_object));
-	ret->name = "sphere";
+	ret->name = sphere/*0*/;
 	ret->hit = &hit_sphere;
 	ret->ctr = obj.ctr;
 
@@ -381,15 +482,16 @@ t_object	*init_frame(t_object obj, t_global *g)
 void		init_complex(t_vector *ctr, int i, t_global *g)
 {
 //	printf("line len in init %d\n", (**(g->obj[i].pts)).len);
-	g->obj[i].name = "complex";
+	g->obj[i].name = complex;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_complex;
 	g->obj[i].bright = &bright_plane;
 	g->obj[i].simple_bright = &simple_bright_plane;
+	g->obj[i].get_normal = &get_normal_plane;
 	g->obj[i].ctr = &ctr[i];
 	g->obj[i].ctr->x = 0;
-	g->obj[i].ctr->y = -280;
-	g->obj[i].ctr->z = 300;
+	g->obj[i].ctr->y = 0;
+	g->obj[i].ctr->z = 1200;
 
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
@@ -404,11 +506,11 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 //	init_vector(&g->obj[i].nr, 1, 0, 0);
 
 	g->obj[i].frame = init_frame(g->obj[i], g);
-	printf("frame name is %s\n", g->obj[i].frame->name);
+	printf("frame name is %u\n", g->obj[i].frame->name);
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 	g->obj[i].tile[0].data_ptr = NULL;
-	g->obj[i].re = 0.5;
-	g->obj[i].spec = 4;
+	g->obj[i].re = 0;
+	g->obj[i].spec = 5;
 	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
 	g->obj[i].rd = g->obj[i].tris->rd - 1;
@@ -417,11 +519,12 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 
 void		init_tri(t_vector *ctr, int i, t_global *g)
 {
-	g->obj[i].name = "tri";
+	g->obj[i].name = tri;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_tri;
 	g->obj[i].bright = &bright_tri;
 	g->obj[i].simple_bright = &simple_bright_tri;
+	g->obj[i].get_normal = &get_normal_plane;
 
 	g->obj[i].ctr = &ctr[i];
 	if (i == 1)
@@ -458,7 +561,7 @@ void		init_tri(t_vector *ctr, int i, t_global *g)
 	g->obj[i].base[1] = norm(cross(diff(g->obj[i].bd1, g->obj[i].bd3), diff(g->obj[i].bd2, g->obj[i].bd3)));
 
 
-	init_tile(i, "./tiles/brick.xpm", g->obj, g);
+	init_tile(i, "./tiles/brick.xpm", g->obj[i].tile, g);
 //	free(g->obj[i].tile[0].data_ptr);
 //	g->obj[i].tile[0].data_ptr = NULL;
 
@@ -467,7 +570,7 @@ void		init_tri(t_vector *ctr, int i, t_global *g)
 
 void		init_cylinder(t_vector *ctr, int i, t_global *g)
 {
-	g->obj[i].name = "cylinder";
+	g->obj[i].name = cylinder;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_cylinder;
 	g->obj[i].bright = &bright_cylinder;
@@ -489,7 +592,7 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	g->obj[i].spec = 4;
+	g->obj[i].spec = 5;
 	g->obj[i].re = 0;
 	g->obj[i].trans = 0;
 	g->obj[i].soft = 1;
@@ -515,16 +618,38 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 
 
 
-//	init_tile(i,"./tiles/blank.xpm", g->obj, g);
-
+	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
 
 }
 
+void		rotate_normal_map_sphere(t_tile *normalmap)
+{
+	t_vector angle;
+	init_vector(&angle, 0, 0, 0);
+	int x = 0;
+	int y = 0;
+
+	while (y < normalmap->h)
+	{
+		x = 0;
+		while (x < normalmap->w)
+		{
+			angle.x = y / (double)(normalmap->h * M_1_PI);
+			angle.y = x / (double)(normalmap->w2 * M_1_PI);
+
+			*(normalmap->vectile + y * normalmap->w + x) = 
+			rotate(*(normalmap->vectile + y * normalmap->w + x), angle);
+			x++;
+		}
+		y++;
+	}
+}
+
 void		init_sphere(t_vector *ctr, int i, t_global *g)
 {
-	g->obj[i].name = "sphere";
+	g->obj[i].name = sphere/*0*/;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_sphere;
 	g->obj[i].bright = &bright_sphere;
@@ -534,8 +659,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0;
-	g->obj[i].re = 0.5;
+	g->obj[i].trans = 0.3;
+	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
 	g->obj[i].soft = 1;
 
@@ -545,25 +670,37 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 //(t_vector *)do_tile_sphere(t_vector, t_object *, t_global *);
 
-
-	init_vector(g->obj[i].ctr, 0, -100, 300);
+	init_vector(g->obj[i].ctr, 0, -100, 200);
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd = 100;
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
+	g->obj[i].rd_1 = 1 / (double)g->obj[i].rd;
 	g->obj[i].color = rgb(0x000101);
 	init_vector(&g->obj[i].ang, 0, 0, 0);
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
+	g->obj[i].tile[0].data_ptr = NULL;
 
-//	init_tile(i,"./tiles/jupiter.xpm", g->obj, g);
-	init_tile(i,"./tiles/blank.xpm", g->obj, g);
-//	g->obj[i].tile[0].data_ptr = NULL;
-}	
+//	printf("init tile\n");
+//	init_tile(0,"./tiles/jupiter.xpm", g->obj[i].tile, g);
+	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
+
+
+//	init_tile(0,"./tiles/z1.xpm", g->obj[i].tile, g);	
+	g->obj[i].normal_map.data_ptr = NULL;
+	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
+//	init_tile(1,"./tiles/z1.xpm", &g->obj[i].normal_map, g);
+	printf("init normal map\n");
+//	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
+	if (g->obj[i].normal_map.data_ptr)
+		rotate_normal_map_sphere(&g->obj[i].normal_map);
+}
 
 void		init_cone(t_vector *ctr, int i, t_global *g)
 {
-	g->obj[i].name = "cone";
+	g->obj[i].name = cone;
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_cone;
 	g->obj[i].bright = &bright_cone;
@@ -585,11 +722,11 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);	
-	g->obj[i].re = 0.5;
+	g->obj[i].re = 0;
 	g->obj[i].spec = 5;
 	g->obj[i].trans = 0;
-	g->obj[i].soft = 0;
-	init_tile(i,"./tiles/blank.xpm", g->obj, g);
+	g->obj[i].soft = 1;
+	init_tile(i,"./tiles/blank.xpm", g->obj[i].tile, g);
 
 //	g->obj[i].tile[0].data_ptr = NULL;
 	

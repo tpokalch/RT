@@ -116,10 +116,6 @@ int		fill_objects(t_vector *ctr, char **argv, t_global *g)
 			else if (ft_strequ(*(argv + iobjc[0]), "cone"))
 				init_cone(ctr, iobjc[1], g);
 			fill_obj(argv + iobjc[0] + 1, iobjc[1], g);
-			g->obj[iobjc[1]].base[1] = rotate(g->base[1], g->obj[iobjc[1]].ang);
-			g->obj[iobjc[1]].base[0] = rotate(g->base[0], g->obj[iobjc[1]].ang);
-			g->obj[iobjc[1]].base[2] = rotate(g->base[2], g->obj[iobjc[1]].ang);
-
 
 //here we init objects that don't need argument modification from comline
 			printf("file %s\n", *(argv + iobjc[0]));
@@ -133,6 +129,10 @@ int		fill_objects(t_vector *ctr, char **argv, t_global *g)
 				printf("initing complex\n");
 				init_complex(ctr, iobjc[1], g);
 			}
+			g->obj[iobjc[1]].base[1] = rotate(g->obj[iobjc[1]].base[1]/*g->base[1]*/, g->obj[iobjc[1]].ang);
+			g->obj[iobjc[1]].base[0] = rotate(g->obj[iobjc[1]].base[0]/*g->base[0]*/, g->obj[iobjc[1]].ang);
+			g->obj[iobjc[1]].base[2] = rotate(g->obj[iobjc[1]].base[2]/*g->base[2]*/, g->obj[iobjc[1]].ang);
+//			campos(g);
 		}
 		else if (!is_coords(*(argv + iobjc[0])))
 		{
@@ -140,5 +140,6 @@ int		fill_objects(t_vector *ctr, char **argv, t_global *g)
 			return (0);
 		}
 	}
+	campos(g);
 	return (1);
 }

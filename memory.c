@@ -6,6 +6,8 @@ int		free_hits(t_global *g)
 	int i;
 	int j;
 
+	// free 2D texture of t_objethit **hits
+	printf("freeing hits...\n");
 	i = -1;
 	while (++i < HEIGHT && (j = -1))
 		while(++j < WIDTH)
@@ -14,6 +16,9 @@ int		free_hits(t_global *g)
 	while (++i < HEIGHT)
 		free(*(g->hits + i));
 	free(g->hits);
+
+	printf("freeing rays...\n");
+	// free 2D texture of t_vector **rays
 	i = -1;
 	while (++i < HEIGHT && (j = -1))
 		while(++j < WIDTH)
@@ -22,11 +27,31 @@ int		free_hits(t_global *g)
 	while (++i < HEIGHT)
 		free(*(g->rays + i));
 	free(g->rays);
+
+	// free thread copies
+	printf("free thread copies\n");
 	i = -1;
 	while (++i < CORES)
+	{
+		printf("freeing %d thread\n", i);
+		free(g->tcps[i]->recursion);
+		free(g->tcps[i]->cosa);
 		free(g->tcps[i]);
+	}
+	// free objects and agragated resources, if any
+	printf("free complex\n");
+	i = 0;
+	while (++i < g->argc + 1)
+	{
+		if (g->obj[i].name == complex)
+			free(g->obj[i].pts);
+	}
+	free(g->obj);
+	free(g->li);
+	free(g->liz);
 	return (1);
 }
+
 void		copy_obj(t_object *t, t_object *g)
 {
 	t = g;
@@ -65,9 +90,10 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->ambient = g->ambient;
 	tcps->base[0] = g->base[0];
 	tcps->base[1] = g->base[1];
+//	tcps->base[1].y = -1;
 	tcps->base[2] = g->base[2];
 
-	tcps->line_taken = g->line_taken;
+//	tcps->line_taken = g->line_taken;
 //	tcps->e1 = g->e1;
 //	tcps->sz_l1 = g->sz_l1;
 //	tcps->bpp1 = g->bpp1;
@@ -76,11 +102,12 @@ void		copy(t_global *tcps, t_global *g)
 	tcps->recursion = g->recursion;
 	tcps->lights = g->lights;
 	tcps->white = g->white;
-	tcps->hitli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
-	tcps->savehitli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
-	tcps->cosa = (double *)malloc(sizeof(double) * g->lights);
-	tcps->recursion = (int *)malloc(sizeof(int) * (g->argc + 1));
-	ft_bzero(tcps->recursion, sizeof(int) * (g->argc + 1));
+
+//	tcps->hitli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
+//	tcps->savehitli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
+	tcps->cosa = (double *)calloc(sizeof(double) * g->lights, 0);
+	tcps->recursion = (int *)calloc(sizeof(int) * (g->argc + 1), 0);
+//	ft_bzero(tcps->recursion, sizeof(int) * (g->argc + 1));
 	//	tcps->ctrli = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 }
 
