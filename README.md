@@ -13,7 +13,7 @@ This is a somewhat complex raytracing implementation. It supports  reflection, t
 
 
 <p align="center">
-  <img width="80%" src="https://raw.githubusercontent.com/tpokalch/RT/master/screens/all.png">
+  <img width="80%" src="https://raw.githubusercontent.com/tpokalch/RT/master/screens/Screen%20Shot%202020-08-28%20at%202.48.52%20PM.png">
 </p>
 
 
