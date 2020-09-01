@@ -16,7 +16,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 {
 //	NOTE: GET RID OF ALL THE NORM(HITLI), failed the first time
 //	gamma correct
-//	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
+	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
 
 
 	int i = 0;
@@ -74,7 +74,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //						t_vector ctrhit = diff(obstructed,  *g->obj[iobjn[1]].ctr); 
 //						printf("calcaulating soft\n");
 //						segfailt here if object is complex. object must be a triangle
-						soft[i] = fmax(soft[i], fmax(0, -dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray))));
+						soft[i] = fmax(soft[i], fmax(0, -dot(/*norm(*/g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])/*)*/, norm(ray))));
 			//		if (obj.soft)
 						soft[i] = tothe2(soft[i], obj.soft);
 /*						if (g->obj[iobjn[1]].trans)

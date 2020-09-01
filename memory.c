@@ -39,12 +39,21 @@ int		free_hits(t_global *g)
 		free(g->tcps[i]);
 	}
 	// free objects and agragated resources, if any
-	printf("free complex\n");
 	i = 0;
 	while (++i < g->argc + 1)
 	{
 		if (g->obj[i].name == complex)
+		{
+			printf("free complex\n");
 			free(g->obj[i].pts);
+		}
+		if (g->obj[i].tile[0].data_ptr)
+		{
+			printf("freeing tiles\n");
+			free(g->obj[i].tile[0].data_ptr);
+			free(g->obj[i].tile[0].vectile);
+			//and vectile!!
+		}
 	}
 	free(g->obj);
 	free(g->li);

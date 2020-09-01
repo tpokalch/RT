@@ -21,12 +21,15 @@ void		ginit(t_global *g)
 	g->lights = 1; //if more than 1, disable specular on plane!
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 
-//	init_vector(&g->li[0], -180, 280, 370); // for many li
+//	init_vector(&g->li[0], 300, 300, -100); // for many li
+
+	init_vector(&g->li[0], -50, 187, -50);
+//	init_vector(&g->li[0], -165,82,13);
 //	init_vector(&g->li[0], -712, 312, 609);
-	init_vector(&g->li[0], -181, 150, 246);
+//	init_vector(&g->li[0], -181, 150, 246);
 	i = 0;
 	while(++i < g->lights)
-		init_vector(&g->li[i], g->li[0].x + ((10 * i) % lround(sqrt(g->lights))  ) /*- 500 * (i >= g->lights / 2)*/, g->li[0].y +  i * 10 / lround(sqrt(g->lights)), g->li[0].z);
+		init_vector(&g->li[i], g->li[0].x + ((10 * i) % lround(sqrt(g->lights))  ) /*- 500 * (i >= g->lights / 2)*/, g->li[0].y +  i * 1 / lround(sqrt(g->lights)), g->li[0].z /*+  i * 1 / lround(sqrt(g->lights))*/);
 
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
@@ -289,9 +292,9 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
-	g->obj[i].re = 0; //0.6 is good
+	g->obj[i].re = 0.6; //0.6 is good
 	g->obj[i].spec = 7;
-	g->obj[i].soft = 1;
+	g->obj[i].soft = 0;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
@@ -659,8 +662,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0.3;
-	g->obj[i].re = 0;
+	g->obj[i].trans = 0;
+	g->obj[i].re = 0.6;
 	g->obj[i].spec = 4;
 	g->obj[i].soft = 1;
 
