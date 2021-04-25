@@ -16,21 +16,24 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 {
 //	NOTE: GET RID OF ALL THE NORM(HITLI), failed the first time
 //	gamma correct
+//	this creates a bug: shadow at distance is not ambient
 	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
 
 
 	int i = 0;
 //	int	objn;
 	t_vector nrm;
-	int	iobjn[2];
+	int	iobjn[2]; //i, //number of the obj that is checked to obstruct light light, //don't know
 	double cosa[g->lights];
 	t_dstpst	t;
 	t_vector ray;
 	t_colbri tmp;
-	int	obsc = 0; // how many ones there are in obss. from how many lights it is shielded.
+	int	obsc = 0; // how many ones there are in obss. from how many lights the point is shielded.
 	int obss[g->lights]; // used in do 1 spec. obss[i] == 1 if that obect is obstructed from light[i]
 	int	specscal;
 	double soft[g->lights];
+	float spec_part = 0;
+	float col_part = 0; // isn't changed if obstructed form all, changed to 0 inf starting caclulate shadow
 //	int	darken[g->lights];
 	t_colbri bright;
 	t_vector color;
@@ -76,7 +79,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //						segfailt here if object is complex. object must be a triangle
 						soft[i] = fmax(soft[i], fmax(0, -dot(/*norm(*/g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])/*)*/, norm(ray))));
 			//		if (obj.soft)
-						soft[i] = tothe2(soft[i], obj.soft);
+//						soft is the gradient from to 0 (0 shadow) to 1 (100% shadow)
+//						soft[i] = tothe2(soft[i], obj.soft); // change power to change hardness
 /*						if (g->obj[iobjn[1]].trans)
 						{
 						bright = g->obj[iobjn[1]].bright(hit, obstructed, &g->obj[iobjn[1]], g);
@@ -94,13 +98,17 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //						soft[i] = dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray));
 //						soft[i] = tothe2(soft[i], obj.soft);
 //						soft[i] = sqrt(soft[i]);
-//						soft[i] = pow(soft[i], 1.5);
+						soft[i] = pow(soft[i], 1.5);
 
 //						double soft = normal_to_the_obhect * hitli, so between 0 and 1
 					}
 					g->prim = iobjn[1];
 					obsc++;
 					obss[i] = 1;
+					if (con(g))
+					{
+						printf("point of %d is obstructed by %d\n", obj.name, g->obj[iobjn[1]].name); 
+					}
 					if (!obj.soft)// if soft shadwos need to look on all obstructions
 					{
 #if 0
@@ -113,9 +121,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 								tmp.col = sum(tmp.col, color);
 						}
 #endif
-						if (con(g))
+/*						if (con(g))
 							printf("tmp col is %f,%f,%f\n", tmp.col.x, tmp.col.y, tmp.col.z); 
-
+*/
 //						cur->col = scale(1 / (float)cur->bri, sum(scale(g->obj[iobjn[1]].trans, color), scale(1 - g->obj[iobjn[1]].trans, scale(cur->bri, cur->col))));
 						break;
 					}
@@ -147,94 +155,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 }
 */
 ////////////
-	i = -1;
-	if (obj.spec)
-	{
-		while (++i < g->lights)
-//			if (obss[i] == 0)
-		{
-//				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
-			cosa[i] = dot(norm(hitli[i]),/* norm(*/reflrayv/*)*/);
 
-//						soft ^ n for more difussion
-			cosa[i] = fmax(0, cosa[i] - soft[i] * soft[i]);
-			if (con(g)) {
-				printf("cosa[0] is %f\n", cosa[0]);
+//	recently moved obsc > 0 section before
 
-
-				printf("soft[i] is %f\n", soft[i]);
-				}
-			if (cosa[i] > 0)
-			{
-/*			double cosai2 = cosa[i] * cosa[i];
-			double cosai4 = cosai2 * cosai2;
-*///			double m = 0.2;
-//			double a = acos(cosa[i]);
-
-//			cosa[i] = exp(-a * a/ (m * m));
-//			cosa[i] =  1/(M_PI * m * m * cosai4) * exp(-1/(m * m) * (1/cosai2 - 1));
-				cosa[i] = tothe2(cosa[i], obj.spec);
-
-
-			if (con(g))
-			{
-				printf("cosa[%d] > 0\n", i);
-				printf("cosa[%d] is %f\n", i, cosa[i]);
-			}
-				//dirty trick to make it look like
-//				the specular white light is mixed
-//				with the color after the color is mixed
-//				with brightness. here it is divided by bri
-//				so that it cancels out when bri * col
-//				in recalc
-//				doesn't work when multipple hard shadows
-//			tmp.col = sum(tmp.col, sum(scale(255 * cosa[i] / (cur->bri * g->lights), g->white),
-//				if (obss[i] != 1)
-//				tmp.col is added to itself each iteration (we are inside a loop now)
-				if (obss[i] != 1 || obj.soft)
-/*					tmp.col = sum(tmp.col,
-						sum(
-							scale(cosa[i], g->white),
-							scale(1 - cosa[i], cur->col)
-											));
-*/
-//#if 0
-				tmp.col = sum(tmp.col,
-						 sum(
-							scale(cosa[i] / (cur->bri / (255.0 )), g->white), /* + */
-							scale((1 - cosa[i]), cur->col)
-									)
-					);
-
-//#endif
-	
-//				tmp.col = sum(tmp.col, sum(scale(/*255 * */cosa[i] /*/ (cur->bri)*/, g->white),
-//					scale((1 - cosa[i]), cur->col)));
-	
-			}
-			else
-			{
-//				do same thing as if cosa == 0
-				if (con(g))
-					printf("cosa < 0, no light spots\n");
-				if (obss[i] != 1 || obj.soft)
-					tmp.col = sum(tmp.col, cur->col);
-			}
-		}//end loop
-//		printf("end loop\n");
-//		tmp.col = scale(1 / (double)g->lights, tmp.col);
-		if (con(g))
-			printf("tmp col is %f,%f,%f\n", tmp.col.x, tmp.col.y, tmp.col.z);
-		if (obsc < g->lights || obj.soft)
-		{
-			if (!obj.soft)
-				specscal = g->lights - obsc;
-			else
-				specscal = g->lights;
-			tmp.col = scale(1 / (double)specscal, tmp.col);
-			cur->col = tmp.col;
-		}
-	}
 	if (obsc > 0 /*&& 0*/) //if it is obscured from at least 1 of the lights
 	{
 		// bug: when plane takes soft
@@ -242,20 +165,151 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		// light is inside sphere
 		// the plane isn't obstructed fully from
 		// light by sphere
+		// this happens because the plane knows it is obstructed by sphere
+		// but it is expecting soft shadows and calculates them by multip
+		// normals and hitli ray, which doesn't always equall 1 
+		// we should check if objects are obstructed completetely by being
+		// on the oppoite side of light in space divided by an obstruction.
+		// (check if light is inside sphere)
+		// this is also a reason of plane having specular reflecion
+		// even when it is obstructed.
+
+		if (con(g))
+		{
+			printf("____OBSTRUCTED____ obsc is %d\n", obsc);
+		}
 		if (obj.soft) // DRAWS SOFT SHADOWS
 		{
 			i = -1;
 			while (++i < g->lights)
-			{
-				//must stay here, don't move
+			{/*
+				if (soft[i] > 0.99)
+					cur->bri = g->ambient;
+				else
+				*/
+			//	{				//must stay here, don't move
 				int briscale;
 				briscale = (cur->bri - g->ambient) / g->lights;
 				cur->bri = cur->bri - briscale * soft[i];
 //				when soft == 1, bri is the darkest
+			//	}
 			}
 		}//		DRAWS REGUALR SHADOWS
 		else
-			cur->bri = g->ambient + ((g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights);
+			cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
+	}
+
+
+
+
+	i = -1;
+	if (obj.spec)
+	{
+		while (++i < g->lights)
+		{
+//			if (obss[i] == 0)
+//				do_1_spec(&tmp, cur, hitli, reflrayv, obj, i, g);
+//			cosine of angle between normal and reflection of specular light
+
+
+//			if (obss[i] == 0 || obj.soft) //because of || obj.soft the trick is done even when obstructed
+			{
+				cosa[i] = dot(norm(hitli[i]),/* norm(*/reflrayv/*)*/);
+//						soft ^ n for more difussion
+				if (con(g))
+					printf("cosa[%d] is %f\n", i, cosa[i]);
+			//if (cosa[i] > 0)
+			{
+//				dirty trick to make it look like
+//				the specular white light is mixed
+//				with the color after the color is mixed
+//				with brightness. here it is divided by bri
+//				so that it cancels out when bri * col
+//				in recalc
+//				doesn't work when multipple hard shadows
+//				tmp.col is added to itself each iteration (we are inside a loop now)
+//				moved cosa[i] inside, check for bug
+//				without dirty trick set cur->bri = 255.0
+				if (cosa[i] < 0)
+					cosa[i] = 0;
+				if (obj.soft)
+					cosa[i] = fmax(0, cosa[i] - soft[i] * soft[i]);
+				cosa[i] = tothe2(cosa[i], obj.spec);
+
+				if (obss[i] == 1)
+					cosa[i] = 0;
+				if (con(g))
+				{
+					printf("now cosa[%d] = %f\n", i, cosa[i]);
+				}
+				spec_part += 255.0 / (float)cur->bri * cosa[i];
+//				col_part += (1 - cosa[i]) / (float)(g->lights - obsc);
+				col_part += (1 - cosa[i]) / (float)(g->lights);
+
+
+
+
+				if (con(g))
+				{
+					printf("col part is %f\n", col_part);
+				}	
+
+#if 0
+				if (con(g))
+					printf("mixing with light\n");
+				tmp.col = sum(tmp.col,
+						 sum(
+							scale( cosa[i] / (cur->bri / 255.0 ), g->white), /* + */
+							scale((1 - cosa[i]), cur->col)));
+#endif
+//				tmp.col = + cosa[i] / ( cur->bri / 255.0 ) * g->white + (1 - cosa[i]) * cur->col
+						if (con(g))
+							printf("obss[%d] is %d\ndoing dirty trick\n", i, obss[i]);
+			}
+		/*	else
+			{
+//				do same thing as if cosa == 0
+				if (con(g))
+					printf("cosa < 0, no light spots\n");
+				if (obss[i] == 0 || obj.soft)
+				{
+					col_part += 1.0 / (g->lights - obsc);
+					if (con(g))
+						printf("col part is %f\n", col_part);
+//					tmp.col = sum(tmp.col, cur->col);
+				}
+			}*/
+//		tmp.col = sum(scale(spec_part, g->spec_con), scale(col_part, cur->col));
+		}//end of (obss[i] == 0)
+/*		else if (g->lights != obsc)//enters here (g->lights - obscc) times
+			col_part += (1.0) / (g->lights - obsc);
+*/
+//		(g->lights == obsc) => col_part = 1;
+		}//end loop
+//		col_part = 1.0;
+//		obstructed zones should contrubute to col part as 1 / (g->lights - obsc
+		if (con(g))
+			printf("col part is %f\n", col_part);
+		tmp.col = sum(scale(spec_part, g->spec_con), scale(col_part, cur->col));
+		if (obsc == g->lights) // otherwise intersection is black
+			tmp.col = cur->col;
+//		printf("end loop\n");
+		if (con(g))
+			printf("tmp col is %f,%f,%f\n", tmp.col.x, tmp.col.y, tmp.col.z);
+		if (obsc < g->lights || obj.soft)
+		{
+			if (obj.soft)
+				specscal = g->lights ;
+			else
+				specscal = g->lights - obsc;
+//			tmp.col = scale(1 / (double)specscal, tmp.col); //divide by the number of cycles in obj.spec
+//			cur->col = tmp.col;
+
+		}
+		cur->col = tmp.col;
+
+
+//	end if(obj.spec)
 	}
 
 	if (con(g))
@@ -264,8 +318,11 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		printf("cosa[0] is %f\n", cosa[0]);
 		printf("final color is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
 		printf("final brigh is %d\n", cur->bri);
+		t_vector col = scale(cur->bri, cur->col);
+		printf("color * brigthness: %f,%f,%f\n", col.x, col.y, col.z);
 	}
 //	gamma correct
+//	doesn't work here on the specular white light
 //	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
 
 
@@ -401,6 +458,7 @@ void		do_load(int j, t_global *g)
 			printf("core 7 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
 		else if (g->core == 7)
 			printf("core 8 = %fp\n", j / (double)(HEIGHT / (double)CORES)  - g->core);
+
 }
 
 void		recalc_row(int jwidth, int j, t_global *g)
@@ -442,6 +500,9 @@ void		recalc_row(int jwidth, int j, t_global *g)
 
 				if (con(g))
 					printf("brightness in recalc is %d\n", bright.bri);
+				// specular reflection shouldn't be afected here by the unmax brightness,
+				// hence the dirty trick. the color is mixed in such a way that bri * col becomes
+				// own color with brightness = 255
 				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
 			}
 			else

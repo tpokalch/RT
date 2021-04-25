@@ -14,23 +14,40 @@
 
 void		ginit(t_global *g)
 {
+//	NOTE: if you add a field to a g structure make shure
+//	to copy teh field into a tcp in memory.c!!!
 	int i;
 	t_objecthit ***hits;
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	g->lights = 1; //if more than 1, disable specular on plane!
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
-
 //	init_vector(&g->li[0], 300, 300, -100); // for many li
 
-	init_vector(&g->li[0], -50, 187, -50);
+//	init_vector(&g->li[0], -50, 187, 450);
 //	init_vector(&g->li[0], -165,82,13);
 //	init_vector(&g->li[0], -712, 312, 609);
 //	init_vector(&g->li[0], -181, 150, 246);
+//	init_vector(&g->li[0], 376,365,227);
+	init_vector(&g->li[0], 117,152,410);
+	init_vector(&g->li[0], 62,118,297);
+	init_vector(&g->li[0], 103,10,269);
+	init_vector(&g->li[0], 48.362500,90.012548,243.742205);
+	init_vector(&g->li[0], 258.415865,-80.441955,176.892432);
+	init_vector(&g->li[0], 154,11,420);
+
+	init_vector(&g->li[0], 183.788427,24.676411,161.037996);
+	init_vector(&g->li[0], 2053.659911,-139.807833,726.474466);
+	init_vector(&g->li[0], -137.162366,586.490258,688.022130);
+	if (g->lights > 1)
+		init_vector(&g->li[1], -360,-47,267);
+
+//# if 0	
 	i = 0;
 	while(++i < g->lights)
-		init_vector(&g->li[i], g->li[0].x + ((10 * i) % lround(sqrt(g->lights))  ) /*- 500 * (i >= g->lights / 2)*/, g->li[0].y +  i * 1 / lround(sqrt(g->lights)), g->li[0].z /*+  i * 1 / lround(sqrt(g->lights))*/);
+		init_vector(&g->li[i], g->li[0].x -((10 * i) % lround(sqrt(g->lights))  ), g->li[0].y +  i * 10 / lround(sqrt(g->lights))  /*((10 * i) % lround(sqrt(g->lights))  )*/, g->li[0].z /*+  (i * 10) / lround(sqrt(g->lights )) */);
 
+//#endif 
 //	init_vector(&g->li[0], -800,-400,300);
 //	init_vector(&g->li[1], -200, 400, 100);
 //	init_vector(&g->li[0], -600, 100, 500);
@@ -65,8 +82,8 @@ void		ginit(t_global *g)
 	init_vector(&g->base[1], 0, 1, 0);
 	init_vector(&g->base[2], 0, 0, 1);
 
-	init_vector(g->angle, 0.3, -0.6, 0);
-//	init_vector(g->angle, 0.45, 0, 0); //look down
+//	init_vector(g->angle, 0.3, -0.6, 0);
+	init_vector(g->angle, 0.45, -0.2, 0); //look down
 //	init_vector(g->angle, 0.15, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
@@ -80,6 +97,7 @@ void		ginit(t_global *g)
 	init_vector(g->cam_pos, 0, 100, -400);
 
 	init_vector(&g->white, 1, 1, 1);
+	g->spec_con = scale(1 / (float)g->lights, g->white);
 	g->light_switch = 0;
 	g->objn = 0;
 	g->prim = 0;
@@ -285,15 +303,15 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ctr->y = -200;
 	g->obj[i].ctr->z = 0;
 	g->obj[i].rd = 10;
+//	g->obj[i].color = scale(0.7, rgb(0x010100));
 	g->obj[i].color = rgb(0x010101);
-//	g->obj[i].color = rgb(0x010100);
 
 
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
 	g->obj[i].re = 0.6; //0.6 is good
-	g->obj[i].spec = 7;
+	g->obj[i].spec = 4;
 	g->obj[i].soft = 0;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
@@ -588,17 +606,17 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	printf("center is %f\n", g->obj[i].ctr->z);
 	g->obj[i].rd = 70;
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
-	g->obj[i].color = rgb(0x010001);
+	g->obj[i].color = rgb(0x000101);
 	g->obj[i].ang.x = 0;
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	g->obj[i].spec = 5;
-	g->obj[i].re = 0;
+	g->obj[i].spec = 2/*4*/;
+	g->obj[i].re = 0.6;
 	g->obj[i].trans = 0;
-	g->obj[i].soft = 1;
+	g->obj[i].soft = 0;
 
 	/*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
@@ -664,8 +682,8 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
 	g->obj[i].re = 0.6;
-	g->obj[i].spec = 4;
-	g->obj[i].soft = 1;
+	g->obj[i].spec = 2;
+	g->obj[i].soft = 0;
 
 	g->obj[i].prop[0] = do_tile_sphere;
 	g->obj[i].prop[1] = do_re;
@@ -678,7 +696,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].rd = 100;
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
 	g->obj[i].rd_1 = 1 / (double)g->obj[i].rd;
-	g->obj[i].color = rgb(0x000101);
+	g->obj[i].color = rgb(0x010101);
 	init_vector(&g->obj[i].ang, 0, 0, 0);
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
@@ -687,13 +705,13 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 //	printf("init tile\n");
 //	init_tile(0,"./tiles/jupiter.xpm", g->obj[i].tile, g);
-	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
 //	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
 
 
 //	init_tile(0,"./tiles/z1.xpm", g->obj[i].tile, g);	
 	g->obj[i].normal_map.data_ptr = NULL;
-	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
+//	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
 //	init_tile(1,"./tiles/z1.xpm", &g->obj[i].normal_map, g);
 	printf("init normal map\n");
 //	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);

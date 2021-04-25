@@ -1,6 +1,27 @@
 
 #include "rtv1.h"
 
+//	what needs to be done with RT
+//	Fix bug of transparent complex object. look for place, where
+//	reflection changes the the normal of an object
+//	but look out for a bug appearing in transparency
+//
+//	combine projection matrix perpective drawing for complex obj.
+//	int ohter words combine opengl project and rtv1. implement
+//	opengl by yourself, or inject opengl into this project
+//
+//	implement function pointers for decision making. test if
+//	polymorphysm in c++ is faster for decision making then if()
+//	test if implemented polymorphysm is faster.
+//
+//	rotation of normal map vectors doesn't work
+//
+//	implement snells law or transparent obect
+//
+//	dirty trick in obstructed is done even when 
+//	the point is obstructed.
+//
+//	light ambient at distance
 
 int			con(t_global *g)
 {

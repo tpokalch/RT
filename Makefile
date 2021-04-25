@@ -1,6 +1,6 @@
 NAME = rtv1
 
-OBJ = lin_alg.o color.o init_data.o events.o central.o comline_obj.o main.o check_arg.o hits.o brights.o memory.o linalg1.o entex.o create_points.o initialize_points.o free_points.o
+OBJ = lin_alg.o color.o init_data.o events.o central.o comline_obj.o main.o check_arg.o hits.o brights.o memory.o linalg1.o entex.o create_points.o points_initialize.o free_points.o
 
 FLAGS = #-Wextra -Werror -Wall
 all: $(NAME)
@@ -21,7 +21,7 @@ $(NAME):
 	clang -g $(FLAGS) -I libft/includes -o linalg1.o -c linalg1.c
 	clang -g $(FLAGS) -I libft/includes -o entex.o -c entex.c
 	clang -g $(FLAGS) -I libft/includes -o create_points.o -c create_points.c
-	clang -g $(FLAGS) -I libft/includes -o initialize_points.o -c initialize_points.c
+	clang -g $(FLAGS) -I libft/includes -o points_initialize.o -c points_initialize.c
 	clang -g $(FLAGS) -I libft/includes -o free_points.o -c free_points.c
 
 

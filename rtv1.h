@@ -339,6 +339,7 @@ typedef struct		s_global
 	int				mip_map;
 	pthread_mutex_t			mutex;
 	int				lights;
+	t_vector			spec_con;
 //	t_vector			*hitli;
 //	t_vector			*savehitli;
 	t_vector			prev;
