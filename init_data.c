@@ -20,7 +20,7 @@ void		ginit(t_global *g)
 	t_objecthit ***hits;
 
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
-	g->lights = 10; //if more than 1, disable specular on plane!
+	g->lights = 1; //if more than 1, disable specular on plane!
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
 //	init_vector(&g->li[0], 300, 300, -100); // for many li
 
@@ -64,12 +64,8 @@ void		ginit(t_global *g)
 //	g->liz[2] = g->li[2].z;
 
 
-///	g->ambient = 100;
+//	g->ambient = 255;
 	g->ambient = 80;
-
-//	g->ambient = 65;
-
-//	g->ambient = 10;
 
 
 //	g->step_bri = (255 - g->ambient) / (double)g->lights;
@@ -680,9 +676,9 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0;
+	g->obj[i].trans = 0.8;
 	g->obj[i].re = 0;
-	g->obj[i].spec = 2;
+	g->obj[i].spec = 4;
 	g->obj[i].soft = 0;
 
 	g->obj[i].prop[0] = do_tile_sphere;
@@ -696,7 +692,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	g->obj[i].rd = 100;
 	g->obj[i].rd2 = g->obj[i].rd * g->obj[i].rd;
 	g->obj[i].rd_1 = 1 / (double)g->obj[i].rd;
-	g->obj[i].color = rgb(0x010101);
+	g->obj[i].color = rgb(0x010100);
 	init_vector(&g->obj[i].ang, 0, 0, 0);
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
