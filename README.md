@@ -3,7 +3,7 @@ This is a somewhat complex raytracing implementation. It supports  reflection, t
 
 
 <p align="center">
-  <img width="80%" src="https://github.com/tpokalch/RT/blob/master/screens/soft.png">
+  <img width="80%" src="https://raw.githubusercontent.com/tpokalch/RT/master/screens/Screen%20Shot%202021-04-25%20at%204.16.45%20AM.png">
 </p>
 
 
