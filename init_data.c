@@ -22,6 +22,8 @@ void		ginit(t_global *g)
 	g->ray->z = lround(WIDTH / (double)2000 * 1600);
 	g->lights = 1; //if more than 1, disable specular on plane!
 	g->li = (t_vector *)malloc(sizeof(t_vector) * g->lights);
+	shot.x = -1;
+
 //	init_vector(&g->li[0], 300, 300, -100); // for many li
 
 //	init_vector(&g->li[0], -50, 187, 450);
@@ -676,7 +678,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 	g->obj[i].ctr = &ctr[i];
 	printf("center %p\n", g->obj[i].ctr);
-	g->obj[i].trans = 0.8;
+	g->obj[i].trans = 0;
 	g->obj[i].re = 0;
 	g->obj[i].spec = 4;
 	g->obj[i].soft = 0;

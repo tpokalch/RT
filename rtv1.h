@@ -32,11 +32,15 @@
 
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 1
+#define CORES 4
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
 
+// these are keycodes for the project onmy old mac,
+// i have to rewrite them for my 2017 mac
+
+/*
 #define A_KEY 0
 #define S_KEY 1
 #define D_KEY 2
@@ -61,6 +65,31 @@
 #define T_KEY 17
 #define Y_KEY 16
 
+*/
+
+#define A_KEY 97 
+#define S_KEY 115
+#define D_KEY 100
+#define F_KEY 102
+#define W_KEY 119
+#define SPACE_KEY 32
+#define ESC_KEY 65307
+#define J_KEY 106
+#define K_KEY 107
+#define L_KEY 108
+#define I_KEY 105
+#define O_KEY 111
+#define BRA_KEY 44
+#define KET_KEY 46
+#define UP_KEY 65362
+#define DOWN_KEY 65364
+#define LEFT_KEY 65361
+#define RIGHT_KEY 65363
+#define H_KEY 104
+#define G_KEY 103
+#define R_KEY 114
+#define T_KEY 116
+#define Y_KEY 121
 
 
 
@@ -103,8 +132,9 @@ struct s_vector
 };
 
 
+// global varible for debugging
 t_vector		shot;
-int			mousex;
+//int			mousex;
 
 
 

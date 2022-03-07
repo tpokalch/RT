@@ -26,8 +26,9 @@ $(NAME):
 
 
 #	deleted gcc -I /usr/local/include
-	gcc $(OBJ) -o rtv1 -L /usr/local/lib/ -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
-	
+#	gcc $(OBJ) -o rtv1 -L /usr/local/lib/ -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
+	gcc $(OBJ) -o rtv1 -L /Library/Developer/CommandLineTools/usr/lib/ -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
+
 clean:
 #	make -C libft/ clean
 	rm -rf $(OBJ)

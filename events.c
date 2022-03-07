@@ -193,7 +193,8 @@ int		mouse_move(int x, int y, void *param)
 
 	i = -1;
 	g = param;
-	mousex = x;
+//	mousex = x; // probably delete later
+//	printf("mouse is at %d, %d\n", x, y);
 //	printf("shit is %f,%f\n", shot.x, shot.y);
 	if (g->light_switch >= 1 && g->light_switch <= g->lights) //move light
 	{

@@ -25,6 +25,8 @@
 
 int			con(t_global *g)
 {
+	return (0);
+	//i forgot how to make it stop((
 	return (shot.x == g->ray->x && shot.y == g->ray->y);
 }
 
@@ -174,8 +176,8 @@ int		main(int argc, char **argv)
 	printf("starting threads\n");
 	start_threads(recalc, &g);
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
-	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
-	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);
+	mlx_hook(g.win_ptr, 2, 1L<<0, key_press, &g);
+	mlx_hook(g.win_ptr, 6, 1L<<6, mouse_move, &g);
 //	mlx_loop_hook(g.mlx_ptr, loop, &g);
 	mlx_loop(g.mlx_ptr);
 }
