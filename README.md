@@ -27,7 +27,7 @@ Click on video below:
 
 Instructions for MacOS. This project uses minilibx, which in turn uses X11 library.
 1. For MacOS version newer that MacOS X install X11 and XShm exttension appropriate for your MacOS version.
-2. Install minilibx from (here)[https://github.com/gcamerli/minilibx] (instructions for instalation available). This version of the project is written for MacOS Big Sur, so use minilibx version bulid on X11. But it is better to use minilibx version that uses Cocoa from Mac OSX, if you have MacOS X.
+2. Install minilibx from (here)[https://github.com/gcamerli/minilibx] (instructions for instalation available). This version of the project is written for MacOS Big Sur, so use minilibx version bulid on X11. But it is better to use minilibx (version) [https://github.com/dannywillems/minilibx-mac-osx] that uses Cocoa from Mac OSX, if you have MacOS X.
 3. You will definetely have to change -L /Location/of/mlx/static/library -lmlx to the location on libmlx.a on your computer as well as -L/Location/of/X11/dynamic/library -lX11 to the location of libX11.dylib on your computer.
 4. type make or make re in your command line.
 
