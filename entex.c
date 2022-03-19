@@ -262,7 +262,7 @@ int		start_threads(void *f, t_global *g)
 		pthread_join(g->tid[i], NULL);
 	}
 	i = -1;
-//	debug(g);
+	//	debug(g);
 	if (WIDTH > 2500)
 	{
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
@@ -270,6 +270,7 @@ int		start_threads(void *f, t_global *g)
 	}
 	if (WIDTH > 1000)
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
+
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
 	if (RECORD_VIDEO)
 		write(fd, g->data_ptr, sizeof(int) * WIDTH * HEIGHT);

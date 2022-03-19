@@ -309,7 +309,7 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
 	g->obj[i].re = 0; //0.6 is good
-	g->obj[i].spec = 4;
+	g->obj[i].spec = 0;
 	g->obj[i].soft = 0;
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
@@ -680,7 +680,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 	printf("center %p\n", g->obj[i].ctr);
 	g->obj[i].trans = 0;
 	g->obj[i].re = 0;
-	g->obj[i].spec = 4;
+	g->obj[i].spec = 0;
 	g->obj[i].soft = 0;
 
 	g->obj[i].prop[0] = do_tile_sphere;

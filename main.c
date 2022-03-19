@@ -25,7 +25,7 @@
 
 int			con(t_global *g)
 {
-	return (0);
+//	return (0);
 	//i forgot how to make it stop((
 	return (shot.x == g->ray->x && shot.y == g->ray->y);
 }
@@ -164,10 +164,15 @@ int		main(int argc, char **argv)
 	if (!check_arg(argv, argc, &g, ctr))
 		return (0);
 	printf("new image\n");
+	
 	g.mlx_ptr = mlx_init();
 	// with mymlx window should be created always after mlx_init
-	// not necessery here, only for homogenity between versions
+	// not necessery in this version of rtv1, here only for homogenity between versions
+	// of rtv1
 	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
+
+
+
 	g.img_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
 	g.data_ptr = (int *)mlx_get_data_addr(g.img_ptr, &g.bpp, &g.sz_l, &g.e);
 //	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
@@ -178,6 +183,10 @@ int		main(int argc, char **argv)
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
 	mlx_hook(g.win_ptr, 2, 1L<<0, key_press, &g);
 	mlx_hook(g.win_ptr, 6, 1L<<6, mouse_move, &g);
+//	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
+//	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);
+
+
 //	mlx_loop_hook(g.mlx_ptr, loop, &g);
 	mlx_loop(g.mlx_ptr);
 }

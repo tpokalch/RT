@@ -32,7 +32,7 @@
 
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 4
+#define CORES  4 
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
@@ -64,8 +64,8 @@
 #define R_KEY 15
 #define T_KEY 17
 #define Y_KEY 16
-
 */
+
 
 #define A_KEY 97 
 #define S_KEY 115
