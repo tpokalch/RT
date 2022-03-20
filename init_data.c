@@ -529,7 +529,7 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 //	init_tile(i, "./tiles/brick.xpm", g->obj, g);
 	g->obj[i].tile[0].data_ptr = NULL;
 	g->obj[i].re = 0;
-	g->obj[i].spec = 5;
+	g->obj[i].spec = 0;
 	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
 	g->obj[i].rd = g->obj[i].tris->rd - 1;
@@ -542,7 +542,7 @@ void		init_tri(t_vector *ctr, int i, t_global *g)
 	g->obj[i].id = i;
 	g->obj[i].hit = &hit_tri;
 	g->obj[i].bright = &bright_tri;
-	g->obj[i].simple_bright = &simple_bright_tri;
+	g->obj[i].simple_bright =/* &simple_bright_tri; */ &bright_tri;
 	g->obj[i].get_normal = &get_normal_plane;
 
 	g->obj[i].ctr = &ctr[i];
@@ -712,7 +712,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 //	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
 //	init_tile(1,"./tiles/z1.xpm", &g->obj[i].normal_map, g);
 	printf("init normal map\n");
-//	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
+	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
 	if (g->obj[i].normal_map.data_ptr)
 		rotate_normal_map_sphere(&g->obj[i].normal_map);
 }

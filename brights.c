@@ -12,6 +12,8 @@
 
 #include "rtv1.h"
 
+void			do_tile_tri(t_vector *retcol, t_object *objp, t_vector hit);
+
 /*
 int	i;
 
@@ -655,12 +657,10 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 	g->recursion[obj->id]++;
 	init_hitli(hitli, hit, g);
 
-
 	if (obj->normal_map.data_ptr)
 		do_normal_map_plane(&obj->nr, hit, obj, g);
 	else
 		obj->nr = obj->base[1];
-
 //	changed campos to invert obj base //message не актуально
 	if (obj->cam_pos)
 	{
@@ -676,7 +676,6 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 		== lround(fabs(hit.z) / (double)80) % 2)
 		init_vector(&obj->color, 0,0.5, 0.5);
 //		init_vector(&obj->color, 1,1, 1);
-
 	ret.col = obj->color;
 	if (obj->re)
 		do_re(reflrayv, hit, &ret.col, *obj, g);
@@ -691,6 +690,38 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 
 	return (ret);
 }
+
+t_colbri		bright_tri(t_vector st, t_vector hit, t_object *obj, t_global *g)
+{
+	t_colbri	ret;
+	t_vector	hitli[g->lights];
+	t_vector	reflrayv;
+	t_colbri	retorig;
+
+
+	if (con(g))
+		printf("inside bright tri\n");
+	g->recursion[obj->id]++;	
+	init_hitli(hitli, hit, g);
+	if (dot(diff(hit, *g->cam_pos), obj->base[1]) > 0)
+		obj->base[1] = scale(-1, obj->base[1]);
+	init_bri(&retorig.bri, hitli, obj->base[1], g);
+	if (obj->tile[0].data_ptr)
+		do_tile_tri(&ret.col, obj, hit);
+	ret.col = obj->color;
+	if (obj->re || obj->spec)
+		reflrayv = reflray(st, hit, obj->base[1], g);
+	if (obj->re)
+		do_re(reflrayv, hit, &ret.col, *obj, g);
+	if (obj->trans)
+		do_trans(st, hit, &ret, *obj, g);
+	ret.bri = retorig.bri;
+	if (obj->spec)
+		do_spec(&ret, hit, obj->base[1], reflrayv, *obj, g);
+	return (ret);
+}
+
+
 
 t_colbri		simple_bright_tri(t_vector st, t_vector hit,
 	t_object *obj, t_global *g)
@@ -737,28 +768,3 @@ void			do_tile_tri(t_vector *retcol, t_object *objp, t_vector hit)
 	obj.color = *(obj.tile[0].vectile + lround(y) * obj.tile[0].w + lround(x));
 }
 
-t_colbri		bright_tri(t_vector st, t_vector hit, t_object *obj, t_global *g)
-{
-	t_colbri	ret;
-	t_vector	hitli[g->lights];
-	t_vector	reflrayv;
-	t_colbri	retorig;
-
-	init_hitli(hitli, hit, g);
-	if (dot(diff(hit, *g->cam_pos), obj->base[1]) > 0)
-		obj->base[1] = scale(-1, obj->base[1]);
-	init_bri(&retorig.bri, hitli, obj->base[1], g);
-	if (obj->tile[0].data_ptr)
-		do_tile_tri(&ret.col, obj, hit);
-	ret.col = obj->color;
-	if (obj->re || obj->spec)
-		reflrayv = reflray(st, hit, obj->base[1], g);
-	if (obj->re)
-		do_re(reflrayv, hit, &ret.col, *obj, g);
-	if (obj->trans)
-		do_trans(st, hit, &ret, *obj, g);
-	ret.bri = retorig.bri;
-	if (obj->spec)
-		do_spec(&ret, hit, obj->base[1], reflrayv, *obj, g);
-	return (ret);
-}

@@ -15,6 +15,10 @@
 //	this function is needed to check for the direction of the plane/tri
 //	normals only once after the movement of the object, or movement of
 //	the camera
+//	(it's more optimal to check if camera is inside of a sphere in
+//	hit sphere, because yoy still have to check if a ray hits the back
+//	hald of a sphere if it doesn't hit the front half)
+
 int		campos(t_global *g)
 {
 	int i;

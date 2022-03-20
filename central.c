@@ -492,7 +492,7 @@ void		recalc_row(int jwidth, int j, t_global *g)
 		t_colbri bright;
 
 		i = -1;
-		if (WIDTH > 2000 || CORES == 4)
+		if (WIDTH > 2000 || CORES >= 4)
 			do_load(j, g);
 		while (++i < WIDTH)
 		{

@@ -102,9 +102,15 @@ t_dstpst	hit_complex(t_vector st, t_vector end,  t_vector ray, t_object obj, t_g
 	t_dstpst t;
 	t_dstpst framecheck;
 
+	if (con(g))
+		printf("hitting_complex\n");
+//	this can be arbitrarily at will commented. will optimize, but cut's of a chunk of .fdf file
+/*
 	framecheck = hit_sphere(st, end, ray, *(obj.frame), g);
 	if (framecheck.obj.name == nothing)
 		return (*(NANI(&t)));
+*/
+//
 	objecthit(&t, st, end, obj.tris, obj.rd, g);
 	if (t.obj.name == nothing)
 	{
@@ -122,7 +128,15 @@ t_dstpst	hit_plane(t_vector st, t_vector end,  t_vector ray, t_object obj, t_glo
 	if (t.dst < 0.0000001 || isinf(t.dst))
 		return(*NANI(&t));
 	t.obj = obj;
+//	change of normal's direction has to be
+//	done in brights because only there is it checked
+//	if there is a normal map and it has to be inverted
+//	or the object is without it and obj->base[1] is the
+//	normal used in obj->nr
+//	obj.cam_pos is managed in events.c campos after certain key presses
 	t.pst = obj.cam_pos;
+	if (con(g))
+		printf("obj.cam_pos is %d\n", obj.cam_pos);
 	return (t);
 }
 
@@ -144,7 +158,7 @@ t_dstpst		hit_sphere(t_vector st, t_vector end,  t_vector ray, t_object obj, t_g
 		return (*(NANI(&t)));
 	t.dst = (-abc.y- sqrt(det)) /(2 * abc.x);
 	//t.pst is called for every pixel, optimize to check only
-	//once!
+	//once! or maybe it's to small of an overhead..
 	if (t.dst <= 0.000001 && (t.pst = 1))
 		t.dst = (-abc.y+ sqrt(det)) / (2 * abc.x);
 	if (t.dst <= 0.000001)
@@ -188,30 +202,33 @@ t_dstpst	hit_tri(t_vector st, t_vector end,  t_vector ray, t_object obj, t_globa
 	t_dstpst framecheck;
 
 	p = *g;
-//	if (con(g))
-//		printf("we are hitting tri\n");
-
-//	printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
+	if (con(g))
+	{
+		printf("we are hitting tri\n");
+		printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
+	}
 	t.dst = dot(diff(obj.bd1, st), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.000001)
 	{
-//		if (con(g))
-//			printf("hit behind screen\n");
+		if (con(g))
+		{
+			printf("hit behind screen\n");
+			printf("returning nani\n");
+		}
 		return(*NANI(&t));
 	}
 	t_vector hit = sum(scale(t.dst, ray), st);
 	if (con(g))
 	{
-//		printf("dot nr bound %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
-//		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
+		printf("dot nr bound %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
+		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
 	}
 	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.base[1], g))
 	{
-//		if (con(g))
-//			printf("returning nani from tri\n");
+		if (con(g))
+			printf("returning nani from tri\n");
 		return(*NANI(&t));
 	}
-//	printf("assigning %d %s to obj\n", obj.id, obj.name);
 	if (con(g))
 		printf("tri hit, returning %d %d enum\n", obj.id, obj.name);
 	t.obj = obj;
