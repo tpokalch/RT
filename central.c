@@ -14,19 +14,20 @@
 
 void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv, /*t_vector nrm,*/ t_object obj, t_global *g)
 {
-//	NOTE: GET RID OF ALL THE NORM(HITLI), failed the first time
-//	gamma correct
-//	this creates a bug: shadow at distance is not ambient
-
 	if (con(g))
+	{
+		printf("entering obstructed vur bri is %d\n", cur->bri);
 		printf("STARTING obstructed\n");
-	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
+	}
+//	NOTE: GET RID OF ALL THE NORM(HITLI), failed the first time
+//	this creates a bug: shadow at distance is not ambient
+//	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66); // gamma correct
 
 
 	int i = 0;
 //	int	objn;
 	t_vector nrm;
-	int	iobjn[2]; //i, //number of the obj that is checked to obstruct light light, //don't know
+	int	iobjn[2]; //iobj[0] is a counter, //iobjn[1] is the number of the obj that is checked to obstruct light
 	double cosa[g->lights];
 	t_dstpst	t;
 	t_vector ray;
@@ -58,7 +59,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		ray = hitli[i];
 		iobjn[0] = 0;
 		iobjn[1] = g->prim;
-		while (++iobjn[0] < g->argc + 1)
+		while (++iobjn[0] < g->argc + 1)//check to be obstructed by all objects
 		{
 			if (iobjn[1] == 0)
 				iobjn[1] = (iobjn[1] + 1) % (g->argc + 1);
@@ -203,7 +204,11 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			}
 		}//		DRAWS REGUALR SHADOWS
 		else
+		{
 			cur->bri = g->ambient + (g->lights - obsc) * (cur->bri - g->ambient) / (double)g->lights;
+			if (con(g))
+				printf("cur bri now is %d\n", cur->bri);
+		}
 	}
 
 

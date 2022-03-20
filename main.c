@@ -183,6 +183,7 @@ int		main(int argc, char **argv)
 	mlx_hook(g.win_ptr, 4, 4, mouse_press, &g);
 	mlx_hook(g.win_ptr, 2, 1L<<0, key_press, &g);
 	mlx_hook(g.win_ptr, 6, 1L<<6, mouse_move, &g);
+//	mlx_mouse_hook(g.win_ptr, mouse_move, &g);
 //	mlx_hook(g.win_ptr, 2, 2, key_press, &g);
 //	mlx_hook(g.win_ptr, 6, 6, mouse_move, &g);
 

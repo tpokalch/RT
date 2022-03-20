@@ -25,14 +25,15 @@
 #define WIDTH_2 400
 
 */
-#define WIDTH 400
-#define HEIGHT 200
-#define HEIGHT_2 100
-#define WIDTH_2 200
+#define WIDTH 300
+#define HEIGHT 150
+#define HEIGHT_2 75
+#define WIDTH_2 150
+
 
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES  4 
+#define CORES 1 
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
