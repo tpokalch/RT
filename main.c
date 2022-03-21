@@ -25,7 +25,7 @@
 
 int			con(t_global *g)
 {
-//	return (1);
+	return (0);
 	//i forgot how to make it stop((
 	return (shot.x == g->ray->x && shot.y == g->ray->y);
 }
