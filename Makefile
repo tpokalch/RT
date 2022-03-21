@@ -33,7 +33,8 @@ $(NAME):
 #	gcc $(OBJ) -o rtv1 -L /usr/local/lib/mlx -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
 #	gcc -g $(OBJ) -o rtv1 --std=c99 -L /usr/local/lib/mlx -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
 
-	gcc $(FLAGS) $(SRC) -o rtv1 -L /usr/local/lib/minilibx -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
+#-lmlx searches for libmlx.a or libmlx.dylib in /usr/local/lib
+	gcc $(FLAGS) $(SRC) -o rtv1 -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
 
 
 

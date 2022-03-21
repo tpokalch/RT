@@ -194,5 +194,6 @@ int		main(int argc, char **argv)
 
 
 //	mlx_loop_hook(g.mlx_ptr, loop, &g);
+	printf("doing mlx_loop\n");
 	mlx_loop(g.mlx_ptr);
 }

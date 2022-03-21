@@ -25,10 +25,10 @@
 #define WIDTH_2 400
 
 */
-#define WIDTH 400
-#define HEIGHT 200
-#define HEIGHT_2 100
-#define WIDTH_2 200
+#define WIDTH 200
+#define HEIGHT 100
+#define HEIGHT_2 50
+#define WIDTH_2 100
 
 
 #define TASK 20
