@@ -21,13 +21,12 @@ $(NAME):
 	clang -g $(FLAGS) -I libft/includes -o linalg1.o -c linalg1.c
 	clang -g $(FLAGS) -I libft/includes -o entex.o -c entex.c
 	clang -g $(FLAGS) -I libft/includes -o create_points.o -c create_points.c
-#	clang -g $(FLAGS) -I libft/includes -o points_initialize.o -c points_initialize.c
 	clang -g $(FLAGS) -I libft/includes -o free_points.o -c free_points.c
 
 
 #	deleted gcc -I /usr/local/include
 #	gcc $(OBJ) -o rtv1 -L /usr/local/lib/mlx -lmlx -L ./libft -lft -framework OpenGL -framework AppKit
-	gcc $(OBJ) -o rtv1 -L /usr/local/lib/mlx -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
+	gcc -g $(OBJ) -o rtv1 -L /usr/local/lib/mlx -lmlx -L ./libft -lft -L/opt/X11/lib -lX11 -lXext -lpthread -framework OpenGL -framework AppKit
 
 
 clean:

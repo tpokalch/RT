@@ -12,6 +12,54 @@
 
 #include "rtv1.h"
 
+
+void		do_tile_sphere(t_vector hit, t_object *obj, t_global *g)
+{
+	t_vector	ctrhit;
+	t_vector	proj;
+	double		x;
+	double		y;
+	t_tile		*tile;
+
+	tile = obj->tile;
+	ctrhit = diff(hit, *obj->ctr)/*obj->real_nr*/;
+//	ctrhit = obj->nr; /real_nr!
+
+	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
+	proj = norm(proj);
+	y = tile[0].h * M_1_PI * acos(dot(obj->real_nr, obj->base[1]));
+	x = tile[0].w2 * M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
+	if (round(x) >= tile[0].w2)
+		x--;
+	obj->color = *(tile[0].vectile
+		+ lround(y) * tile[0].w + lround(x));
+//	obj->color = *(tile[0].vectile
+//		+ lround(y) * tile[0].w2 + lround(x) % tile[0].w2);
+}
+
+void		do_tile_cone(/*t_vector ctrhit,*/
+	t_vector hit, t_object *obj, t_global *g)
+{
+	t_vector	proj;
+	double		x;
+	double		y;
+	t_tile		*tile;
+
+	tile = obj->tile;
+	proj = diff(obj->nr/*ctrhit*/, scale(dot(obj->base[1], obj->nr/*ctrhit*/), obj->base[1]));
+	proj = norm(proj);
+	x = tile[0].w2 * (1 * M_1_PI *
+		myacos(proj, obj->base[2], obj->base[1], g));
+	y = mymod(1 - dot(obj->base[1], diff(hit, *obj->ctr)), tile[0].h);
+//	printf("(x,y) is (%f,%f)\n", x, y);
+//	printf("(width,height) of tile is (%d,%d)\n", tile[0].w, tile[0].h);
+	obj->color = *(tile[0].vectile
+		+ lround(y) * tile[0].w + lround(x));
+}
+
+
+
+
 void			do_tile_tri(t_vector *retcol, t_object *objp, t_vector hit);
 
 /*
@@ -211,25 +259,6 @@ t_colbri	simple_bright_cone(t_vector st, t_vector hit, t_object *obj,
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	return (ret);
 }
-
-void		do_tile_cone(/*t_vector ctrhit,*/
-	t_vector hit, t_object *obj, t_global *g)
-{
-	double		x;
-	double		y;
-	t_vector	proj;
-	t_tile		*objtile;
-
-	objtile = obj->tile;
-	proj = diff(obj->nr/*ctrhit*/, scale(dot(obj->base[1], obj->nr/*ctrhit*/), obj->base[1]));
-	proj = norm(proj);
-	x = objtile[0].w2 * (1 * M_1_PI *
-		myacos(proj, obj->base[2], obj->base[1], g));
-	y = mymod(1 - dot(obj->base[1], diff(hit, *obj->ctr)), objtile[0].h);
-	obj->color = *(objtile[0].vectile
-		+ lround(y) * objtile[0].w + lround(x));
-}
-
 
 t_vector	get_normal_cone(t_vector point, t_object *obj)
 {
@@ -457,30 +486,6 @@ t_colbri	simple_bright_sphere(t_vector st, t_vector hit,
 		do_trans(st, hit, &ret, *obj, g);
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 	return (ret);
-}
-
-void		do_tile_sphere(t_vector hit, t_object *obj, t_global *g)
-{
-	t_vector	ctrhit;
-	t_vector	proj;
-	double		x;
-	double		y;
-	t_tile		*tile;
-
-	tile = obj->tile;
-	ctrhit = diff(hit, *obj->ctr)/*obj->real_nr*/;
-//	ctrhit = obj->nr; /real_nr!
-
-	proj = diff(ctrhit, scale(dot(obj->base[1], ctrhit), obj->base[1]));
-	proj = norm(proj);
-	y = tile[0].h * M_1_PI * acos(dot(obj->real_nr, obj->base[1]));
-	x = tile[0].w2 * M_1_PI * myacos(proj, obj->base[2], obj->base[1], g);
-	if (round(x) >= tile[0].w2)
-		x--;
-	obj->color = *(tile[0].vectile
-		+ lround(y) * tile[0].w + lround(x));
-//	obj->color = *(tile[0].vectile
-//		+ lround(y) * tile[0].w2 + lround(x) % tile[0].w2);
 }
 
 void	    do_normal_map_sphere(t_vector hit, t_object *obj, t_global *g)

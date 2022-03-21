@@ -768,10 +768,10 @@ void		init_cone(t_vector *ctr, int i, t_global *g)
 	g->obj[i].spec = 5;
 	g->obj[i].trans = 0;
 	g->obj[i].soft = 1;
-	init_tile(i,"./tiles/blank.xpm", g->obj[i].tile, g);
+	g->obj[i].tile[0].data_ptr = NULL;	
+	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
 
-//	g->obj[i].tile[0].data_ptr = NULL;
-	
+
 /*
 	g->obj[i].tile[0].ptr = mlx_xpm_file_to_image
 		(g->mlx_ptr,
