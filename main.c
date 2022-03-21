@@ -25,7 +25,7 @@
 
 int			con(t_global *g)
 {
-//	return (0);
+//	return (1);
 	//i forgot how to make it stop((
 	return (shot.x == g->ray->x && shot.y == g->ray->y);
 }
@@ -175,6 +175,11 @@ int		main(int argc, char **argv)
 
 	g.img_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
 	g.data_ptr = (int *)mlx_get_data_addr(g.img_ptr, &g.bpp, &g.sz_l, &g.e);
+	if (!g.data_ptr || !g.img_ptr || !g.mlx_ptr)
+	{
+		printf("mlx_get_data_addr or img_ptr or mlx_ptr returned NULL");
+		return (0);
+	}
 //	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
 	copy_tcps(&g);
 

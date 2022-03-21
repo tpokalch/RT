@@ -136,6 +136,21 @@ void			shift_center(t_vector **pts, t_vector *ptdim, t_global *g)
 	}
 }
 
+t_vector	**initialize_points(int height)
+{
+	int			i;
+	t_vector	**ret;
+
+	i = 0;
+	ret = (t_vector **)malloc(sizeof(t_vector *) * height);
+	while (i < height)
+	{
+		*(ret + i) = NULL;
+		i++;
+	}
+	return (ret);
+}
+
 t_vector		**create_points(char *filename, t_vector *ptdim, t_global *g)
 {
 	t_vector	**ret;

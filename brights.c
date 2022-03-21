@@ -686,7 +686,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 	g->recursion[obj->id] = 0;
 
 	if (con(g))
-		printf("BRIGTNTESS %d\n", ret.bri);
+		printf("BRIGTNTESS of plane is %d\n", ret.bri);
 
 	return (ret);
 }

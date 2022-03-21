@@ -45,7 +45,14 @@ int		free_hits(t_global *g)
 		if (g->obj[i].name == complex)
 		{
 			printf("free complex\n");
+			int j = 0;
+			while (g->obj[i].pts[j])
+			{
+				free(g->obj[i].pts[j]);
+				j++;
+			}
 			free(g->obj[i].pts);
+			free(g->obj[i].tris);
 		}
 		if (g->obj[i].tile[0].data_ptr)
 		{

@@ -113,10 +113,10 @@ double				tothe2(double x, int e)
 		x = x * x;
 	return (x);
 }
-
+/*
 t_dstpst			*NANI(t_dstpst *t)
 {
 	t->dst = NAN;
 	t->obj.name = nothing;
 	return (t);
-}
+}*/

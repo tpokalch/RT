@@ -33,7 +33,7 @@
 
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES  1 
+#define CORES 1 
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
@@ -91,24 +91,6 @@
 #define R_KEY 114
 #define T_KEY 116
 #define Y_KEY 121
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 typedef enum e_name
 {
@@ -291,7 +273,7 @@ typedef struct		s_object
 	t_colbri				(*simple_bright)(t_vector, t_vector, t_object *, struct s_global *);
 	t_vector				(*get_normal)(t_vector, t_object *);
 
-
+//	bd1, bd2, bd3 are boundaries ofa triangle if an object is a triangle
 	t_vector		bd1;
 	t_vector		bd2;
 	t_vector		bd3;
@@ -309,6 +291,7 @@ typedef struct		s_object
 
 	void			(*prop[3])();
 	t_vector		**pts;
+//	if an object is complex it consists of triangle objects
 	t_object		*tris;
 	double			re;
 	double			trans;

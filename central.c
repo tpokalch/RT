@@ -359,12 +359,18 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 	double closest_tmp;
 	t_vector ray;
 
-	i = 0;
+	i = 1;
 	legal_hit = 0;
 	ray = diff(end, st);
-	while (++i < objc)
+//	object with id 0 is ignored. for this reason 1 triangle in 
+	if (con(g))
+		printf("objc in objecthit is %d\n", objc);
+	while (i < objc)
 	{
-//		printf("tryitn hit\n");
+		if (con(g))
+		{
+//			printf("tryitn hit i = %d\n", i);
+		}
 		t_crt = obj[i].hit(st, end, ray, obj[i], g);
 		if ((t_crt.dst >= 0.0000001) && (!legal_hit || t_crt.dst < closest_tmp))
 		{
@@ -374,6 +380,7 @@ void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc
 			*ret = t_crt;
 			ret->obj.cam_pos = t_crt.pst;
  		}
+		i++;
 	}
 	if (!legal_hit)
 		ret->obj.name = nothing;
@@ -507,12 +514,12 @@ void		recalc_row(int jwidth, int j, t_global *g)
 			ray = rotate(ray, *g->angle);
 			*g->rays[j][i] = ray;
 //			printf("objecthit from recalc\n");
-
+//			printf("objecthiting\n");
 			objecthit(&ret, *g->cam_pos, sum(ray, *g->cam_pos), g->obj, g->argc + 1, g);
 //			printf("assign\n");
 			g->hits[j][i]->obj = ret.obj;
 			g->hits[j][i]->hit = sum(scale(ret.dst, *g->rays[j][i]), *g->cam_pos);
-//			printf("checking hit\n");
+//			printf("checking hit i is %d\njwidth is %d\n", i, jwidth);
 			if (g->hits[j][i]->obj.name != nothing)
 			{
 //				printf("doing pixel i, j %d,%d\n", i, j);
@@ -529,7 +536,11 @@ void		recalc_row(int jwidth, int j, t_global *g)
 				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
 			}
 			else
+			{
+				if (con(g))
+					printf("hit nothing\n");
 				g->data_ptr[jwidth + i] = 0;
+			}
 		}
 }	
 
@@ -540,6 +551,7 @@ void		*recalc(void *p)
 	int end;
 	int jwidth;
 
+	printf("in recalc");
 	g = (t_global *)p;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;

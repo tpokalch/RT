@@ -12,6 +12,13 @@
 
 #include "rtv1.h"
 
+t_dstpst			*NANI(t_dstpst *t)
+{
+	t->dst = NAN;
+	t->obj.name = nothing;
+	return (t);
+}
+
 int 		hit_quad(t_vector st, t_vector end,  t_vector ray, t_vector quad[4], t_global *g)
 {
 	t_vector tri[2][3];
@@ -114,7 +121,9 @@ t_dstpst	hit_complex(t_vector st, t_vector end,  t_vector ray, t_object obj, t_g
 	objecthit(&t, st, end, obj.tris, obj.rd, g);
 	if (t.obj.name == nothing)
 	{
-		return (*(NANI(&t)));
+		if (con(g))
+			printf("returning nani from complex\n");
+		return (*(NANI(&t)));	
 	}
 	return (t);
 }
@@ -204,33 +213,37 @@ t_dstpst	hit_tri(t_vector st, t_vector end,  t_vector ray, t_object obj, t_globa
 	p = *g;
 	if (con(g))
 	{
-		printf("we are hitting tri\n");
-		printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
+//		printf("we are hitting tri\n");
+//		printf("nr is %f,%f,%f\n", obj.base[1].x, obj.base[1].y, obj.base[1].z);
 	}
 	t.dst = dot(diff(obj.bd1, st), obj.base[1]) / dot(ray, obj.base[1]);
 	if (t.dst < 0.000001)
 	{
 		if (con(g))
 		{
-			printf("hit behind screen\n");
-			printf("returning nani\n");
+//			printf("hit behind screen\n");
+//			printf("returning nani\n");
 		}
 		return(*NANI(&t));
 	}
 	t_vector hit = sum(scale(t.dst, ray), st);
 	if (con(g))
 	{
-		printf("dot nr bound %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
-		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
+//		printf("dot nr bound must be 0 %f\n", dot(obj.base[1], diff(obj.bd1, obj.bd3)));
+//		printf("dot nr bound->hit %f\n", dot(obj.base[1], diff(obj.bd1, hit)));
 	}
 	if (!pinside(sum(scale(t.dst, ray), st), obj.bd1, obj.bd2, obj.bd3, obj.base[1], g))
 	{
 		if (con(g))
-			printf("returning nani from tri\n");
+		{
+//			printf("returning nani from tri\n");
+		}
 		return(*NANI(&t));
 	}
 	if (con(g))
-		printf("tri hit, returning %d %d enum\n", obj.id, obj.name);
+	{
+//		printf("tri hit, returning %d %d enum\n", obj.id, obj.name);
+	}
 	t.obj = obj;
 	return (t);
 }

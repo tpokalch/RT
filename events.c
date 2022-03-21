@@ -24,6 +24,7 @@ int		campos(t_global *g)
 	int i;
 
 	i = 1;
+	printf("doing campos\n");
 	while (i < g->argc + 1)
 	{
 		printf("argc = %d\n", g->argc);
@@ -46,7 +47,7 @@ int		campos(t_global *g)
 			
 //					1==inside
 			g->obj[i].cam_pos = 1;
-			printf("we are in %d %d enum\n", i, g->obj[i].name);
+			printf("i is %d objname is %d enum\n", i, g->obj[i].name);
 		}
 		else
 			g->obj[i].cam_pos = 0;
@@ -78,6 +79,8 @@ int		key_press(int kk, void *param)
 			printf("closing file\n");
 		}
 		exit(free_hits(g));
+		mlx_destroy_image(g->mlx_ptr, g->img_ptr);
+		mlx_destroy_window(g->mlx_ptr, g->img_ptr);
 	}
 	else if (kk == W_KEY || kk == S_KEY || kk == A_KEY || kk == D_KEY || kk == F_KEY || kk == DOWN_KEY
 		|| kk == UP_KEY || kk == J_KEY || kk == K_KEY || kk == L_KEY || kk == I_KEY
@@ -88,7 +91,7 @@ int		key_press(int kk, void *param)
 	else if (kk == H_KEY || kk == G_KEY) //camera perspective
 	{
 		g->ray->z = fabs(g->ray->z + 10 * (2 * (kk == H_KEY) - 1));
-		copy_tcps(g);
+		//copy_tcps(g); //unneccessery because g->ray is a pointer, so it is shared between all tcps
 		return (start_threads(recalc, g));
 	}
 	else if ((kk == R_KEY || kk == T_KEY) && g->light_switch > 0 && g->light_switch <= g->lights)

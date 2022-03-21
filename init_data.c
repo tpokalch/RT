@@ -109,7 +109,10 @@ void		ginit(t_global *g)
 	g->recursion = 0;
 	i = -1;
 	while (++i < CORES)
+	{
+		printf("copying tcps\n");	
 		g->tcps[i] = (t_global *)malloc(sizeof(t_global));
+	}
 	printf("end ginit\n");
 }
 
@@ -376,27 +379,48 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 	t_object *ret;
 	int len;
 
+//	len is width of the rectangular map. obj.ptdim is initialized in create points.c.
+//	must devide by 20 to get the length
 	len = obj.ptdim.x / 20;
 	h = arrheight((void **)pts);
-	ret = (t_object *)malloc(sizeof(t_object) * (len * h * 2 + 1));
+//	(len - 1) * (h - 1) * 2 is the number of triangles that can be created
+//	from map len x h
+	if (!(ret = (t_object *)malloc(sizeof(t_object) * ((len - 1)* (h - 1) * 2 + 1))))
+	{
+		printf("MALLOC FAIL\n");
+		return (NULL);
+	}
+	printf("allocated %d t_objects for a complex object\n", (len - 1)* (h - 1) * 2 + 1);
 	j = 0;
 	i = 0;
-	retc = 0;
-//	init_vector(&smallspace, 0.0001, 0.0001, 0.0001);
-	init_vector(&smallspace, 0, 0, 0);
+	// start from 1 because object with id 0 is ignored
+	retc = 1;
+	init_vector(&smallspace, 0.0001, 0.0001, 0.0001);
+//	init_vector(&smallspace, 0, 0, 0);
 	while (*(pts + j + 1))
 	{
 		i = 0;
-		while (i + 1 < len)
+		while (i + 1 < len) // each cycle 2 triangles with tangential sides are created
+				//	this is why you have to check if (i + 1) point exists
 		{
+			//each cycle 2 triangles with tangential sides are created
+
+			//		##
+			//		#*
 			ret[retc].bd1 = sum(rotate(*(*(pts + j) + i), obj.ang), *obj.ctr);
 			ret[retc].bd2 = sum(rotate(*(*(pts + j) + i + 1), obj.ang), *obj.ctr);
 			ret[retc].bd3 = sum(rotate(*(*(pts + j + 1) + i), obj.ang), *obj.ctr);	
 
+//			printf("three points of first triangle \n%f,%f,%f\n%f,%f,%f\n%f,%f,%f\n", ret[retc].bd1.x, ret[retc].bd1.y, ret[retc].bd1.z, ret[retc].bd2.x, ret[retc].bd2.y, ret[retc].bd2.z, ret[retc].bd3.x, ret[retc].bd3.y, ret[retc].bd3.z);
 
+			//		*#
+			//		##
 			ret[retc + 1].bd1 = sum(rotate(sum(*(*(pts + j + 1) + i + 1), smallspace), obj.ang), *obj.ctr);
 			ret[retc + 1].bd2 = sum(rotate(sum(*(*(pts + j) + i + 1), smallspace), obj.ang), *obj.ctr);
 			ret[retc + 1].bd3 = sum(rotate(sum(*(*(pts + j + 1) + i), smallspace), obj.ang), *obj.ctr);	
+
+//			printf("three points of second triangle \n%f,%f,%f\n%f,%f,%f\n%f,%f,%f\n", ret[retc + 1].bd1.x, ret[retc + 1].bd1.y, ret[retc + 1].bd1.z, ret[retc + 1].bd2.x, ret[retc + 1].bd2.y, ret[retc + 1].bd2.z, ret[retc + 1].bd3.x, ret[retc + 1].bd3.y, ret[retc + 1].bd3.z);
+
 
 			ret[retc].hit = &hit_tri;
 			ret[retc + 1].hit = &hit_tri;
@@ -459,16 +483,15 @@ t_object	*create_tris(t_vector **pts, t_object obj, t_global *g)
 		ret[retc].spec = obj.spec;
 		ret[retc + 1].spec = obj.spec;
 
-		i++;
-		retc = retc + 2;
+		i++; //process the square to the right
+		retc = retc + 2; //but since 2 triangles were create, skip over 1 place in obj[]
 		}
 		j++;
 	}
-	(ret)->rd = (len - 1)* (h - 1)* 2 + 1;
+//	ret->rd is the number of objects that is passed to objecthit in hit_complex
+	(ret)->rd = ((len - 1)* (h - 1)* 2 + 1);
 //	printf("there are %d tris\n", ret->rd);
 	return (ret);
-
-
 }
 
 t_object	*init_frame(t_object obj, t_global *g)
@@ -532,7 +555,7 @@ void		init_complex(t_vector *ctr, int i, t_global *g)
 	g->obj[i].spec = 0;
 	g->obj[i].trans = 0;
 	g->obj[i].tris = create_tris(g->obj[i].pts, g->obj[i], g);
-	g->obj[i].rd = g->obj[i].tris->rd - 1;
+	g->obj[i].rd = g->obj[i].tris->rd;
 }
 
 
@@ -712,7 +735,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 //	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
 //	init_tile(1,"./tiles/z1.xpm", &g->obj[i].normal_map, g);
 	printf("init normal map\n");
-	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
+//	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
 	if (g->obj[i].normal_map.data_ptr)
 		rotate_normal_map_sphere(&g->obj[i].normal_map);
 }
