@@ -84,7 +84,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 						soft[i] = fmax(soft[i], fmax(0, -dot(/*norm(*/g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])/*)*/, norm(ray))));
 			//		if (obj.soft)
 //						soft is the gradient from to 0 (0 shadow) to 1 (100% shadow)
-						soft[i] = tothe2(soft[i], obj.soft); // change power to change hardness
+//						soft[i] = tothe2(soft[i], obj.soft); // change power to change hardness
 						if (con(g))
 							printf("soft[%d] = %f\n", i, soft[i]);
 
@@ -104,7 +104,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //						soft[i] = fmax(0, -dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray)));
 
 //						soft[i] = dot(norm(g->obj[iobjn[1]].get_normal(obstructed, &g->obj[iobjn[1]])), norm(ray));
-//						soft[i] = tothe2(soft[i], obj.soft);
+						soft[i] = tothe2(soft[i], obj.soft);
 //						soft[i] = sqrt(soft[i]);
 //						soft[i] = pow(soft[i], 1.5);
 
@@ -139,9 +139,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			}
 			iobjn[1] = (iobjn[1] + 1) % (g->argc + 1);
 		}
-//		if (obj.soft)
-//			soft[i] = tothe2(soft[i], obj.soft);
-
+/*		if (obj.soft)
+			soft[i] = tothe2(soft[i], obj.soft);
+*/
 		i++;
 	}
 //	delete if no trans

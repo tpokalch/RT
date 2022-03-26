@@ -30,6 +30,8 @@ int			con(t_global *g)
 	return (shot.x == g->ray->x && shot.y == g->ray->y);
 }
 
+// moved to events
+/*
 int		mouse_press(int button, int x, int y, void *param)
 {
 	t_global *g;
@@ -50,7 +52,7 @@ int		mouse_press(int button, int x, int y, void *param)
 	}
 	return (1);
 }
-
+*/
 int	loop(void *p)
 {
 	t_global *g = (t_global *)p;

@@ -25,15 +25,15 @@
 #define WIDTH_2 400
 
 */
-#define WIDTH 400
-#define HEIGHT 200
-#define HEIGHT_2 100
-#define WIDTH_2 200
+#define WIDTH 300
+#define HEIGHT 150
+#define HEIGHT_2 75
+#define WIDTH_2 150
 
 
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 4 
+#define CORES 4
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
@@ -41,6 +41,7 @@
 // these are keycodes for the project onmy old mac,
 // i have to rewrite them for my 2017 mac
 
+// keycodes for mlx on cocoa (old)
 /*
 #define A_KEY 0
 #define S_KEY 1
@@ -67,7 +68,7 @@
 #define Y_KEY 16
 */
 
-
+//keycodes for mlx on X11
 #define A_KEY 97 
 #define S_KEY 115
 #define D_KEY 100
@@ -164,6 +165,7 @@ int					init_objects(t_vector *ctr, char **argv, t_global *g);
 int					obj_traver(char **argv, char *c);
 void				init_rays(t_vector ****ray);
 void				init_hits(t_objecthit ***hits);
+int					mouse_press(int button, int x, int y, void *param);
 int					key_press(int kk, void *param);
 void				copy_tcps(t_global *g);
 void				copy(t_global *tcps, t_global *g);

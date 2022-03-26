@@ -58,6 +58,27 @@ int		campos(t_global *g)
 
 extern int fd;
 
+int		mouse_press(int button, int x, int y, void *param)
+{
+	t_global *g;
+	t_object a;
+
+	g = param;
+//	ft_bzero((int *)g->data_ptr, g->sz_l * HEIGHT);
+	if (button == 1)
+	{
+		shot.x = -WIDTH / 2 + x;
+		shot.y = HEIGHT / 2 - y;
+		printf("\n%f, %f\n", shot.x, shot.y);
+//		a = g->obj[g->objn];
+//		printf("object is %d %s %f, %f, %f\n%f,%f, %f\n", g->objn, a.name, a.ctr->x, a.ctr->y, a.ctr->z, a.nr.x, a.nr.y, a.nr.z);
+		printf("mouse press -> realc\n");
+//		start_threads(toimg, g);
+		start_threads(recalc, g);
+	}
+	return (1);
+}
+
 int		key_press(int kk, void *param)
 {
 	t_global *g;
