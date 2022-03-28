@@ -12,7 +12,6 @@
 
 #include "rtv1.h"
 
-//#if 0
 void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv, /*t_vector nrm,*/ t_object obj, t_global *g)
 {
 	if (con(g))
@@ -28,9 +27,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 	int i = 0;
 //	int	objn;
 	t_vector nrm;
-	int j = 0;
-	int objn = 0;
 //	int	iobjn[2]; //iobj[0] is a counter, //objn is the number of the obj that is checked to obstruct light
+	int j = 0;
+	int objn;
 	double cosa[g->lights];
 	t_dstpst	t;
 	t_vector ray;
@@ -62,11 +61,11 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		ray = hitli[i];
 		j = 0;
 		objn = g->prim;
-		while (++j < g->argc + 1)//check to be obstructed by all objects
+		while (++i < g->argc + 1)//check to be obstructed by all objects
 		{
 			if (objn == 0)
 				objn = (objn + 1) % (g->argc + 1);
-			if (obj.id != g->obj[objn].id)
+			if (obj.id != g->obj[objn].id || 0)
 			{
 				t = g->obj[objn].hit(hit, g->li[i], ray, g->obj[objn], g);
 //				printf("inside obstructed\n");
@@ -81,14 +80,13 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 					if (obj.soft)
 					{
 						obstructed = sum(scale(t.dst, ray), hit);
-
 //						t_vector ctrhit = diff(obstructed,  *g->obj[objn].ctr); 
 //						printf("calcaulating soft\n");
 //						segfailt here if object is complex. object must be a triangle
 						soft[i] = fmax(soft[i], fmax(0, -dot(/*norm(*/g->obj[objn].get_normal(obstructed, &g->obj[objn])/*)*/, norm(ray))));
 			//		if (obj.soft)
 //						soft is the gradient from to 0 (0 shadow) to 1 (100% shadow)
-						soft[i] = tothe2(soft[i], obj.soft); // change power to change hardness
+//						soft[i] = tothe2(soft[i], obj.soft); // change power to change hardness
 						if (con(g))
 							printf("soft[%d] = %f\n", i, soft[i]);
 
@@ -108,17 +106,20 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //						soft[i] = fmax(0, -dot(norm(g->obj[objn].get_normal(obstructed, &g->obj[objn])), norm(ray)));
 
 //						soft[i] = dot(norm(g->obj[objn].get_normal(obstructed, &g->obj[objn])), norm(ray));
-//						soft[i] = tothe2(soft[i], obj.soft);
+						soft[i] = tothe2(soft[i], obj.soft);
 //						soft[i] = sqrt(soft[i]);
 //						soft[i] = pow(soft[i], 1.5);
 
 //						double soft = normal_to_the_obhect * hitli, so between 0 and 1
-
 					}
 					g->prim = objn;
 					obsc++;
 					obss[i] = 1;
-					if (!obj.soft)// if no soft shadwos need to look only at first obstruction
+					if (con(g))
+					{
+						printf("point of %d is obstructed by %d\n", obj.name, g->obj[objn].name); 
+					}
+					if (!obj.soft)// if soft shadwos need to look on all obstructions
 					{
 #if 0
 						if (g->obj[objn].trans)
@@ -140,9 +141,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 			}
 			objn = (objn + 1) % (g->argc + 1);
 		}
-//		if (obj.soft)
-//			soft[i] = tothe2(soft[i], obj.soft);
-
+/*		if (obj.soft)
+			soft[i] = tothe2(soft[i], obj.soft);
+*/
 		i++;
 	}
 //	delete if no trans
@@ -229,6 +230,9 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //			{
 				cosa[i] = dot(norm(hitli[i]),/* norm(*/reflrayv/*)*/);
 //						soft ^ n for more difussion
+//				cosa[i] = fmax(0, cosa[i] - soft[i] * soft[i]);
+				if (con(g))
+					printf("cosa[%d] is %f\n", i, cosa[i]);
 			//if (cosa[i] > 0)
 //			{
 //				dirty trick to make it look like
@@ -246,8 +250,6 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 				if (obj.soft)
 					cosa[i] = fmax(0, cosa[i] - soft[i] * soft[i]);
 				cosa[i] = tothe2(cosa[i], obj.spec);
-
-
 				if (!obj.soft && obss[i] == 1)
 					cosa[i] = 0;
 				if (con(g))
@@ -259,6 +261,17 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 				spec_part += 255.0 / (float)cur->bri * cosa[i];
 //				col_part += (1 - cosa[i]) / (float)(g->lights - obsc);
 				col_part += (1 - cosa[i]) / (float)(g->lights);
+
+
+
+
+				if (con(g))
+				{
+					printf("col part is %f\n", col_part);
+					printf("spec part is %f\n", spec_part);
+				}	
+
+
 #if 0
 				if (con(g))
 					printf("mixing with light\n");
@@ -268,6 +281,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 							scale((1 - cosa[i]), cur->col)));
 #endif
 //				tmp.col = + cosa[i] / ( cur->bri / 255.0 ) * g->white + (1 - cosa[i]) * cur->col
+						if (con(g))
+							printf("obss[%d] is %d\ndoing dirty trick\n", i, obss[i]);
 //			}
 		/*	else
 			{
@@ -289,10 +304,16 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 */
 //		(g->lights == obsc) => col_part = 1;
 		}//end loop
-//#endif
-
-/////////////////////// end previous verion
+//		col_part = 1.0;
 //		obstructed zones should contrubute to col part as 1 / (g->lights - obsc
+		if (con(g))
+		{
+			printf("col part is %f\n", col_part);
+			printf("cur col is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
+					printf("col part is %f\n", col_part);
+					printf("spec part is %f\n", spec_part);
+			printf("spec con is %f,%f,%f\n", g->spec_con.x,  g->spec_con.y,  g->spec_con.z); 
+		}
 		tmp.col = sum(scale(spec_part, g->spec_con), scale(col_part, cur->col));
 /*		if (obsc == g->lights && !obj.soft) // otherwise intersection is black
 			tmp.col = cur->col;
@@ -311,7 +332,19 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 
 		}
 		cur->col = tmp.col;
+
+
 //	end if(obj.spec)
+	}
+
+	if (con(g))
+	{
+		printf("obstruction counter is %d\n", obsc);
+		printf("cosa[0] is %f\n", cosa[0]);
+		printf("final color is %f,%f,%f\n", cur->col.x, cur->col.y, cur->col.z);
+		printf("final brigh is %d\n", cur->bri);
+		t_vector col = scale(cur->bri, cur->col);
+		printf("color * brigthness: %f,%f,%f\n", col.x, col.y, col.z);
 	}
 //	gamma correct
 //	doesn't work here on the specular white light
@@ -319,7 +352,6 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 
 
 }
-//#endif
 
 void	objecthit(t_dstpst *ret, t_vector st, t_vector end, t_object *obj, int objc, t_global *g)
 {
@@ -476,7 +508,6 @@ void		recalc_row(int jwidth, int j, t_global *g)
 //for debug
 			init_vector(g->ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
 //
-//			printf("recalc row\n");
 			if (con(g))
 				printf("li at %f,%f,%f\n", g->li->x, g->li->y, g->li->z); 
 

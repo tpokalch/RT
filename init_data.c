@@ -31,7 +31,7 @@ void		ginit(t_global *g)
 //	init_vector(&g->li[0], -712, 312, 609);
 //	init_vector(&g->li[0], -181, 150, 246);
 //	init_vector(&g->li[0], 376,365,227);
-	init_vector(&g->li[0], 117,152,410);
+	init_vector(&g->li[0], 117,152,710);
 	init_vector(&g->li[0], 62,118,297);
 	init_vector(&g->li[0], 103,10,269);
 	init_vector(&g->li[0], 48.362500,90.012548,243.742205);
