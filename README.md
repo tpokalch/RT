@@ -23,7 +23,7 @@ Click on video below:
 [![rtdemo](https://i.imgur.com/4axhpzH.jpg)](https://www.youtube.com/watch?v=Qp7saN0JnSI)
 
 
-# Instalation
+# Installation
 
 Instructions for MacOS. This project uses minilibx, which in turn uses X11 library.
 1. For MacOS version newer that MacOS X install X11 and XShm exttension appropriate for your MacOS version.
