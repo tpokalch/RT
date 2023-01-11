@@ -53,12 +53,264 @@ int		mouse_press(int button, int x, int y, void *param)
 	return (1);
 }
 */
+
+void	integrator(t_global *g)
+{
+	static t_vector s1;
+	static t_vector s2;
+	static t_vector s3;
+
+	double dt = 0.005;
+
+	double m1 = g->obj[2].rd;
+	double m2 = g->obj[3].rd;
+	double m3 = g->obj[4].rd;
+
+
+	double G = 0.01;
+
+
+	static int count = 0;
+
+
+	if (count == 0)
+	{
+		init_vector(&s1, 300, 0, 400);
+		init_vector(&s2, 0, 0, -m1 * 400 / m2);
+		init_vector(&s3, -m1 * 300 / m3, 0, 0);
+
+
+	//	init_vector(&s1, 0, 0, 0);
+	//	init_vector(&s2, 0, 0, 0);
+	//	init_vector(&s3, 0, 0, 0);
+
+	}
+	s2 = scale(0.99, s2);
+	count++;	
+
+	t_vector *p1 = (g->obj[2].ctr);
+	t_vector *p2 = (g->obj[3].ctr);
+	t_vector *p3 = (g->obj[4].ctr);
+
+	t_vector v = diff(*p2, *p1);
+	double r12 = sqrt(dot(v, v));
+
+	t_vector h = diff(*p3, *p1);
+	double r13 = sqrt(dot(h, h));
+
+	t_vector d = diff(*p3, *p2);
+	double r23 = sqrt(dot(d, d));
+
+
+
+	t_vector force12;
+	t_vector force13;
+	t_vector force23;
+
+
+
+
+	if (r12 < 0.01)
+		init_vector(&force12, 0, 0, 0);
+	else
+		force12 = scale(G * m1 * m2 / r12 * r12 * r12, v);
+
+	if (r13 < 0.01)
+		init_vector(&force13, 0, 0, 0);
+	else
+		force13 = scale(G * m1 * m2 / r13 * r13 * r13, h);
+
+	if (r23 < 0.01)
+		init_vector(&force23, 0, 0, 0);
+	else	
+		force23 = scale(G * m1 * m2 / r23 * r23 * r23, d);
+
+
+	t_vector a1 = scale( 1/m1 , sum(force12, force13));
+
+	t_vector a2 = scale( 1/m2, sum(scale(-1, force12), force23));
+
+	t_vector a3 = scale( 1/m3, sum(scale(-1, force13), scale(-1, force23)));
+
+	s1 = sum(scale( dt, a1), s1);
+	s2 = sum(scale( dt, a2), s2);
+	s3 = sum(scale( dt, a3), s3);
+
+
+
+	t_vector newp1 = sum(*p1, scale(dt, s1)); 
+	t_vector newp2 = sum(*p2, scale(dt, s2)); 
+	t_vector newp3 = sum(*p3, scale(dt, s3)); 
+
+
+	v = diff(newp1, newp2);
+	h =  diff(newp3, newp1);
+	d =  diff(newp3, newp2);
+
+
+	r12 = sqrt(dot(v, v));
+	double r31 = sqrt(dot(h, h));
+	double r32 = sqrt(dot(d, d));
+//	collision
+
+//#if 0
+
+
+	if (r12 -  (g->obj[2].rd + g->obj[3].rd) < 0.1)
+	{
+		printf("collision\n");
+
+/*		t_vector temp;
+		temp = s1;
+		s1 = s2;
+		s2 = temp;
+*/
+		t_vector rad21 = norm(diff(*(g->obj[2].ctr), *(g->obj[3].ctr)));
+		double speed2 = dot(s2, rad21);
+
+
+		t_vector rad12 = scale(1, rad21);
+		double speed1 = dot(s1, rad12);
+
+
+		printf("speed1 projection is %f\n", speed1);
+		printf("speed2 projection is %f\n", speed2);
+
+
+		double newspeed2 = ((m2 - m1) *speed2 + m1 * 2 * speed1) / (m1 + m2);
+		printf("newspeed2 is %f\n", newspeed2);
+
+		s2 = sum(diff(s2, scale(speed2, rad21)), scale(newspeed2, rad21));
+
+
+		double newspeed1 = ((m1 - m2) *speed1 + m2 * 2 * speed2) / (m1 + m2);
+		printf("newspeed1 is %f\n", newspeed1);
+
+
+		s1 = sum(diff(s1, scale(speed1, rad12)), scale(newspeed1, rad12));
+
+
+		t_vector newp1 = sum(*p1, scale(dt, s1)); 
+		t_vector newp2 = sum(*p2, scale(dt, s2)); 
+
+			v = diff(newp1, newp2);
+			r12 = sqrt(dot(v, v));
+
+		while (r12 -  (g->obj[2].rd + g->obj[3].rd) < 0.1)
+		{
+			printf("closeness %f\n", r12 -  (g->obj[2].rd + g->obj[3].rd));
+			t_vector getout2 = norm(diff(newp2, newp1));
+			newp1 = sum(newp1, scale(0.1, scale(-1, getout2)));
+			newp2 = sum(newp2, scale(0.1,  getout2)); 
+			v = diff(newp1, newp2);
+			r12 = sqrt(dot(v, v));
+			printf("newp1 is %f,%f,%f\n", newp1.x,newp1.y,newp1.z);
+			printf("getout2 is  %f,%f,%f\n", getout2.x,getout2.y,getout2.z);
+		}
+	{
+		*p1 = newp1;
+		*p2 = newp2;
+	}
+
+
+	}
+	else
+//#endif
+	{
+		*p1 = newp1;
+ 		*p2 = newp2;
+		*p3 = newp3;
+	}
+
+
+	if (r32 -  (g->obj[4].rd + g->obj[3].rd) < 0.1)
+	{
+		printf("collision\n");
+
+/*		t_vector temp;
+		temp = s1;
+		s1 = s2;
+		s2 = temp;
+*/
+		t_vector rad23 = norm(diff(*(g->obj[2].ctr), *(g->obj[3].ctr)));
+		double speed2 = dot(s2, rad23);
+
+
+		t_vector rad32 = scale(1, rad23);
+		double speed3 = dot(s3, rad32);
+
+
+		printf("speed1 projection is %f\n", speed3);
+		printf("speed2 projection is %f\n", speed2);
+
+
+		double newspeed2 = ((m2 - m3) *speed2 + m3 * 2 * speed3) / (m3 + m2);
+		printf("newspeed2 is %f\n", newspeed2);
+
+		s2 = sum(diff(s2, scale(speed2, rad23)), scale(newspeed2, rad23));
+
+
+		double newspeed3 = ((m3 - m2) *speed3 + m2 * 2 * speed2) / (m3 + m2);
+		printf("newspeed1 is %f\n", newspeed3);
+
+
+		s3 = sum(diff(s3, scale(speed3, rad32)), scale(newspeed3, rad32));
+
+
+		t_vector newp3 = sum(*p3, scale(dt, s3)); 
+		t_vector newp2 = sum(*p2, scale(dt, s2)); 
+
+			v = diff(newp3, newp2);
+			r12 = sqrt(dot(v, v));
+
+		while (r32 -  (g->obj[4].rd + g->obj[3].rd) < 0.1)
+		{
+			printf("closeness %f\n", r32 -  (g->obj[4].rd + g->obj[3].rd));
+			t_vector getout2 = norm(diff(newp2, newp1));
+			newp3 = sum(newp3, scale(0.1, scale(-1, getout2)));
+			newp2 = sum(newp2, scale(0.1,  getout2)); 
+			v = diff(newp1, newp2);
+			r32 = sqrt(dot(v, v));
+			printf("newp1 is %f,%f,%f\n", newp3.x,newp3.y,newp3.z);
+			printf("getout2 is  %f,%f,%f\n", getout2.x,getout2.y,getout2.z);
+		}
+	{
+		*p1 = newp1;
+		*p2 = newp2;
+	}
+
+
+	}
+	else
+//#endif
+	{
+		*p1 = newp1;
+ 		*p2 = newp2;
+		*p3 = newp3;
+	}
+
+
+
+	printf("speed 1 is %f,%f,%f\n", s1.x, s1.y, s1.z);
+	printf("speed 2 is %f,%f,%f\n", s2.x, s2.y, s2.z);
+
+
+}
+
+
+
+
 int	loop(void *p)
 {
 	t_global *g = (t_global *)p;
-	g->li->x += 10;
-	*g->cam_pos = diff(*g->cam_pos, *g->normal);
-	printf("loop starting threads\n");
+
+//	the light moves lefr to righ and the camera moves back
+//	g->li->x += 5;
+//	*g->cam_pos = diff(*g->cam_pos, scale(0.1, *g->normal));
+
+	integrator(g);
+
+//	printf("loop starting threads\n");
 	start_threads(move, g);
 	return (1);
 }
@@ -196,6 +448,6 @@ int		main(int argc, char **argv)
 
 
 //	mlx_loop_hook(g.mlx_ptr, loop, &g);
-	printf("doing mlx_loop\n");
+//	printf("doing mlx_loop\n");
 	mlx_loop(g.mlx_ptr);
 }

@@ -41,6 +41,7 @@ void		ginit(t_global *g)
 	init_vector(&g->li[0], 183.788427,24.676411,161.037996);
 	init_vector(&g->li[0], 2053.659911,-139.807833,726.474466);
 	init_vector(&g->li[0], -137.162366,586.490258,688.022130);
+//	init_vector(&g->li[0], -137.162366,586.490258,200.022130);
 	if (g->lights > 1)
 		init_vector(&g->li[1], -360,-47,267);
 
@@ -81,7 +82,7 @@ void		ginit(t_global *g)
 	init_vector(&g->base[2], 0, 0, 1);
 
 //	init_vector(g->angle, 0.3, -0.6, 0);
-	init_vector(g->angle, 0.45, -0.2, 0); //look down
+	init_vector(g->angle, 0.45, 0, 0); //look down
 //	init_vector(g->angle, 0.15, 0, 0);
 //	init_vector(g->angle, 0, 0, 0);
 
@@ -312,8 +313,8 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 	g->obj[i].ang.y = 0;
 	g->obj[i].ang.z = 0;
 	g->obj[i].re = 0; //0.6 is good
-	g->obj[i].spec = 6; // 6 is good
-	g->obj[i].soft = 1; //0 or 1 
+	g->obj[i].spec = 0; // 6 is good
+	g->obj[i].soft = 0; //0 or 1 
 	g->obj[i].trans = 0;
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
@@ -329,7 +330,8 @@ void		init_plane(t_vector *ctr, int i, t_global *g)
 
 
 //	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
-	g->obj[i].normal_map.data_ptr = NULL;
+//	g->obj[i].normal_map.data_ptr = NULL;
+
 //	init_tile(1,"./tiles/basecolornormal.xpm", &g->obj[i].normal_map, g);
 //	init_tile(1,"./tiles/wheelnormal.xpm", &g->obj[i].normal_map, g);
 //	init_tile(1,"./tiles/normalmap.xpm", &g->obj[i].normal_map, g);
@@ -634,8 +636,8 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 	init_vector(&g->obj[i].base[0], 1, 0, 0);
 	init_vector(&g->obj[i].base[1], 0, 1, 0);
 	init_vector(&g->obj[i].base[2], 0, 0, 1);
-	g->obj[i].spec = 2/*4*/;
-	g->obj[i].re = 0.6;
+	g->obj[i].spec = 0/*4*/;
+	g->obj[i].re = 0;
 	g->obj[i].trans = 0;
 	g->obj[i].soft = 0;
 
@@ -660,7 +662,7 @@ void		init_cylinder(t_vector *ctr, int i, t_global *g)
 
 
 
-	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
 	g->obj[i].tile[0].w2 = g->obj[i].tile[0].w / 2;
 	g->obj[i].tile[0].h2 = g->obj[i].tile[0].h / 2;
 
@@ -726,6 +728,7 @@ void		init_sphere(t_vector *ctr, int i, t_global *g)
 
 //	printf("init tile\n");
 //	init_tile(0,"./tiles/jupiter.xpm", g->obj[i].tile, g);
+//	init_tile(0,"./tiles/earth.xpm", g->obj[i].tile, g);
 //	init_tile(0,"./tiles/basecolor.xpm", g->obj[i].tile, g);
 //	init_tile(0,"./tiles/blank.xpm", g->obj[i].tile, g);
 

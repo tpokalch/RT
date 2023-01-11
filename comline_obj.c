@@ -89,6 +89,7 @@ void		fill_obj(char **argv, int n, t_global *g)
 		{
 			vectorify(&(g->obj[n].rd), (argv + 3));
 			g->obj[n].rd2 = g->obj[n].rd * g->obj[n].rd;
+			g->obj[n].rd_1 = 1 / (double)g->obj[n].rd;
 		}
 		i++;
 	}

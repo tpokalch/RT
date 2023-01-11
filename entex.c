@@ -270,13 +270,13 @@ int		start_threads(void *f, t_global *g)
 	}
 	if (WIDTH > 1000)
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
-	printf("putting image to window\n");
+//	printf("putting image to window\n");
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
-	printf("success\n");
+//	printf("success\n");
 	if (RECORD_VIDEO)
 		write(fd, g->data_ptr, sizeof(int) * WIDTH * HEIGHT);
-	printf("clock\n");
+//	printf("clock\n");
 	t[1] = clock();
-	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
+//	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
 	return (1);
 }
