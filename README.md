@@ -21,7 +21,7 @@ Click on video below:
 
 
 
-<a href="https://youtu.be/WHm0eooveFc"><img src="https://i.imgur.com/5LH6p8Y.png" alt="" data-canonical-src="https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png" width="300" height="200" />
+<a href="https://youtu.be/WHm0eooveFc"><img src="https://i.imgur.com/5LH6p8Y.png" alt="" data-canonical-src="https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png" width="270" height="200" />
 
 # Installation
 
