@@ -17,8 +17,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 {
 	if (con(g))
 	{
-		printf("entering obstructed vur bri is %d\n", cur->bri);
-		printf("STARTING obstructed\n");
+		printf("entering obstructed\n");
+		printf("cur bri is %d\n", cur->bri);
 	}
 //	NOTE: GET RID OF ALL THE NORM(HITLI), failed the first time
 //	this creates a bug: shadow at distance is not ambient
@@ -62,7 +62,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 		ray = hitli[i];
 		j = 0;
 		objn = g->prim;
-		while (++j < g->argc + 1)//check to be obstructed by all objects
+		while (++j < g->argc + 1)//check to be obstructed by all objects g->obj[0] is the camera
 		{
 			if (objn == 0)
 				objn = (objn + 1) % (g->argc + 1);
@@ -92,8 +92,8 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 						if (con(g))
 							printf("soft[%d] = %f\n", i, soft[i]);
 
-
-/*						if (g->obj[objn].trans)
+/*
+						if (g->obj[objn].trans)
 						{
 						bright = g->obj[objn].bright(hit, obstructed, &g->obj[objn], g);
 						color = scale(bright.bri, bright.col);
@@ -316,7 +316,7 @@ void	obstructed(t_colbri *cur, t_vector hit, t_vector *hitli, t_vector reflrayv,
 //	gamma correct
 //	doesn't work here on the specular white light
 //	cur->bri = 255.0 * pow(cur->bri/255.0, 0.66);
-
+//	printf("obstructed ended\n");
 
 }
 //#endif
@@ -401,23 +401,38 @@ void		move_row(int j, int jwidth, t_global *g)
 		i = -1;
 		while (++i < WIDTH)
 		{
+//			printf("_________________-working on pixel %d,%d\n", i, j);
 //for debug
 			init_vector(g->ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
 //
+//			printf("objecthit\n");
 			objecthit(&ret, *g->cam_pos,
 			sum(*g->rays[j][i], *g->cam_pos), g->obj, g->argc + 1,
 			g);
+//			printf("objecthit success. ret.obj.name = %u\n", ret.obj.name);
 			g->hits[j][i]->hit = sum(scale(ret.dst, *g->rays[j][i]), *g->cam_pos);
 			g->hits[j][i]->obj = ret.obj;
+//			printf("hit inited\n");
 			if (g->hits[j][i]->obj.name != nothing)
 			{
-				bright = ret.obj.bright(*g->cam_pos, (g->hits[j][i])->hit, &(g->hits)[j][i]->obj, g);
+//				printf("calling bright %u\n", ret.obj.name);
+//				printf("obj ctr.x is %f\n", g->hits[j][i]->obj.ctr->x);
+											// probably segfolt because of this
+				bright = ret.obj.bright(*g->cam_pos, (g->hits[j][i])->hit, &((g->hits)[j][i]->obj) /*&(g->hits)[j][i]->obj*/, g);
+//				printf("writing to data_ptr\n");
 				g->data_ptr[jwidth + i] = color(bright.bri, bright.col);
+//				printf("success\n");
 			}
 			else
 				g->data_ptr[jwidth + i] = 0;			
+//			printf("pixel complete\n");
 		}
 }
+
+//	this function can be called instead of recalc when the camera 
+//	isn't rotating, for example moving the object, or moving the camera without rotation
+//	for light movement call toimg
+
 
 void		*move(void *p)
 {
@@ -435,7 +450,9 @@ void		*move(void *p)
 	{
 		jwidth += WIDTH;
 		move_row(j, jwidth, g);
+		printf("row moved\n");
 	}
+	printf("move complete\n");
 	return (NULL);
 }
 
@@ -463,13 +480,15 @@ void		do_load(int j, t_global *g)
 
 void		recalc_row(int jwidth, int j, t_global *g)
 {
+//		printf("recalcing row %d\n", j);
+
 		t_vector ray;
 		t_dstpst ret;
 		int i;
 		t_colbri bright;
 
 		i = -1;
-		if (WIDTH > 2000 || CORES >= 4)
+		if (WIDTH > 1000 && CORES >= 4)
 			do_load(j, g);
 		while (++i < WIDTH)
 		{
@@ -484,23 +503,23 @@ void		recalc_row(int jwidth, int j, t_global *g)
 			init_vector(&ray, i - WIDTH_2, HEIGHT_2 - j, g->ray->z);
 			ray = rotate(ray, *g->angle);
 			*g->rays[j][i] = ray;
-//			printf("objecthit from recalc\n");
-//			printf("objecthiting\n");
+	//		printf("objecthit from recalc\n");
+	//		printf("objecthiting\n");
 			objecthit(&ret, *g->cam_pos, sum(ray, *g->cam_pos), g->obj, g->argc + 1, g);
-//			printf("assign\n");
+	//		printf("assign\n");
 			g->hits[j][i]->obj = ret.obj;
 			g->hits[j][i]->hit = sum(scale(ret.dst, *g->rays[j][i]), *g->cam_pos);
-//			printf("checking hit i is %d\njwidth is %d\n", i, jwidth);
+	//		printf("checking hit i is %d\njwidth is %d\n", i, jwidth);
 			if (g->hits[j][i]->obj.name != nothing)
 			{
-//				printf("doing pixel i, j %d,%d\n", i, j);
+	//			printf("doing pixel i, j %d,%d\n", i, j);
 //				if (i == 61 && j == 14)
-//					printf("hit obj %d %d\n", ret.obj.name, ret.obj.id);
+//					printf("hit obj name = %d id = %d\n", ret.obj.name, ret.obj.id);
 				bright = g->hits[j][i]->obj.
 				bright(*g->cam_pos, g->hits[j][i]->hit, &(g->hits)[j][i]->obj, g);
 
-				if (con(g))
-					printf("brightness in recalc is %d\n", bright.bri);
+//				if (con(g))
+	//				printf("brightness in recalc is %d\n", bright.bri);
 				// specular reflection shouldn't be afected here by the unmax brightness,
 				// hence the dirty trick. the color is mixed in such a way that bri * col becomes
 				// own color with brightness = 255
@@ -508,8 +527,8 @@ void		recalc_row(int jwidth, int j, t_global *g)
 			}
 			else
 			{
-				if (con(g))
-					printf("hit nothing\n");
+//				if (con(g))
+	//				printf("hit nothing\n");
 				g->data_ptr[jwidth + i] = 0;
 			}
 		}
@@ -522,7 +541,7 @@ void		*recalc(void *p)
 	int end;
 	int jwidth;
 
-	printf("in recalc");
+//	printf("in recalc\n");
 	g = (t_global *)p;
 	end = (g->core + 1) * HEIGHT / CORES;
 	j = g->core * HEIGHT / CORES - 1;

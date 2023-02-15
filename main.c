@@ -19,9 +19,9 @@
 //	implement snells law or transparent obect
 //
 //	dirty trick in obstructed is done even when 
-//	the point is obstructed.
+//	the point is obstructed. // fixed?
 //
-//	light ambient at distance
+//	light ambient at distance // fixed?
 
 int			con(t_global *g)
 {
@@ -60,11 +60,11 @@ void	integrator(t_global *g)
 	static t_vector s2;
 	static t_vector s3;
 
-	double dt = 0.005;
+	double dt = 0.001;
 
-	double m1 = g->obj[2].rd;
-	double m2 = g->obj[3].rd;
-	double m3 = g->obj[4].rd;
+	double m1 = g->obj[2].rd ;
+	double m2 = g->obj[3].rd ;
+	double m3 = g->obj[4].rd ;
 
 
 	double G = 0.01;
@@ -75,17 +75,19 @@ void	integrator(t_global *g)
 
 	if (count == 0)
 	{
-		init_vector(&s1, 300, 0, 400);
-		init_vector(&s2, 0, 0, -m1 * 400 / m2);
-		init_vector(&s3, -m1 * 300 / m3, 0, 0);
+
+		init_vector(&s1, 600, 0, 1800);
+		init_vector(&s2, 0, 0, -m1 * 1800 / m2);
+		init_vector(&s3, -m1 * 600 / m3, 0, 0);
 
 
-	//	init_vector(&s1, 0, 0, 0);
-	//	init_vector(&s2, 0, 0, 0);
-	//	init_vector(&s3, 0, 0, 0);
 
+/*		init_vector(&s1, 0, 0, 0);
+		init_vector(&s2, 0, 0, 0);
+		init_vector(&s3, 0, 0, 0);
+*/
 	}
-	s2 = scale(0.99, s2);
+//	s2 = scale(0.99, s2);
 	count++;	
 
 	t_vector *p1 = (g->obj[2].ctr);
@@ -156,9 +158,11 @@ void	integrator(t_global *g)
 //#if 0
 
 
+////////////////////// r12 number 1
+
 	if (r12 -  (g->obj[2].rd + g->obj[3].rd) < 0.1)
 	{
-		printf("collision\n");
+		printf("____________collision\n");
 
 /*		t_vector temp;
 		temp = s1;
@@ -173,8 +177,8 @@ void	integrator(t_global *g)
 		double speed1 = dot(s1, rad12);
 
 
-		printf("speed1 projection is %f\n", speed1);
-		printf("speed2 projection is %f\n", speed2);
+//		printf("speed1 projection is %f\n", speed1);
+//		printf("speed2 projection is %f\n", speed2);
 
 
 		double newspeed2 = ((m2 - m1) *speed2 + m1 * 2 * speed1) / (m1 + m2);
@@ -196,9 +200,9 @@ void	integrator(t_global *g)
 			v = diff(newp1, newp2);
 			r12 = sqrt(dot(v, v));
 
-		while (r12 -  (g->obj[2].rd + g->obj[3].rd) < 0.1)
+		while (r12 -  (g->obj[2].rd + g->obj[3].rd) < 1)
 		{
-			printf("closeness %f\n", r12 -  (g->obj[2].rd + g->obj[3].rd));
+			printf("closeness12 %f\n", r12 -  (g->obj[2].rd + g->obj[3].rd));
 			t_vector getout2 = norm(diff(newp2, newp1));
 			newp1 = sum(newp1, scale(0.1, scale(-1, getout2)));
 			newp2 = sum(newp2, scale(0.1,  getout2)); 
@@ -219,10 +223,11 @@ void	integrator(t_global *g)
 	{
 		*p1 = newp1;
  		*p2 = newp2;
-		*p3 = newp3;
+//		*p3 = newp3;
 	}
 
-
+/////////////////////////// r32 number 3
+//#if 0
 	if (r32 -  (g->obj[4].rd + g->obj[3].rd) < 0.1)
 	{
 		printf("collision\n");
@@ -232,7 +237,7 @@ void	integrator(t_global *g)
 		s1 = s2;
 		s2 = temp;
 */
-		t_vector rad23 = norm(diff(*(g->obj[2].ctr), *(g->obj[3].ctr)));
+		t_vector rad23 = norm(diff(*(g->obj[4].ctr), *(g->obj[3].ctr)));
 		double speed2 = dot(s2, rad23);
 
 
@@ -240,8 +245,8 @@ void	integrator(t_global *g)
 		double speed3 = dot(s3, rad32);
 
 
-		printf("speed1 projection is %f\n", speed3);
-		printf("speed2 projection is %f\n", speed2);
+//		printf("speed1 projection is %f\n", speed3);
+//		printf("speed2 projection is %f\n", speed2);
 
 
 		double newspeed2 = ((m2 - m3) *speed2 + m3 * 2 * speed3) / (m3 + m2);
@@ -260,58 +265,149 @@ void	integrator(t_global *g)
 		t_vector newp3 = sum(*p3, scale(dt, s3)); 
 		t_vector newp2 = sum(*p2, scale(dt, s2)); 
 
-			v = diff(newp3, newp2);
-			r12 = sqrt(dot(v, v));
+			h = diff(newp3, newp2);
+			r32 = sqrt(dot(h, h));
 
-		while (r32 -  (g->obj[4].rd + g->obj[3].rd) < 0.1)
+		while (r32 -  (g->obj[4].rd + g->obj[3].rd) < 1)
 		{
-			printf("closeness %f\n", r32 -  (g->obj[4].rd + g->obj[3].rd));
-			t_vector getout2 = norm(diff(newp2, newp1));
+			printf("closeness32 %f\n", r32 -  (g->obj[4].rd + g->obj[3].rd));
+			t_vector getout2 = norm(diff(newp2, newp3));
 			newp3 = sum(newp3, scale(0.1, scale(-1, getout2)));
 			newp2 = sum(newp2, scale(0.1,  getout2)); 
-			v = diff(newp1, newp2);
+			v = diff(newp2, newp3);
 			r32 = sqrt(dot(v, v));
 			printf("newp1 is %f,%f,%f\n", newp3.x,newp3.y,newp3.z);
 			printf("getout2 is  %f,%f,%f\n", getout2.x,getout2.y,getout2.z);
+//			s2 = scale(-1, s2);
+//			s3 = scale(-1, s3);
+
+
 		}
-	{
-		*p1 = newp1;
 		*p2 = newp2;
-	}
+		*p3 = newp3;
 
 
 	}
 	else
 //#endif
 	{
-		*p1 = newp1;
+//		*p1 = newp1;
  		*p2 = newp2;
 		*p3 = newp3;
 	}
 
 
 
-	printf("speed 1 is %f,%f,%f\n", s1.x, s1.y, s1.z);
-	printf("speed 2 is %f,%f,%f\n", s2.x, s2.y, s2.z);
+//////////////////////////////////////////// r31 number 2
 
+//#if 0
+	if (r31 -  (g->obj[4].rd + g->obj[2].rd) < 0.1)
+	{
+		printf("collision\n");
+
+/*		t_vector temp;
+		temp = s1;
+		s1 = s2;
+		s2 = temp;
+*/
+		t_vector rad13 = norm(diff(*(g->obj[2].ctr), *(g->obj[4].ctr)));
+		double speed1 = dot(s1, rad13);
+
+
+		t_vector rad31 = scale(1, rad13);
+		double speed3 = dot(s3, rad31);
+
+
+//		printf("speed1 projection is %f\n", speed3);
+//		printf("speed2 projection is %f\n", speed2);
+
+
+		double newspeed1 = ((m1 - m3) *speed1 + m3 * 2 * speed3) / (m3 + m1);
+		printf("newspeed2 is %f\n", newspeed1);
+
+		s1 = sum(diff(s1, scale(speed1, rad13)), scale(newspeed1, rad13));
+
+
+		double newspeed3 = ((m3 - m1) *speed3 + m1 * 2 * speed1) / (m3 + m1);
+		printf("newspeed1 is %f\n", newspeed3);
+
+
+		s3 = sum(diff(s3, scale(speed3, rad31)), scale(newspeed3, rad31));
+
+
+		t_vector newp3 = sum(*p3, scale(dt, s3)); 
+		t_vector newp1 = sum(*p1, scale(dt, s1)); 
+
+			h = diff(newp3, newp1);
+			r31 = sqrt(dot(h, h));
+
+		while (r31 -  (g->obj[4].rd + g->obj[2].rd) < 1)
+		{
+			printf("closeness31 %f\n", r31 -  (g->obj[4].rd + g->obj[2].rd));
+			t_vector getout1 = norm(diff(newp1, newp3));
+			newp3 = sum(newp3, scale(0.1, scale(-1, getout1)));
+			newp1 = sum(newp1, scale(0.1,  getout1)); 
+			v = diff(newp1, newp3);
+			r31 = sqrt(dot(v, v));
+			printf("newp1 is %f,%f,%f\n", newp3.x,newp3.y,newp3.z);
+			printf("getout1 is  %f,%f,%f\n", getout1.x,getout1.y,getout1.z);
+		}
+		*p1 = newp1;
+		*p3 = newp3;
+	}
+	else
+//#endif
+	{
+		*p1 = newp1;
+// 		*p2 = newp2;
+		*p3 = newp3;
+	}
+
+//#endif
+
+
+
+
+
+//	printf("speed 1 is %f,%f,%f\n", s1.x, s1.y, s1.z);
+//	printf("speed 2 is %f,%f,%f\n", s2.x, s2.y, s2.z);
+//#endif
 
 }
 
 
+void	update_camera(t_global *g)
+{
+	static float t = 0;
+	t+=0.01;
+	float w = 1;
+	float R = -sqrt(g->cam_pos->x * g->cam_pos->x + g->cam_pos->z * g->cam_pos->z);
+	float newz = R * cos(w * t);
+	float newx = R * sin(w * t);
 
+	g->angle->y = w * t;
+//	*g->normal = rotate(g->_0015, *g->angle);
+
+	g->cam_pos->z = newz;
+	g->cam_pos->x = newx;
+
+
+}
 
 int	loop(void *p)
 {
+//	printf("start loop function callback\n");
 	t_global *g = (t_global *)p;
 
 //	the light moves lefr to righ and the camera moves back
 //	g->li->x += 5;
 //	*g->cam_pos = diff(*g->cam_pos, scale(0.1, *g->normal));
-
+	update_camera(g);
+//	printf("integtator call\n");
 	integrator(g);
-
-//	printf("loop starting threads\n");
-	start_threads(move, g);
+	
+	printf("______loop starting threads\n");
+	start_threads(recalc, g);
 	return (1);
 }
 
@@ -322,7 +418,7 @@ void		free_arr(char **arr)
 	i = 0;
 	while (*(arr + i) != NULL)
 	{
-		printf("now freeing %s\n", *(arr + i));
+//		printf("now freeing %s\n", *(arr + i));
 		free(*(arr + i));
 		i++;
 	}
@@ -393,15 +489,16 @@ int fd;
 int		main(int argc, char **argv)
 {
 	t_global g;
-	t_vector ctr[argc];
+//	t_vector *ctr = (t_vector *)malloc(sizeof(t_vector) * argc);
+//	t_vector ctr[argc];
 	t_vector kenobi[6];
 	int h;
 	int w;
 
-	g.mlx_ptr = mlx_init();
 
-	if (RECORD_VIDEO)
-		fd = open("./video", O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
+	g.mlx_ptr = mlx_init();
+//	if (RECORD_VIDEO)
+//		fd = open("./video.sh", O_WRONLY | O_CREAT | O_APPEND, S_IRWXU);
 	h = WIDTH;
 	w = HEIGHT;
 	g.cam_pos = &kenobi[0];
@@ -415,11 +512,13 @@ int		main(int argc, char **argv)
 	printf("ginit\n");
 	ginit(&g);
 	printf("check arg\n");
-	if (!check_arg(argv, argc, &g, ctr))
+//	check arg allocates memory for g->obj and their centers
+	if (!check_arg(argv, argc, &g/*, ctr*/))
 		return (0);
 	printf("new image\n");
 	
-	g.mlx_ptr = mlx_init();
+//	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
+//	g.mlx_ptr = mlx_init();
 	// with mymlx window should be created always after mlx_init
 	// not necessery in this version of rtv1, here only for homogenity between versions
 	// of rtv1
@@ -429,11 +528,33 @@ int		main(int argc, char **argv)
 
 	g.img_ptr = mlx_new_image(g.mlx_ptr, WIDTH, HEIGHT);
 	g.data_ptr = (int *)mlx_get_data_addr(g.img_ptr, &g.bpp, &g.sz_l, &g.e);
+
+//	testtest
+	int local_endian;
+	  int   a;
+
+	  printf("MinilibX Test Program\n");
+	  a = 0x11223344;
+
+    	  if (((unsigned char *)&a)[0] == 0x11)
+                local_endian = 1;
+        else
+                local_endian = 0;
+	printf("bpp: %d, sz_l = %d, endian = %d\n", g.bpp, g.sz_l, g.e);
+	printf("local endian: %d\n", local_endian);
+
+//	testend testend
+
 	if (!g.data_ptr || !g.img_ptr || !g.mlx_ptr)
 	{
 		printf("mlx_get_data_addr or img_ptr or mlx_ptr returned NULL");
 		return (0);
 	}
+	printf("data_ptr is %p\n", g.data_ptr);
+	printf("img_ptr is %p\n", g.img_ptr);
+	printf("mlx_ptr is %p\n", g.mlx_ptr);
+
+
 //	g.win_ptr = mlx_new_window(g.mlx_ptr, WIDTH, HEIGHT, "window1");
 	copy_tcps(&g);
 

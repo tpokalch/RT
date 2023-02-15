@@ -21,7 +21,7 @@ int		obj_traver(char **argv, char *c)
 		!(ft_strequ(*(argv), "sphere")) &&
 		!(ft_strequ(*(argv), "cylinder")) &&
 		!(ft_strequ(*(argv), "cone")) &&
-		!(ft_strequ(*(argv), "spheror")) &&
+//		!(ft_strequ(*(argv), "spheror")) &&
 		!(ft_strequ(*(argv), "tri") &&
 		open(*argv, O_RDONLY) == -1));
 }
@@ -37,13 +37,13 @@ int		init_objects(t_vector *ctr, char **argv, t_global *g)
 	while (*(argv + ++i))
 	{
 		if (ft_strequ(*(argv + i), "plane"))
-			init_plane(ctr, i + 1, g);
+			init_plane(i + 1, g);
 		else if (ft_strequ(*(argv + i), "sphere"))
-			init_sphere(ctr, i + 1, g);
+			init_sphere(i + 1, g);
 		else if (ft_strequ(*(argv + i), "cylinder"))
-			init_cylinder(ctr, i + 1, g);
+			init_cylinder(i + 1, g);
 		else if (ft_strequ(*(argv + i), "cone"))
-			init_cone(ctr, i + 1, g);
+			init_cone(i + 1, g);
 		if (obj_traver((argv + i), "or"))
 		{
 			g->obj[i + 1].base[1] = rotate(g->base[1], g->obj[i + 1].ang);
@@ -52,7 +52,7 @@ int		init_objects(t_vector *ctr, char **argv, t_global *g)
 
 		}
 		if (ft_strequ(*(argv + i), "tri"))
-			init_tri(ctr, i + 1, g);
+			init_tri(i + 1, g);
 		else
 			return (0);
 	}
@@ -92,17 +92,19 @@ int		arg_valid(char **argv)
 
 int		usage(void)
 {
-	ft_putstr("Usage: ./RTv1 obj1 [x,y,z] [angx,angy,angz] [color] [radius] [obj2]...\n");
+	ft_putstr("Usage: ./RTv1 obj1 [x,y,z] [angx,angy,angz] [r,g,b] [radius] [obj2]...\n");
 	ft_putstr("              sphere\n");
 	ft_putstr("              plane\n");
 	ft_putstr("              cone\n");
 	ft_putstr("              cylinder\n");
 	ft_putstr("              tri\n");
-	ft_putstr("              spheror\n");
+//	ft_putstr("              spheror\n");
+
+	ft_putstr("Example: ./rtv1 sphere 0,100,300 0,0,0 1,1,1 100 cylinder\n");
 	return (0);
 }
 
-int		check_arg(char **argv, int argc, t_global *g, t_vector *ctr)
+int		check_arg(char **argv, int argc, t_global *g)
 {
 	if (argc < 2)
 		return (usage());
@@ -112,9 +114,21 @@ int		check_arg(char **argv, int argc, t_global *g, t_vector *ctr)
 	{
 		if (!(g->argc = (arg_valid(argv))))
 			return (putstr("Arg invalid\n", 0));
-		g->obj = (t_object *)malloc(sizeof(t_object) * (argc + 1));
-		if (!fill_objects(ctr, argv, g))
+
+		g->obj = (t_object *)malloc(sizeof(t_object) * (g->argc + 1));
+//		maybe don't need obj[0]->ctr?
+		for (int i = 0; i < g->argc + 1; i++)
+		{
+			g->obj[i].ctr = (t_vector *)malloc(sizeof(t_vector));
+			printf("assign %p adress to %d object's center\n", g->obj[i].ctr, i);
+		}
+		if (!fill_objects(argv, g))
+		{
+			for (int i = 0; i < argc + 1; i++)
+				free(g->obj[i].ctr);
+			free(g->obj);
 			return (printf("Init error\n"));
+		}
 	}
 	printf("end checkng arg\n");
 	return (1);

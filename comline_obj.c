@@ -95,7 +95,7 @@ void		fill_obj(char **argv, int n, t_global *g)
 	}
 }
 
-int		fill_objects(t_vector *ctr, char **argv, t_global *g)
+int		fill_objects(char **argv, t_global *g)
 {
 	int iobjc[2];
 	t_vector	_010;
@@ -109,26 +109,26 @@ int		fill_objects(t_vector *ctr, char **argv, t_global *g)
 		if (obj_traver(argv + iobjc[0], "or") && (++iobjc[1]))
 		{
 			if (ft_strequ(*(argv + iobjc[0]), "plane"))
-				init_plane(ctr, iobjc[1], g);
+				init_plane(iobjc[1], g);
 			else if (ft_strequ(*(argv + iobjc[0]), "sphere"))
-				init_sphere(ctr, iobjc[1], g);
+				init_sphere(iobjc[1], g);
 			else if (ft_strequ(*(argv + iobjc[0]), "cylinder"))
-				init_cylinder(ctr, iobjc[1], g);
+				init_cylinder(iobjc[1], g);
 			else if (ft_strequ(*(argv + iobjc[0]), "cone"))
-				init_cone(ctr, iobjc[1], g);
+				init_cone(iobjc[1], g);
 			fill_obj(argv + iobjc[0] + 1, iobjc[1], g);
 
 //here we init objects that don't need argument modification from comline
 			printf("file %s\n", *(argv + iobjc[0]));
 	
 			if (ft_strequ(*(argv + iobjc[0]), "tri"))
-				init_tri(ctr, iobjc[1], g);
+				init_tri(iobjc[1], g);
 			else if ((g->obj[iobjc[1]].pts = create_points(*(argv + iobjc[0]), &g->obj[iobjc[1]].ptdim, g)))
 			{
 //				printf("line len in comline %d\n", (**(g->obj[iobjc[1]].pts)).len);
 
 				printf("initing complex\n");
-				init_complex(ctr, iobjc[1], g);
+				init_complex(iobjc[1], g);
 			}
 			g->obj[iobjc[1]].base[1] = rotate(g->obj[iobjc[1]].base[1]/*g->base[1]*/, g->obj[iobjc[1]].ang);
 			g->obj[iobjc[1]].base[0] = rotate(g->obj[iobjc[1]].base[0]/*g->base[0]*/, g->obj[iobjc[1]].ang);

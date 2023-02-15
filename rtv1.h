@@ -18,22 +18,42 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <time.h>
-/*
-#define WIDTH 800
-#define HEIGHT 400
-#define HEIGHT_2 200
-#define WIDTH_2 400
 
-*/
+
+
 #define WIDTH 400
 #define HEIGHT 200
 #define HEIGHT_2 100
 #define WIDTH_2 200
 
 
+/*
+#define WIDTH 720
+#define HEIGHT 450
+#define HEIGHT_2 225
+#define WIDTH_2 360
+*/
+
+//full screen
+
+/*
+#define WIDTH 1440
+#define HEIGHT 900
+#define HEIGHT_2 450
+#define WIDTH_2 720
+*/
+
+// for full screen doubly avareged image
+/*
+#define WIDTH 5760
+#define HEIGHT 3600
+#define HEIGHT_2 1800
+#define WIDTH_2 2880
+*/
+
 #define TASK 20
 #define STRIPS HEIGHT / TASK
-#define CORES 4
+#define CORES 3
 #define M_T 6.28318530718
 #define MAX_REC 4
 #define RECORD_VIDEO 0
@@ -143,28 +163,28 @@ t_vector			norm(t_vector a);
 int					color(int b, t_vector c);
 t_vector			scale(double a, t_vector b);
 void				ginit(t_global *g);
-void				init_plane(t_vector *ctr, int i, t_global *g);
-void				init_cylinder(t_vector *ctr, int i, t_global *g);
-void				init_sphere(t_vector *ctr, int i, t_global *g);
-void				init_spheror(t_vector *ctr, int i, t_global *g);
-void				init_cone(t_vector *ctr, int i, t_global *g);
-void				init_tri(t_vector *ctr, int i, t_global *g);
-void				init_complex(t_vector *ctr, int i, t_global *g);
+void				init_plane(int i, t_global *g);
+void				init_cylinder(int i, t_global *g);
+void				init_sphere(int i, t_global *g);
+void				init_spheror(int i, t_global *g);
+void				init_cone(int i, t_global *g);
+void				init_tri(int i, t_global *g);
+void				init_complex(int i, t_global *g);
 
 
-int					check_arg(char **argv, int argc, t_global *g, t_vector *ctr);
+int					check_arg(char **argv, int argc, t_global *g);
 int					usage(void);
 int					arg_valid(char **argv);
-int					fill_objects(t_vector *ctr, char **argv, t_global *g);
+int					fill_objects(char **argv, t_global *g);
 void				fill_obj(char **argv, int n, t_global *g);
 void				vectorify(void *obj_coord, char **argv);
 int					is_coords(char *argv);
 int					putstr(char *s, int ret);
 void				free_arr(char **arr);
-int					init_objects(t_vector *ctr, char **argv, t_global *g);
+//int					init_objects(t_vector *ctr, char **argv, t_global *g);
 int					obj_traver(char **argv, char *c);
 void				init_rays(t_vector ****ray);
-void				init_hits(t_objecthit ***hits);
+void				init_hits(t_objecthit ****hits);
 int					mouse_press(int button, int x, int y, void *param);
 int					key_press(int kk, void *param);
 void				copy_tcps(t_global *g);
@@ -344,7 +364,7 @@ typedef struct		s_global
 	t_object		*all_obj;
 	t_objecthit		***hits;
 	t_vector		***rays;
-	int				objn;
+	int				objn; // the object that the focus is on. 0 is screen, if there are n physical objects, then objn can be from 0 to n
 	int				argc;
 	pthread_t		tid[CORES];
 	int				core;
@@ -360,7 +380,7 @@ typedef struct		s_global
 //	t_vector			*savehitli;
 	t_vector			prev;
 	double				*cosa;
-	t_vector			*ctrli;
+//	t_vector			*ctrli;
 	int					*recursion;
 	t_global		*tcps[CORES];
 }				t_global;

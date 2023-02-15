@@ -252,6 +252,22 @@ int		start_threads(void *f, t_global *g)
 
 	t[0] = clock();
 	i = -1;
+
+
+	static int frame = 0;
+	frame++;
+// experiment start
+/*
+	i = i + 1;
+	recalc(g->tcps[i]);
+*/
+//experiment end
+// uncomment later
+
+	int last_recorded_frame = 0;
+
+	if (frame >last_recorded_frame - 1)
+	{
 	while (++i < CORES)
 		pthread_create(&g->tid[i], NULL, f, g->tcps[i]);
 	i = -1;
@@ -260,9 +276,14 @@ int		start_threads(void *f, t_global *g)
 		if (WIDTH > 751)
 			printf("joining cores\n");
 		pthread_join(g->tid[i], NULL);
+		printf("cores joined\n");
 	}
+
 	i = -1;
 	//	debug(g);
+
+
+/*
 	if (WIDTH > 2500)
 	{
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
@@ -270,13 +291,22 @@ int		start_threads(void *f, t_global *g)
 	}
 	if (WIDTH > 1000)
 		alias(g->data_ptr, g->data_ptr, WIDTH, HEIGHT, WIDTH, HEIGHT);
+*/
+
 //	printf("putting image to window\n");
 	mlx_put_image_to_window(g->mlx_ptr, g->win_ptr, g->img_ptr, 0, 0);
+//	system("screencapture -x -R 0,46,1440,900 ~/Desktop/$(date +%y%m%d%H%M%S).png");
+
+	char string[100];
 //	printf("success\n");
 	if (RECORD_VIDEO)
-		write(fd, g->data_ptr, sizeof(int) * WIDTH * HEIGHT);
+	{
+		sprintf(string, "screencapture -x -R 0,46,%d,%d ~/Desktop/$(date +%%y%%m%%d%%H%%M%%S_frame%d).png", WIDTH, HEIGHT, frame);
+		system(string);
+	}
+	}
 //	printf("clock\n");
 	t[1] = clock();
-//	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
+	printf("fps %f\n",1 / ((double)(t[1] - t[0]) / (double)CLOCKS_PER_SEC));
 	return (1);
 }

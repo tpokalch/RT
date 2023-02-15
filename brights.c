@@ -93,6 +93,7 @@ t_colbri		refl(t_vector refl, t_vector hit, t_object obj, t_global *g)
 		ret.bri = 0;
 		return (ret);
 	}
+//	printf("calling bright_%u\n", reflobj.obj.name);
 	ret = reflobj.obj.bright(hit, reflobj.hit, &reflobj.obj, g);
 	ret.col = scale(ret.bri / (double)255, ret.col);
 	return (ret);
@@ -119,8 +120,10 @@ void		do_re(t_vector reflrayv, t_vector hit,
 	if (g->recursion[obj.id] < MAX_REC)
 //	if (g->recursion->x > 0 || g->recursion->y > 0 || g->recursion->z > 0)
 	{
+//		printf("reflcolbre\n");
 		reflcolbri = refl(reflrayv, hit, obj, g);
 		*reocol = reflcolbri.col;
+//		printf("reocol\n");
 		*reocol = sum(scale(1 - obj.re, tileocolo),
 			scale(obj.re, reflcolbri.col));
 
@@ -550,17 +553,27 @@ t_colbri	bright_sphere(t_vector st, t_vector hit, t_object *obj, t_global *g)
 	t_vector	reflrayv;
 	t_vector	hitli[g->lights];
 
+//	printf("inside bright sphere\n");
 	g->recursion[obj->id]++;
 	init_hitli(hitli, hit, g);
-	obj->nr = obj->real_nr = scale(obj->rd_1, diff(hit, *obj->ctr));
+//	printf("onj nr assig\n");
+//	printf("id %d obj->ctr is %p\n", obj->id, obj->ctr);
+//	printf("ctr\n");
+//	printf("obj->ctr is %f, %f,%f\n", (obj->ctr)->x,  (obj->ctr)->y,  (obj->ctr)->z);
+
+	obj->nr = obj->real_nr = scale(obj->rd_1, diff(hit, *(obj->ctr)));
 
 //	normal must be inited before lighting calculation
 //	this changes obj->nr
 	if (obj->normal_map.data_ptr)
+	{
+		printf("doing normal map sphere\n");
 		do_normal_map_sphere(hit, obj, g);
-
-//	if (con(g))
-//		printf("cam: %f, %f, %f, li: %f, %f, %f angle: %f,%f,%f\n",g->cam_pos->x, g->cam_pos->y, g->cam_pos->z, g->li->x, g->li->y, g->li->z, g->angle->x, g->angle->y, g->angle->z);
+	}
+/*
+	if (con(g))
+		printf("cam: %f, %f, %f, li: %f, %f, %f angle: %f,%f,%f\n",g->cam_pos->x, g->cam_pos->y, g->cam_pos->z, g->li->x, g->li->y, g->li->z, g->angle->x, g->angle->y, g->angle->z);
+*/
 	if (obj->cam_pos)
 	{
 		obj->nr = scale(-1, obj->nr);
@@ -659,9 +672,12 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 	t_vector	reflrayv;
 	t_vector	hitli[g->lights];
 
+//	printf("inside bright plane\n");
 	g->recursion[obj->id]++;
+//	printf("init hitli\n");
 	init_hitli(hitli, hit, g);
 
+//	printf("hitli inited\n");
 	if (obj->normal_map.data_ptr)
 		do_normal_map_plane(&obj->nr, hit, obj, g);
 	else
@@ -672,6 +688,7 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 //		obj->base[1] = scale(-1, obj->base[1]);
 		obj->nr = scale(-1, obj->nr);
 	}
+//	printf("init bri\n");
 	init_bri(&ret.bri, hitli, obj->nr, g);
 	if (obj->spec || obj->re)
 		reflrayv = reflray(st, hit, obj->nr, g);
@@ -682,10 +699,12 @@ t_colbri		bright_plane(t_vector st, t_vector hit,
 		init_vector(&obj->color, 0,0.5, 0.5);
 //		init_vector(&obj->color, 1,1, 1);
 	ret.col = obj->color;
+//	printf("re\n");
 	if (obj->re)
 		do_re(reflrayv, hit, &ret.col, *obj, g);
 	if (obj->trans)
 		do_trans(st, hit, &ret, *obj, g);	
+//	printf("obstructed\n");
 	obstructed(&ret, hit, hitli, reflrayv, *obj, g);
 
 	g->recursion[obj->id] = 0;
@@ -705,7 +724,7 @@ t_colbri		bright_tri(t_vector st, t_vector hit, t_object *obj, t_global *g)
 
 
 	if (con(g))
-		printf("inside bright tri\n");
+//		printf("inside bright tri\n");
 	g->recursion[obj->id]++;	
 	init_hitli(hitli, hit, g);
 	if (dot(diff(hit, *g->cam_pos), obj->base[1]) > 0)
