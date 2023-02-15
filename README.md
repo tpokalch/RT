@@ -20,7 +20,7 @@ This is a somewhat complex raytracing implementation. It supports  reflection, t
 Click on video below:
 
 
-[![rtdemo](https://i.imgur.com/4axhpzH.jpg)](https://www.youtube.com/watch?v=Qp7saN0JnSI)
+[![rtdemo](https://imgur.com/a/6BO33QC)](https://youtu.be/WHm0eooveFc)
 
 
 # Installation
